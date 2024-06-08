@@ -22,4 +22,16 @@ public static class ExtensionsString
 
 		return capitalsCount > 0;
 	}
+
+	public static long ToLong(this string s)
+	{
+		long returnValue = 0;
+		for (int i = 0; i < s.Length; ++i)
+		{
+			int digit = int.Parse($"{s[s.Length - i - 1]}");
+			returnValue += (long)(digit * UnityEngine.Mathf.Pow(10, i));
+		}
+		UnityEngine.Debug.Log($"string VS long\n{s}\n{returnValue}");
+		return returnValue;
+	}
 }

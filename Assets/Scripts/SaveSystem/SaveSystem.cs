@@ -12,13 +12,15 @@ public static class SaveSystem
 	private static readonly string m_customMapsDirectory = $"{Application.persistentDataPath}/Maps/Custom";
 	private static readonly string m_importedMapsDirectory = $"{Application.persistentDataPath}/Maps/Imported";
 
-	private static readonly string m_mapExtension = "map";									// [TODO] Change this to "png"
+	private static readonly string m_mapExtension = "png";
 	private static readonly string m_mapMetaExtension = "mapmeta";
 	private static readonly string m_mapStatsExtension = "stat";
 
-	private static Texture2D TEST_texture;													// [Q] This works! Go with this over custom .map (text) file?
+	
 	private static string m_mapFullFilePath = string.Empty;
-	private static string m_mapFileContents = string.Empty;
+	
+	private static Texture2D m_customMapTexture;
+	private static MapmetaData<string, string> m_customMapmetaInfo;
 	#endregion
 
 
@@ -84,90 +86,33 @@ public static class SaveSystem
 	#region Custom Map Files
 	public static void CreateCustomMapFile(string mapFileName, int gridDimensions)
 	{
-		TEST_texture = new Texture2D(gridDimensions, gridDimensions);
-		m_mapFileContents = string.Empty;
+		m_customMapTexture = new Texture2D(gridDimensions, gridDimensions);
 		m_mapFullFilePath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
 		if (File.Exists(m_mapFullFilePath))
 		{
 			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
 			//File.SetAttributes(m_mapFullFilePath, FileAttributes.Normal);
 		}
-
-
-
-		// [TODO]	This method!
-		// [Q]		Can we save the sprite in Application.persistentDataPath? Rather than converting to a text file.
-
-		/*
-		int width = m_sprite.texture.width;
-		int height = m_sprite.texture.height;
-		string spriteString = string.Empty;
-
-		for (int x = 0; x < width; ++x)
-		{
-			for (int y = 0; y < height; ++y)
-			{
-				Color color = m_sprite.texture.GetPixel(x, y);
-				string colorString = color.ToString();
-				colorString = colorString.Replace("RGBA(", string.Empty);
-				colorString = colorString.Replace(")", string.Empty);
-				spriteString += colorString + ";";
-			}
-			spriteString = spriteString.Remove(spriteString.Length - 1);
-			spriteString += "\n";
-		}
-		spriteString = spriteString.Remove(spriteString.Length - 1);
-		spriteString = spriteString.Replace(" ", string.Empty);
-
-		Debug.Log($"{System.DateTime.Now.Ticks}");
-		Debug.Log($"{System.IO.Path.GetRandomFileName()}");
-
-		return;
-
-		//string mapPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.imageContentsHash}.map";
-		string mapPath = $"{Application.persistentDataPath}\\{m_sprite.texture.imageContentsHash}.map";
-		Debug.Log(mapPath);
-		if (System.IO.File.Exists(mapPath))
-			System.IO.File.SetAttributes(mapPath, System.IO.FileAttributes.Normal);
-		System.IO.StreamWriter mapWriter = System.IO.File.CreateText(mapPath);
-		mapWriter.Write(spriteString);
-		mapWriter.Close();
-		System.IO.File.SetAttributes(mapPath, System.IO.FileAttributes.ReadOnly);
-		//System.IO.File.SetAttributes(mapPath, System.IO.FileAttributes.Hidden);
-		//*/
 	}
 
 	public static void AddToCustomMapFile(Color color, bool endOfRow, int x, int y)
 	{
-		string colorString = color.ToString();
-		colorString = colorString.Replace("RGBA(", string.Empty);
-		colorString = colorString.Replace(")", string.Empty);
-		m_mapFileContents += colorString;
-		m_mapFileContents += (endOfRow) ? "\n" : ";";
-
-		TEST_texture.SetPixel(x, y, color);
+		m_customMapTexture.SetPixel(x, y, color);
 	}
 
 	public static void SaveCustomMapFile()
 	{
-		m_mapFileContents = m_mapFileContents.Replace(" ", "");								// [NOTE] Not really needed I guess? Saves minimal space
-		m_mapFileContents = m_mapFileContents.Substring(0, m_mapFileContents.Length - 1);	// Remove final \n character
 		if (File.Exists(m_mapFullFilePath))
 		{
 			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
 			File.SetAttributes(m_mapFullFilePath, FileAttributes.Normal);
 		}
-		StreamWriter writer = File.CreateText(m_mapFullFilePath);
-		writer.Write(m_mapFileContents);
-		writer.Dispose();
+		FileStream pngWriter = new FileStream($"{m_customMapsDirectory}/abcd1234.png", FileMode.Create, FileAccess.Write, FileShare.None);
+		m_customMapTexture.filterMode = FilterMode.Point;
+		pngWriter.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
+		pngWriter.Dispose();
 		File.SetAttributes(m_mapFullFilePath, FileAttributes.ReadOnly);
 		//File.SetAttributes(m_mapFullFilePath, FileAttributes.Hidden);
-
-		//FileStream pngWriter = File.Create($"{m_customMapsDirectory}/abcd1234.png");
-		FileStream pngWriter = new FileStream($"{m_customMapsDirectory}/abcd1234.png", FileMode.Create, FileAccess.Write, FileShare.None);
-		//while (pngWriter.)
-		pngWriter.Write(TEST_texture.EncodeToPNG(), 0, TEST_texture.EncodeToPNG().Length);
-		pngWriter.Dispose();
 	}
 	#endregion
 
@@ -179,12 +124,15 @@ public static class SaveSystem
 		//string fileName = Path.GetRandomFileName();										// [TODO] Commented out for testing! Use this!!!
 		string fileName = "abcd1234";
 		string fullPath = $"{m_customMapsDirectory}/{fileName}.{m_mapMetaExtension}";
+		m_customMapmetaInfo = new MapmetaData<string, string>();
 
 		MapmetaData<string, string> data = new MapmetaData<string, string>();
 		data.Add($"{EMapmetaInfo.CreationTime}", $"{DateTime.Now.Ticks}");
 		data.Add($"{EMapmetaInfo.UpdatedTime}", $"{DateTime.Now.Ticks}");
 		data.Add($"{EMapmetaInfo.MapName}", "Test_Map_01");
 		data.Add($"{EMapmetaInfo.AuthorName}", "Rocco");
+		data.Add($"{EMapmetaInfo.Description}", "This is a test map. I'm writing a description. How original.");
+		data.Add($"{EMapmetaInfo.GridDimension}", "9");
 
 		//for (int i = 0; i < Enum.GetValues(typeof(EMapmetaInfo)).Length; ++i)
 		//{
@@ -192,6 +140,15 @@ public static class SaveSystem
 		//}
 
 		string dataJson = JsonUtility.ToJson(data);
+
+		// [TODO] Delete this!
+		// Well, move it to the UPDATE section
+		if (File.Exists(fullPath))
+		{
+			// [TODO] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
+			File.SetAttributes(fullPath, FileAttributes.Normal);
+		}
+		// ^^^ ^^^ ^^^
 
 		StreamWriter metaWriter = File.CreateText(fullPath);
 		metaWriter.Write(dataJson);
@@ -201,7 +158,7 @@ public static class SaveSystem
 		return fileName;
 	}
 
-	public static void AddToCustomMapmetaFile()
+	public static void AddToCustomMapmetaFile(EMapmetaInfo infoType, string value)
 	{
 
 	}
@@ -265,10 +222,28 @@ public static class SaveSystem
 		return mapmetaFiles;
 	}
 
-	public static MapmetaData<string, string> GetMapmetaContents(string filepath)
+	public static MapmetaData<string, string> GetMapmetaContents(string fullFilepath)
 	{
-		string mapmetaFile = File.ReadAllText(filepath);
+		string mapmetaFile = File.ReadAllText(fullFilepath);
 		return JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
+	}
+
+	public static string GetMapmetaInfo(string fullFilepath, EMapmetaInfo infoType)
+	{
+		MapmetaData<string, string> mapmetaInfo = GetMapmetaContents(fullFilepath);
+		string infoString = mapmetaInfo[$"{infoType}"];
+		switch (infoType)
+		{
+			case EMapmetaInfo.CreationTime:
+			case EMapmetaInfo.UpdatedTime:
+				long ticks = long.Parse(infoString);
+				DateTime dateTime = new DateTime(ticks);
+				infoString = dateTime.ToShortDateString();
+				break;
+			default:
+				break;
+		}
+		return infoString;
 	}
 
 

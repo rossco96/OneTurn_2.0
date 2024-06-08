@@ -1,4 +1,5 @@
-//using TMPro;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,18 +8,23 @@ using UnityEngine.UI;
 
 public class LevelEditorMenuManager : MonoBehaviour
 {
-	[SerializeField] private CustomLevelData[] m_customLevels;								// [Q] Can delete this?
-	//[SerializeField] private CustomLevelsList m_customLevelsList;							// [TODO] Implement this!
-
 	[Space]
 	[SerializeField] private Button m_buttonLoadLevel;
-	[SerializeField] private TMPro.TMP_Dropdown m_loadLevelDropdown;
-	//[SerializeField] private Sprite m_loadLevelSprite;									// [DELETE] Can set the m_loadLevelDropdown sprite!
+	[SerializeField] private TMP_Dropdown m_loadLevelDropdown;
 
-	//private CustomLevelData m_currentLoadLevel;
+	[Space]
+	[SerializeField] private GameObject m_levelInfoPanel;
+	[SerializeField] private TMP_InputField m_inputAuthorName;
+	[SerializeField] private TMP_InputField m_inputMapName;
+	[SerializeField] private TMP_InputField m_inputDescription;
+	[SerializeField] private Image m_mapImage;
+	[SerializeField] private TextMeshProUGUI m_gridDimensionsText;
+	[SerializeField] private Button m_buttonUpdateInfo;
+
+	[Space]
+	[SerializeField] private Button m_buttonContinue;
 
 	private string[] m_existingMapmetaFilepaths;
-	private string[] m_orderedExistingMapmetas;
 	private int m_existingLevelsCount;
 
 	// [TODO] Implement!
@@ -27,8 +33,12 @@ public class LevelEditorMenuManager : MonoBehaviour
 	private bool m_levelInfoDirty = false;
 
 
+	// [TODO] Refactor OnEnable pls
 	private void OnEnable()
 	{
+		// [TODO][Q] Implement input character limits?
+		//m_inputAuthorName.characterLimit =
+
 		m_existingMapmetaFilepaths = SaveSystem.GetCustomMapmetaFilepaths();
 		m_existingLevelsCount = m_existingMapmetaFilepaths.Length;
 
@@ -43,7 +53,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 	// [TODO] Rename this! As it's basically just initialising the existing levels dropdown...
 	private void InitLoadLevelDropdown()
 	{
-		System.Collections.Generic.List<MapmetaData<string, string>> mapmetaDatas = new System.Collections.Generic.List<MapmetaData<string, string>>();
+		List<MapmetaData<string, string>> mapmetaDatas = new List<MapmetaData<string, string>>();
 		for (int i = 0; i < m_existingLevelsCount; ++i)
 		{
 			MapmetaData<string, string> mapmetaData = SaveSystem.GetMapmetaContents(m_existingMapmetaFilepaths[i]);
@@ -51,14 +61,15 @@ public class LevelEditorMenuManager : MonoBehaviour
 			// [TODO] Order the maps by the most recently created on top!
 		}
 
-		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
+		List<string> dropdownOptions = new List<string>();
 		for (int i = mapmetaDatas.Count - 1; i >= 0; --i)
 		{
 			int recentIndex = 0;
-			int recentTime = 0;
-			for (int j = mapmetaDatas.Count - 1; j >= 0; ++j)
+			long recentTime = 0;
+			for (int j = mapmetaDatas.Count - 1; j >= 0; --j)
 			{
-				int mapmetaCreationTime = int.Parse(mapmetaDatas[i]["CreationTime"]);							// [TODO][Q] Do we want creation time or most recently edited time?
+				// [TODO][Q] Do we want creation time or most recently edited time?
+				long mapmetaCreationTime = long.Parse(mapmetaDatas[i][$"{EMapmetaInfo.CreationTime}"]);
 				if (mapmetaCreationTime > recentTime)
 				{
 					recentTime = mapmetaCreationTime;
@@ -67,7 +78,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 			}
 			// [TODO][Q] Also add sprites?
 
-			dropdownOptions.Add(mapmetaDatas[recentIndex]["MapName"]);
+			dropdownOptions.Add(mapmetaDatas[recentIndex][$"{EMapmetaInfo.MapName}"]);
 			mapmetaDatas.RemoveAt(recentIndex);
 		}
 
@@ -86,19 +97,59 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 
 	#region UI Button Methods
-	public void ToggleLoadLevelSelectScreen()
+	public void SetContinueButtonCreate()
 	{
-
+		m_buttonContinue.gameObject.SetActive(true);										// [NOTE] Only needed for the first time..
+		m_buttonContinue.GetComponentInChildren<TextMeshProUGUI>().text = "Create";
+		m_buttonContinue.onClick.RemoveAllListeners();
+		m_buttonContinue.onClick.AddListener(CreateNewLevel);
 	}
 
-	public void ToggleLevelInfoScreen()
+	public void SetContinueButtonEdit()
 	{
-
+		m_buttonContinue.gameObject.SetActive(true);                                        // [NOTE] Only needed for the first time..
+		m_buttonContinue.GetComponentInChildren<TextMeshProUGUI>().text = "Edit";
+		m_buttonContinue.onClick.RemoveAllListeners();
+		m_buttonContinue.onClick.AddListener(EditExistingLevel);
 	}
 
-	public void CreateNewLevel()
-	{
 
+	public void LoadNewInfoPanel()
+	{
+		m_levelInfoPanel.SetActive(true);													// [NOTE] Only needed for the first time..
+
+		//m_inputAuthorName.ActivateInputField();
+		m_inputAuthorName.text = string.Empty;
+		m_inputMapName.text = string.Empty;
+		m_inputDescription.text = string.Empty;
+
+		m_mapImage.gameObject.SetActive(false);
+		m_gridDimensionsText.gameObject.SetActive(false);
+		m_buttonUpdateInfo.gameObject.SetActive(false);
+	}
+
+	public void LoadExistingInfoPanel()
+	{
+		m_levelInfoPanel.SetActive(true);                                                   // [NOTE] Only needed for the first time..
+
+		// [TODO][Q] Include this info as well?
+		//m_creationTime.text = 
+		//m_updatedTime.text = 
+
+		// [TODO][IMPORTANT] Replace 0 with the correct value!!!
+		m_inputAuthorName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.AuthorName);
+		m_inputMapName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.MapName);
+		m_inputDescription.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.Description);
+
+		//m_mapImage.sprite = ;
+		
+		string gridDimensions = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.GridDimension);
+		m_gridDimensionsText.text = $"Size: {gridDimensions}x{gridDimensions}";
+
+		m_mapImage.gameObject.SetActive(true);
+		m_gridDimensionsText.gameObject.SetActive(true);
+		m_buttonUpdateInfo.gameObject.SetActive(true);
+		m_buttonUpdateInfo.interactable = false;
 	}
 
 	public void UpdateLevelInfo()
@@ -106,69 +157,20 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 	}
 
-	public void LoadLevel()
+
+	public void CreateNewLevel()
+	{
+
+	}
+
+	public void EditExistingLevel()
 	{
 		SceneManager.LoadScene("LevelEditor");
 	}
 	#endregion
 
 
-
 	/*
-	public void UpdateThemeIndex(int indexDirection)
-	{
-		m_themeIndex += indexDirection;
-
-		m_currentTheme = m_themesList.ThemesData[m_themeIndex];
-		m_themeIconImage.sprite = m_currentTheme.LevelSelectIcon;
-		m_numberOfMaps = m_currentTheme.Maps.Length;
-		
-		m_mapIndex = 0;
-		// [TODO] Show "1", or whatever we're using to represent the first level
-		m_buttonMapUp.interactable = false;
-		if (m_buttonMapDown.interactable == false)
-			m_buttonMapDown.interactable = true;
-		// [TODO] For testing only! Will never need this, unless only one map in a given theme
-		if (m_mapIndex == m_numberOfMaps - 1)
-			m_buttonMapDown.interactable = false;
-
-		LevelSelectData.SetThemeData(m_currentTheme);
-		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-
-		// [TODO][IMPORTANT] 'else' commented out here (and in UpdateMapIndex below) since testing with such small numbers of indexes - there's some overlap!
-		if (m_themeIndex == 0)
-			m_buttonThemeUp.interactable = false;
-		/*else* / if (m_themeIndex == 1 && m_buttonThemeUp.interactable == false)
-			m_buttonThemeUp.interactable = true;
-		/*else* / if (m_themeIndex == m_numberOfThemes - 1)
-			m_buttonThemeDown.interactable = false;
-		/*else* / if (m_themeIndex == m_numberOfThemes - 2 && m_buttonThemeDown.interactable == false)
-			m_buttonThemeDown.interactable = true;
-	}
-
-	public void UpdateMapIndex(int indexDirection)
-	{
-		if (indexDirection != -1 && indexDirection != 1)
-		{
-			Debug.LogError("[SinglePlayerMenuManager::UpdateMapIndex] Invalid indexDirection. Must only be -1 or 1.");
-			return;
-		}
-		m_mapIndex += indexDirection;
-		// [TODO] Show "1", or whatever we're using to represent the first level
-		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
-
-		if (m_mapIndex == 0)
-			m_buttonMapUp.interactable = false;
-		/*else* / if (m_mapIndex == 1 && m_buttonMapUp.interactable == false)
-			m_buttonMapUp.interactable = true;
-		/*else* / if (m_mapIndex == m_numberOfMaps - 1)
-			m_buttonMapDown.interactable = false;
-		/*else* / if (m_mapIndex == m_numberOfMaps - 2 && m_buttonMapDown.interactable == false)
-			m_buttonMapDown.interactable = true;
-	}
-
-
-
 	public void UpdateMultiplayerToggle(Toggle isMultiplayerToggle)
 	{
 		// [TODO]
@@ -186,7 +188,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 		LevelSelectData.SetIsMultiplayer(isMultiplayerToggle.isOn);
 
 		m_gameModeDropdown.ClearOptions();
-		System.Collections.Generic.List<string> gameModes = new System.Collections.Generic.List<string>();
+		List<string> gameModes = new List<string>();
 		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
 		{
 			string gameMode = $"{(EGameMode)i}";
@@ -204,14 +206,14 @@ public class LevelEditorMenuManager : MonoBehaviour
 			m_gameModeDropdown.value = 1;
 	}
 
-	public void UpdateGameMode(TMPro.TMP_Dropdown dropdown)
+	public void UpdateGameMode(TMP_Dropdown dropdown)
 	{
 		EGameMode gameMode = (EGameMode)dropdown.value;
 		//Debug.Log($"[LevelSelectMenuManager::UpdateGameMode] If generated in the correct order, we should be selecting: '{gameMode}'");
 		LevelSelectData.SetGameMode(gameMode);
 	}
 
-	public void UpdateTurnDirection(TMPro.TMP_Dropdown dropdown)
+	public void UpdateTurnDirection(TMP_Dropdown dropdown)
 	{
 		ETurnDirection turnDirection = (ETurnDirection)dropdown.value;
 		//Debug.Log($"[LevelSelectMenuManager::UpdateTurnDirection] If generated in the correct order, we should be selecting: '{turnDirection}'");

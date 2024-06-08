@@ -54,6 +54,8 @@ public enum EMapmetaInfo
 {
 	CreationTime,
 	UpdatedTime,
+	AuthorName,
 	MapName,
-	AuthorName
+	Description,				// This is optional!
+	GridDimension
 }
