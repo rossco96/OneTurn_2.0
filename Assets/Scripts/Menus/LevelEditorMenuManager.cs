@@ -24,13 +24,12 @@ public class LevelEditorMenuManager : MonoBehaviour
 	[Space]
 	[SerializeField] private Button m_buttonContinue;
 
-	private string[] m_existingMapmetaFilepaths;
-	private int m_existingLevelsCount;
+	private string[] m_existingMapmetaFilepathsByCreationTime;
 
 	// [TODO] Implement!
 	// If editing an existing field (must check no fields empty)
 	// then if clicking NEW or switching in the dropdown - Autosave!
-	private bool m_levelInfoDirty = false;
+	//private bool m_levelInfoDirty = false;
 
 
 	// [TODO] Refactor OnEnable pls
@@ -39,27 +38,31 @@ public class LevelEditorMenuManager : MonoBehaviour
 		// [TODO][Q] Implement input character limits?
 		//m_inputAuthorName.characterLimit =
 
-		m_existingMapmetaFilepaths = SaveSystem.GetCustomMapmetaFilepaths();
-		m_existingLevelsCount = m_existingMapmetaFilepaths.Length;
-
-		bool levelsToLoad = m_existingLevelsCount > 0;
-		m_buttonLoadLevel.interactable = levelsToLoad;
-		// Don't do this here! Enable when clicking on LOAD button, disable if then click on NEW button
-		//m_loadLevelDropdown.gameObject.SetActive(levelsToLoad);
-		if (levelsToLoad)
-			InitLoadLevelDropdown();
+		InitExistingLevelsOptions();
 	}
 
 	// [TODO] Rename this! As it's basically just initialising the existing levels dropdown...
-	private void InitLoadLevelDropdown()
+	private void InitExistingLevelsOptions()
+	{
+		string[] existingMapmetaFilepaths = SaveSystem.GetCustomMapmetaFilepaths();
+		m_buttonLoadLevel.interactable = existingMapmetaFilepaths.Length > 0;
+
+		if (existingMapmetaFilepaths.Length == 0) return;
+
+		m_existingMapmetaFilepathsByCreationTime = new string[0];
+		InitLoadLevelDropdown(existingMapmetaFilepaths);
+	}
+
+	private void InitLoadLevelDropdown(string[] filepaths)
 	{
 		List<MapmetaData<string, string>> mapmetaDatas = new List<MapmetaData<string, string>>();
-		for (int i = 0; i < m_existingLevelsCount; ++i)
+		for (int i = 0; i < filepaths.Length; ++i)
 		{
-			MapmetaData<string, string> mapmetaData = SaveSystem.GetMapmetaContents(m_existingMapmetaFilepaths[i]);
+			MapmetaData<string, string> mapmetaData = SaveSystem.GetMapmetaContents(filepaths[i]);
 			mapmetaDatas.Add(mapmetaData);
-			// [TODO] Order the maps by the most recently created on top!
 		}
+		
+		// Order the maps by the most recently created on top:
 
 		List<string> dropdownOptions = new List<string>();
 		for (int i = mapmetaDatas.Count - 1; i >= 0; --i)
@@ -69,17 +72,18 @@ public class LevelEditorMenuManager : MonoBehaviour
 			for (int j = mapmetaDatas.Count - 1; j >= 0; --j)
 			{
 				// [TODO][Q] Do we want creation time or most recently edited time?
-				long mapmetaCreationTime = long.Parse(mapmetaDatas[i][$"{EMapmetaInfo.CreationTime}"]);
+				long mapmetaCreationTime = long.Parse(mapmetaDatas[j][$"{EMapmetaInfo.CreationTime}"]);
 				if (mapmetaCreationTime > recentTime)
 				{
 					recentTime = mapmetaCreationTime;
 					recentIndex = j;
 				}
 			}
-			// [TODO][Q] Also add sprites?
 
 			dropdownOptions.Add(mapmetaDatas[recentIndex][$"{EMapmetaInfo.MapName}"]);
 			mapmetaDatas.RemoveAt(recentIndex);
+			m_existingMapmetaFilepathsByCreationTime = m_existingMapmetaFilepathsByCreationTime.Add(filepaths[recentIndex]);
+			filepaths = filepaths.RemoveAt(recentIndex);
 		}
 
 		m_loadLevelDropdown.AddOptions(dropdownOptions);
@@ -99,7 +103,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 	#region UI Button Methods
 	public void SetContinueButtonCreate()
 	{
-		m_buttonContinue.gameObject.SetActive(true);										// [NOTE] Only needed for the first time..
+		m_buttonContinue.gameObject.SetActive(true);										// [NOTE] Only needed for the first time.. can also move to inspector
 		m_buttonContinue.GetComponentInChildren<TextMeshProUGUI>().text = "Create";
 		m_buttonContinue.onClick.RemoveAllListeners();
 		m_buttonContinue.onClick.AddListener(CreateNewLevel);
@@ -107,7 +111,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 	public void SetContinueButtonEdit()
 	{
-		m_buttonContinue.gameObject.SetActive(true);                                        // [NOTE] Only needed for the first time..
+		m_buttonContinue.gameObject.SetActive(true);                                        //
 		m_buttonContinue.GetComponentInChildren<TextMeshProUGUI>().text = "Edit";
 		m_buttonContinue.onClick.RemoveAllListeners();
 		m_buttonContinue.onClick.AddListener(EditExistingLevel);
@@ -116,9 +120,9 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 	public void LoadNewInfoPanel()
 	{
-		m_levelInfoPanel.SetActive(true);													// [NOTE] Only needed for the first time..
+		m_levelInfoPanel.SetActive(true);													//
 
-		//m_inputAuthorName.ActivateInputField();
+		//m_inputAuthorName.ActivateInputField();	// what this do?
 		m_inputAuthorName.text = string.Empty;
 		m_inputMapName.text = string.Empty;
 		m_inputDescription.text = string.Empty;
@@ -128,24 +132,28 @@ public class LevelEditorMenuManager : MonoBehaviour
 		m_buttonUpdateInfo.gameObject.SetActive(false);
 	}
 
-	public void LoadExistingInfoPanel()
+	public void LoadExistingInfoPanel(TMP_Dropdown dropdown)
 	{
-		m_levelInfoPanel.SetActive(true);                                                   // [NOTE] Only needed for the first time..
+		m_levelInfoPanel.SetActive(true);                                                   //
 
-		// [TODO][Q] Include this info as well?
+		// [TODO][Q] Include this info as well? If so then uneditable, of course
 		//m_creationTime.text = 
 		//m_updatedTime.text = 
 
-		// [TODO][IMPORTANT] Replace 0 with the correct value!!!
-		m_inputAuthorName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.AuthorName);
-		m_inputMapName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.MapName);
-		m_inputDescription.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.Description);
+		int index = dropdown.value;
 
-		//m_mapImage.sprite = ;
+		m_inputAuthorName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.AuthorName);
+		m_inputMapName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.MapName);
+		m_inputDescription.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.Description);
 		
-		string gridDimensions = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepaths[0], EMapmetaInfo.GridDimension);
-		m_gridDimensionsText.text = $"Size: {gridDimensions}x{gridDimensions}";
+		string gridDimension = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.GridDimension);
+		m_gridDimensionsText.text = $"Size: {gridDimension}x{gridDimension}";
 
+		Texture2D texture = SaveSystem.GetCustomMapTexture(m_existingMapmetaFilepathsByCreationTime[index]);
+		//m_mapImage.sprite = Sprite.Create(texture, new Rect(Vector2.zero, int.Parse(gridDimension) * Vector2.one), 0.5f * Vector2.one);	// Commented out for testing only!
+		m_mapImage.sprite = Sprite.Create(texture, new Rect(Vector2.zero, 9 * Vector2.one), 0.5f * Vector2.one);							// (delete this after testing
+
+		// [NOTE] Only needed if clicking the LOAD button. Not required for dropdown value changes (could put in separate method?)
 		m_mapImage.gameObject.SetActive(true);
 		m_gridDimensionsText.gameObject.SetActive(true);
 		m_buttonUpdateInfo.gameObject.SetActive(true);
@@ -160,82 +168,35 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 	public void CreateNewLevel()
 	{
+		// Create mapmeta file through SaveSystem
+		string fullFilepath = SaveSystem.CreateCustomMapmetaFile();
+		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.AuthorName, m_inputAuthorName.text);
+		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.MapName, m_inputMapName.text);
+		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.Description, m_inputDescription.text);
+		SaveSystem.SaveCustomMapmetaFile();
 
+		SaveSystem.CreateCustomMapFile(fullFilepath);
+		SaveSystem.SaveCustomMapFile();
+
+		// [TODO]
+		//SaveSystem.CreateCustomStatFile(randomFileName);
+
+		// Set LevelEditorData
+		LevelEditorData.LoadExistingLevel = false;
+		LevelEditorData.CustomMapFullFilepath = fullFilepath;
+
+		SceneManager.LoadScene("LevelEditor");
 	}
 
 	public void EditExistingLevel()
 	{
+		// Set LevelEditorData
+		LevelEditorData.LoadExistingLevel = true;
+		LevelEditorData.CustomMapFullFilepath = m_existingMapmetaFilepathsByCreationTime[m_loadLevelDropdown.value];    // [TODO] Cache currently selected filepath?
+		LevelEditorData.GridTexture = SaveSystem.GetCustomMapTexture(m_existingMapmetaFilepathsByCreationTime[m_loadLevelDropdown.value]);
+		LevelEditorData.GridDimension = int.Parse(SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[m_loadLevelDropdown.value], EMapmetaInfo.GridDimension));
+
 		SceneManager.LoadScene("LevelEditor");
 	}
 	#endregion
-
-
-	/*
-	public void UpdateMultiplayerToggle(Toggle isMultiplayerToggle)
-	{
-		// [TODO]
-		// Is there a better way of retaining the data???
-		// [NOTE]
-		// Currently doing like this since we're clearing the list each time, but because EXIT is in both modes,
-		// want to retain that data if switching between single player and multiplayer (and if ITEMS selected then no updating is required)
-
-		int gameModeValue = -1;
-		if (m_gameModeDropdown.value > 1)
-			m_gameModeDropdown.value = 0;
-		else if (m_gameModeDropdown.value == 1)
-			gameModeValue = 1;
-
-		LevelSelectData.SetIsMultiplayer(isMultiplayerToggle.isOn);
-
-		m_gameModeDropdown.ClearOptions();
-		List<string> gameModes = new List<string>();
-		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
-		{
-			string gameMode = $"{(EGameMode)i}";
-			if (gameMode.StartsWith("M_"))
-			{
-				if (isMultiplayerToggle.isOn == false)
-					continue;
-				else
-					gameMode = gameMode.Substring(2);
-			}
-			gameModes.Add(gameMode);
-		}
-		
-		if (gameModeValue == 1)
-			m_gameModeDropdown.value = 1;
-	}
-
-	public void UpdateGameMode(TMP_Dropdown dropdown)
-	{
-		EGameMode gameMode = (EGameMode)dropdown.value;
-		//Debug.Log($"[LevelSelectMenuManager::UpdateGameMode] If generated in the correct order, we should be selecting: '{gameMode}'");
-		LevelSelectData.SetGameMode(gameMode);
-	}
-
-	public void UpdateTurnDirection(TMP_Dropdown dropdown)
-	{
-		ETurnDirection turnDirection = (ETurnDirection)dropdown.value;
-		//Debug.Log($"[LevelSelectMenuManager::UpdateTurnDirection] If generated in the correct order, we should be selecting: '{turnDirection}'");
-		LevelSelectData.SetTurnDirection(turnDirection);
-	}
-
-
-
-	public void LoadLevel()
-	{
-		// [TODO]
-		//	o Get ThemeData and then the specific MapData from the index chosen
-		//	o Pass ThemeData and MapData to *STATIC* LevelGenerator
-		//	o Using GameplayManager, within the level itself, retrieve the data
-		//	o Generate the level
-
-		// [NOTE] No longer implementing as below!
-
-		//if (m_isMultiplayer)
-		//	SceneManager.LoadScene("LevelScene_Multiplayer");
-		//else
-			SceneManager.LoadScene("LevelScene");
-	}
-	//*/
 }

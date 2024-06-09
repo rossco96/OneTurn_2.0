@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 public class TEST_SaveDataCode : MonoBehaviour
@@ -201,3 +202,4 @@ public class TEST_SaveDataCode : MonoBehaviour
 		//SaveSystem.TESTGenerateMapFile("");
 	}
 }
+//*/

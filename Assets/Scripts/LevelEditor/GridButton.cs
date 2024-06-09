@@ -9,54 +9,52 @@ using UnityEditor;
 
 public class GridButton : Button
 {
-	// [TODO] Delete!
-	//private int m_xCoordinate;
-	//private int m_yCoordinate;
-	//public void SetGridCoordinate(int x, int y) { m_xCoordinate = x; m_yCoordinate = y; }
-
 	private UnityAction<GridButton> OnButtonSelected;
-	public void RegisterOnButtonSelected(UnityAction<GridButton> onButtonSelected) { OnButtonSelected += onButtonSelected; }
+	public void RegisterOnButtonSelected(UnityAction<GridButton> onButtonSelected)
+	{ 
+		OnButtonSelected += onButtonSelected; 
+	}
 	
 	private Color m_propertyColor = Color.white;
 	public Color PropertyColor => m_propertyColor;
-	public void SetPropertyColor(Color color) { m_propertyColor = color; }
+	public void SetPropertyColor(Color color)
+	{ 
+		m_propertyColor = color;
+		// [TODO] Implement setting the sprite associated with said colour
+		// DEBUG FOR NOW -- Just set the button colour
+		image.color = color;
+	}
+
+	private SelectionState m_previousState = SelectionState.Normal;
+	private bool m_buttonClicked = false;
 
 
 	#region [other override methods]
-	/*
-	public override void OnSelect(BaseEventData eventData)
+	protected override void DoStateTransition(SelectionState state, bool instant)
 	{
-		if (EventSystem.current.currentSelectedGameObject != null)
-		{
-			if (EventSystem.current.currentSelectedGameObject.TryGetComponent<GridButton>(out GridButton gb) == false)
-			{
-				return;
-			}
-			gb.DoStateTransition(SelectionState.Normal, true);
-			Debug.Log($"{EventSystem.current.currentSelectedGameObject}<statenormal>");
-		}
-		base.OnSelect(eventData);
-	}
+		// [NOTE] This feels very hacky, but absolutely (finally!) gives the desried workaround to navigate the grid
 
-	public override void OnPointerEnter(PointerEventData eventData)
-	{
-		//Debug.Log($"{eventData == null} / {eventData.selectedObject == null} / {EventSystem.current == null} / {EventSystem.current.currentSelectedGameObject == null}");
-		//Debug.Log($"[{EventSystem.current.currentSelectedGameObject?.name}]---[{eventData.selectedObject?.name}]");
-		//(eventData.selectedObject == null ? null : eventData.selectedObject.name)
-		
-		//EventSystem.current.SetSelectedGameObject(null);
-		if (EventSystem.current.currentSelectedGameObject != null)
+		if (m_buttonClicked)
 		{
-			if (EventSystem.current.currentSelectedGameObject.TryGetComponent<GridButton>(out GridButton gb) == false)
-			{
-				return;
-			}
-			gb.DoStateTransition(SelectionState.Normal, true);
-			Debug.Log($"{EventSystem.current.currentSelectedGameObject}<statenormal>");
+			m_buttonClicked = false;
+			DoStateTransition(SelectionState.Normal, true);
+			return;
 		}
-		base.OnPointerEnter(eventData);
+
+		if (state == SelectionState.Selected)
+		{
+			return;
+		}
+
+		if (state == SelectionState.Pressed && m_previousState == SelectionState.Pressed)
+		{
+			DoStateTransition(SelectionState.Normal, true);
+			return;
+		}
+
+		m_previousState = state;
+		base.DoStateTransition(state, instant);
 	}
-	//*/
 	#endregion
 
 
@@ -65,11 +63,9 @@ public class GridButton : Button
 		base.OnPointerExit(eventData);
 		if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
 		{
-			EventSystem.current.SetSelectedGameObject(gameObject);
+			m_buttonClicked = true;
 			OnButtonSelected.Invoke(this);
-			eventData.Reset();
 		}
-		DoStateTransition(SelectionState.Normal, true);
 	}
 }
 

@@ -62,22 +62,19 @@ public class LevelEditor : MonoBehaviour
 	#region Grid Buttons
 	private void InitGridButtons()
 	{
-		for (int i = 0; i < m_gridRows.Length; ++i)
+		for (int i = 0; i < LevelEditorData.GridDimension; ++i)
 		{
 			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
-			for (int j = 0; j < gridButtons.Length; ++j)
+			for (int j = 0; j < LevelEditorData.GridDimension; ++j)
 			{
 				GridButton gb = gridButtons[j];
-				//gb.SetGridCoordinate(j, i);										// Has to be j,i way around!
 				gb.RegisterOnButtonSelected(OnGridButtonClicked);
-				if (LevelEditorData.LoadExistingLevel)
-				{
-
-				}
-				else
-				{
-					gb.SetPropertyColor(m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare));
-				}
+				gb.SetPropertyColor
+				(
+					(LevelEditorData.LoadExistingLevel)
+						? LevelEditorData.GridTexture.GetPixel(j, LevelEditorData.GridDimension - i - 1)
+						: m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare)
+				);
 			}
 		}
 	}
@@ -131,11 +128,14 @@ public class LevelEditor : MonoBehaviour
 	
 	public void Save()
 	{
-		SaveSystem.CreateCustomMapFile(LevelEditorData.ExistingFileName, m_gridDimensions);	
+		Debug.LogWarning("[LevelEditor::Save] Method not yet implemented.");
+		//SaveSystem.CreateCustomMapFile(LevelEditorData.ExistingFileName, m_gridDimensions);			// OLD (delete)
+		//SaveSystem.UpdateCustomMapFile(LevelEditorData.ExistingFileName, m_gridDimensions);			// NEW (UpdateCustomMapFile needs creating)
 	}
 	#endregion
 
 
+	/*
 	public void TEST_GenerateCustomMapFile()
 	{
 		SaveSystem.CreateCustomMapFile("abcd1234", m_gridDimensions);
@@ -145,17 +145,14 @@ public class LevelEditor : MonoBehaviour
 			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
 			for (int j = 0; j < m_gridDimensions; ++j)
 			{
-				GridButton gb = gridButtons[j];
-				SaveSystem.AddToCustomMapFile
-				(
-					gb.PropertyColor,
-					j == m_gridDimensions - 1,
-					j,																		// NOTE THIS MAY END UP AN UPSIDE DOWN IMAGE
-					m_gridDimensions - i - 1												// ... if image creation works at all
-				);
+				// Can't select i as the y-component since Texture creation runs from bottom left
+				// and GridLayoutGroup runs from top right. Have to use "m_gridDimensions - i - 1"
+				// to reverse it
+				SaveSystem.AddToCustomMapFile(gridButtons[j].PropertyColor, j, (m_gridDimensions - i - 1));
 			}
 		}
 
 		SaveSystem.SaveCustomMapFile();
 	}
+	//*/
 }

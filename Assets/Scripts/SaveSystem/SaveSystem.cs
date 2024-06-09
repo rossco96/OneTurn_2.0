@@ -7,7 +7,7 @@ using UnityEngine;
 public static class SaveSystem
 {
 	#region Vars
-	private static readonly string m_initFullFilePath = $"{Application.persistentDataPath}/{Application.productName}.init";
+	private static readonly string m_initFullFilepath = $"{Application.persistentDataPath}/{Application.productName}.init";
 	private static readonly string m_gameMapsDirectory = $"{Application.persistentDataPath}/Maps/Game";
 	private static readonly string m_customMapsDirectory = $"{Application.persistentDataPath}/Maps/Custom";
 	private static readonly string m_importedMapsDirectory = $"{Application.persistentDataPath}/Maps/Imported";
@@ -17,7 +17,8 @@ public static class SaveSystem
 	private static readonly string m_mapStatsExtension = "stat";
 
 	
-	private static string m_mapFullFilePath = string.Empty;
+	private static string m_mapFullFilepath = string.Empty;
+	private static string m_mapmetaFullFilepath = string.Empty;
 	
 	private static Texture2D m_customMapTexture;
 	private static MapmetaData<string, string> m_customMapmetaInfo;
@@ -30,23 +31,23 @@ public static class SaveSystem
 		InitCustomImportDirectories();														// [TODO] delete delete delete delete delete delete delete
 		string currentVersion = Application.version;
 		
-		if (File.Exists(m_initFullFilePath))
+		if (File.Exists(m_initFullFilepath))
 		{
-			string text = File.ReadAllText(m_initFullFilePath);
+			string text = File.ReadAllText(m_initFullFilepath);
 			// If it's the same version, no new levels (etc.)
 			if (text == currentVersion)
 				return;
-			File.SetAttributes(m_initFullFilePath, FileAttributes.Normal);
+			File.SetAttributes(m_initFullFilepath, FileAttributes.Normal);
 		}
 		else
 		{
 			InitCustomImportDirectories();
 		}
 
-		StreamWriter writer = File.CreateText(m_initFullFilePath);
+		StreamWriter writer = File.CreateText(m_initFullFilepath);
 		writer.Write(currentVersion);
 		writer.Dispose();
-		File.SetAttributes(m_initFullFilePath, FileAttributes.ReadOnly);
+		File.SetAttributes(m_initFullFilepath, FileAttributes.ReadOnly);
 		//File.SetAttributes(statPath, FileAttributes.Hidden);
 
 		InitNewLevels();
@@ -76,7 +77,6 @@ public static class SaveSystem
 
 	private static void InitCustomImportDirectories()
 	{
-		Debug.Log($"????? [{m_customMapsDirectory}] [{m_importedMapsDirectory}]");
 		Directory.CreateDirectory(m_customMapsDirectory);
 		Directory.CreateDirectory(m_importedMapsDirectory);
 	}
@@ -84,34 +84,38 @@ public static class SaveSystem
 
 
 	#region Custom Map Files
-	public static void CreateCustomMapFile(string mapFileName, int gridDimensions)
+	public static void CreateCustomMapFile(string mapFileName/*, int gridDimension*/)
 	{
-		m_customMapTexture = new Texture2D(gridDimensions, gridDimensions);
-		m_mapFullFilePath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
-		if (File.Exists(m_mapFullFilePath))
+		// [NOTE] *Creating* a new map file is always 9x9
+		// Decide if we're using this method for *Updating* a map file as well...
+		// ... In which case, will want to pass gridDimensions!
+		//m_customMapTexture = new Texture2D(gridDimension, gridDimension);
+		m_customMapTexture = new Texture2D(9, 9);											// [TODO] Store as const k_initialGridDimension ?
+		m_mapFullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
+		if (File.Exists(m_mapFullFilepath))
 		{
 			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
 			//File.SetAttributes(m_mapFullFilePath, FileAttributes.Normal);
 		}
 	}
 
-	public static void AddToCustomMapFile(Color color, bool endOfRow, int x, int y)
+	public static void AddToCustomMapFile(Color color, int x, int y)
 	{
 		m_customMapTexture.SetPixel(x, y, color);
 	}
 
 	public static void SaveCustomMapFile()
 	{
-		if (File.Exists(m_mapFullFilePath))
+		if (File.Exists(m_mapFullFilepath))
 		{
 			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
-			File.SetAttributes(m_mapFullFilePath, FileAttributes.Normal);
+			File.SetAttributes(m_mapFullFilepath, FileAttributes.Normal);
 		}
-		FileStream pngWriter = new FileStream($"{m_customMapsDirectory}/abcd1234.png", FileMode.Create, FileAccess.Write, FileShare.None);
+		FileStream wrtier = new FileStream(m_mapFullFilepath, FileMode.Create, FileAccess.Write, FileShare.None);
 		m_customMapTexture.filterMode = FilterMode.Point;
-		pngWriter.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
-		pngWriter.Dispose();
-		File.SetAttributes(m_mapFullFilePath, FileAttributes.ReadOnly);
+		wrtier.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
+		wrtier.Dispose();
+		File.SetAttributes(m_mapFullFilepath, FileAttributes.ReadOnly);
 		//File.SetAttributes(m_mapFullFilePath, FileAttributes.Hidden);
 	}
 	#endregion
@@ -121,51 +125,39 @@ public static class SaveSystem
 	// [TODO][IMPORTANT] Implement this similar to Custom Map Files region above!
 	public static string CreateCustomMapmetaFile()
 	{
-		//string fileName = Path.GetRandomFileName();										// [TODO] Commented out for testing! Use this!!!
-		string fileName = "abcd1234";
-		string fullPath = $"{m_customMapsDirectory}/{fileName}.{m_mapMetaExtension}";
+		string randomFileName = Path.GetRandomFileName();
+		m_mapmetaFullFilepath = $"{m_customMapsDirectory}/{randomFileName}.{m_mapMetaExtension}";
+		
 		m_customMapmetaInfo = new MapmetaData<string, string>();
-
-		MapmetaData<string, string> data = new MapmetaData<string, string>();
-		data.Add($"{EMapmetaInfo.CreationTime}", $"{DateTime.Now.Ticks}");
-		data.Add($"{EMapmetaInfo.UpdatedTime}", $"{DateTime.Now.Ticks}");
-		data.Add($"{EMapmetaInfo.MapName}", "Test_Map_01");
-		data.Add($"{EMapmetaInfo.AuthorName}", "Rocco");
-		data.Add($"{EMapmetaInfo.Description}", "This is a test map. I'm writing a description. How original.");
-		data.Add($"{EMapmetaInfo.GridDimension}", "9");
-
-		//for (int i = 0; i < Enum.GetValues(typeof(EMapmetaInfo)).Length; ++i)
-		//{
-		//	data.Add($"{(EMapmetaInfo)i}", );
-		//}
-
-		string dataJson = JsonUtility.ToJson(data);
+		m_customMapmetaInfo.Add($"{EMapmetaInfo.CreationTime}", $"{DateTime.Now.Ticks}");
+		m_customMapmetaInfo.Add($"{EMapmetaInfo.UpdatedTime}", $"{DateTime.Now.Ticks}");
+		m_customMapmetaInfo.Add($"{EMapmetaInfo.GridDimension}", "9");					// All new levels initialised as a 9x9 grid
 
 		// [TODO] Delete this!
 		// Well, move it to the UPDATE section
-		if (File.Exists(fullPath))
+		if (File.Exists(m_mapmetaFullFilepath))
 		{
 			// [TODO] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
-			File.SetAttributes(fullPath, FileAttributes.Normal);
+			File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Normal);
 		}
 		// ^^^ ^^^ ^^^
 
-		StreamWriter metaWriter = File.CreateText(fullPath);
-		metaWriter.Write(dataJson);
-		metaWriter.Close();
-		File.SetAttributes(fullPath, FileAttributes.ReadOnly);
-
-		return fileName;
+		return m_mapmetaFullFilepath;
 	}
 
 	public static void AddToCustomMapmetaFile(EMapmetaInfo infoType, string value)
 	{
-
+		m_customMapmetaInfo.Add($"{infoType}", value);
 	}
 
 	public static void SaveCustomMapmetaFile()
 	{
-
+		string dataJson = JsonUtility.ToJson(m_customMapmetaInfo);
+		StreamWriter metaWriter = File.CreateText(m_mapmetaFullFilepath);
+		metaWriter.Write(dataJson);
+		metaWriter.Close();
+		File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -208,6 +200,31 @@ public static class SaveSystem
 
 
 	#region Get Data
+	public static Texture2D GetCustomMapTexture(string mapmetaFullFilepath)
+	{
+		int gridDimension = int.Parse(GetMapmetaInfo(mapmetaFullFilepath, EMapmetaInfo.GridDimension));
+		string mapFilepath = mapmetaFullFilepath.Replace($".{m_mapMetaExtension}", $".{m_mapExtension}");
+
+		Texture2D texture = new Texture2D(gridDimension, gridDimension);		
+		FileStream reader = new FileStream(mapFilepath, FileMode.Open, FileAccess.Read, FileShare.None);
+
+		byte[] bytes = new byte[reader.Length];
+		int bytesToRead = (int)reader.Length;
+		int bytesRead = 0;
+		while (bytesToRead > 0)
+		{
+			int n = reader.Read(bytes, bytesRead, bytesToRead);
+			if (n == 0) break;
+			bytesRead += n;
+			bytesToRead -= n;
+		}
+
+		reader.Dispose();
+		texture.LoadImage(bytes);
+		texture.filterMode = FilterMode.Point;
+		return texture;
+	}
+
 	// [TODO] GetStatData , GetMetaData
 	// [Q] Also need GetMapData? Or if implementing via saving the sprite itself, GetMap?
 	public static string[] GetCustomMapmetaFilepaths()
@@ -216,7 +233,7 @@ public static class SaveSystem
 		string[] mapmetaFiles = new string[0];
 		for (int i = 0; i < allFiles.Length; ++i)
 		{
-			if (allFiles[i].Contains(m_mapMetaExtension))
+			if (allFiles[i].Contains($".{m_mapMetaExtension}"))
 				mapmetaFiles = mapmetaFiles.Add(allFiles[i]);
 		}
 		return mapmetaFiles;
