@@ -230,7 +230,7 @@ public static class SaveSystem
 		for (int i = 0; i < fileNames.Length; ++i)
 		{
 			int orderIndex = creationTimesOrder[i];
-			orderedFileNames[orderIndex] = fileNames[i];
+			orderedFileNames[i] = fileNames[orderIndex];
 		}
 
 		return orderedFileNames;
