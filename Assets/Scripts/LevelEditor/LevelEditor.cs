@@ -6,16 +6,19 @@ using UnityEngine.UI;
 
 public class LevelEditor : MonoBehaviour
 {
+	private const int k_maxGridSize = 15;														// [Q] Do this here? Also include k_minGridSize = 9?
+
 	[SerializeField] private LevelGeneratorColorData m_colorData;
 
 	[Space]
 	[SerializeField] private TextMeshProUGUI m_sliderLabel;
+	[SerializeField] private Slider m_gridSlider;
 	[SerializeField] private GridLayoutGroup m_gridParent;
 	[SerializeField] private GameObject[] m_gridRows;
 
 	[Space]
 	[SerializeField] private TMP_Dropdown m_toolsDropdown;
-	//[SerializeField] private Image m_toolImage;
+	//[SerializeField] private Image m_toolImage;												// [DELETE] Just use dropdown, potensh include tool image in dropdown
 	//[SerializeField] private TextMeshProUGUI m_toolLabel;
 
 	private string m_levelFileName;                                                             // [TODO] Implement!
@@ -30,6 +33,7 @@ public class LevelEditor : MonoBehaviour
 		InitToolsDropdown();
 
 		//m_levelFileName = LevelSelectData.CustomData.											// [TODO] Implement!
+		// [TODO] Also display level name on the screen?
 	}
 
 
@@ -62,19 +66,31 @@ public class LevelEditor : MonoBehaviour
 	#region Grid Buttons
 	private void InitGridButtons()
 	{
-		for (int i = 0; i < LevelEditorData.GridDimension; ++i)
+		int gridDimension = LevelEditorData.GridDimension;
+		m_gridSlider.value = (gridDimension - 7) / 2;
+
+		for (int i = 0; i < k_maxGridSize; ++i)
 		{
 			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
-			for (int j = 0; j < LevelEditorData.GridDimension; ++j)
+			m_gridRows[i].SetActive(i < gridDimension);
+			for (int j = 0; j < k_maxGridSize; ++j)
 			{
 				GridButton gb = gridButtons[j];
+				gb.gameObject.SetActive(j < gridDimension);
 				gb.RegisterOnButtonSelected(OnGridButtonClicked);
-				gb.SetPropertyColor
-				(
-					(LevelEditorData.LoadExistingLevel)
-						? LevelEditorData.GridTexture.GetPixel(j, LevelEditorData.GridDimension - i - 1)
-						: m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare)
-				);
+				if (i < gridDimension && j < gridDimension)
+				{
+					gb.SetPropertyColor
+					(
+						(LevelEditorData.LoadExistingLevel)
+							? LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1)
+							: m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare)
+					);
+				}
+				else
+				{
+					gb.SetPropertyColor(m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare));
+				}
 			}
 		}
 	}

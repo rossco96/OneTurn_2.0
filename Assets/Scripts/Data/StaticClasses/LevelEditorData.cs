@@ -4,7 +4,7 @@ public static class LevelEditorData
 {
 	public static Texture2D GridTexture;
 
-	public static string CustomMapFullFilepath = string.Empty;
+	public static string CustomMapFileName = string.Empty;
 	public static bool LoadExistingLevel = false;
 	public static int GridDimension = 9;
 

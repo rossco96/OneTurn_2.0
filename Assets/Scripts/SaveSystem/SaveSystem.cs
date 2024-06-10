@@ -16,6 +16,8 @@ public static class SaveSystem
 	private static readonly string m_mapMetaExtension = "mapmeta";
 	private static readonly string m_mapStatsExtension = "stat";
 
+	private static readonly string m_multiplayerGameModePrefix = "M_";
+
 	
 	private static string m_mapFullFilepath = string.Empty;
 	private static string m_mapmetaFullFilepath = string.Empty;
@@ -84,13 +86,9 @@ public static class SaveSystem
 
 
 	#region Custom Map Files
-	public static void CreateCustomMapFile(string mapFileName/*, int gridDimension*/)
+	public static void CreateCustomMapFile(string mapFileName, int gridDimension = 9)
 	{
-		// [NOTE] *Creating* a new map file is always 9x9
-		// Decide if we're using this method for *Updating* a map file as well...
-		// ... In which case, will want to pass gridDimensions!
-		//m_customMapTexture = new Texture2D(gridDimension, gridDimension);
-		m_customMapTexture = new Texture2D(9, 9);											// [TODO] Store as const k_initialGridDimension ?
+		m_customMapTexture = new Texture2D(gridDimension, gridDimension);
 		m_mapFullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
 		if (File.Exists(m_mapFullFilepath))
 		{
@@ -142,7 +140,7 @@ public static class SaveSystem
 		}
 		// ^^^ ^^^ ^^^
 
-		return m_mapmetaFullFilepath;
+		return randomFileName;
 	}
 
 	public static void AddToCustomMapmetaFile(EMapmetaInfo infoType, string value)
@@ -163,6 +161,12 @@ public static class SaveSystem
 
 
 	#region Stat Files
+	public static void CreateCustomStatFile(string mapFileName)
+	{
+		string mapFilePath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
+		GenerateStatFile(mapFilePath);
+	}
+
 	private static void GenerateStatFile(string filePath)
 	{
 		StatsData<StatKey<string, string, string>, float> statsData = new StatsData<StatKey<string, string, string>, float>();
@@ -170,17 +174,17 @@ public static class SaveSystem
 		string[] turnDirection = Enum.GetNames(typeof(ETurnDirection));
 		string[] statsSection = Enum.GetNames(typeof(EStatsSection));
 
-		for (int a = 0; a < gameModes.Length; ++a)
+		for (int gameModeIndex = 0; gameModeIndex < gameModes.Length; ++gameModeIndex)
 		{
-			if ((EGameMode)a == EGameMode.M_Bomb || (EGameMode)a == EGameMode.M_Chase) continue;
-			string mode = gameModes[a];
-			for (int b = 0; b < turnDirection.Length; ++b)
+			if ($"{(EGameMode)gameModeIndex}".StartsWith(m_multiplayerGameModePrefix)) continue;
+			string mode = gameModes[gameModeIndex];
+			for (int turnDirectionIndex = 0; turnDirectionIndex < turnDirection.Length; ++turnDirectionIndex)
 			{
-				string direction = turnDirection[b];
-				for (int c = 0; c < statsSection.Length; ++c)
+				string direction = turnDirection[turnDirectionIndex];
+				for (int statsSectionIndex = 0; statsSectionIndex < statsSection.Length; ++statsSectionIndex)
 				{
-					if ((EGameMode)a == EGameMode.Exit && (EStatsSection)c == EStatsSection.Items) continue;
-					string stat = statsSection[c];
+					if ((EGameMode)gameModeIndex == EGameMode.Exit && (EStatsSection)statsSectionIndex == EStatsSection.Items) continue;
+					string stat = statsSection[statsSectionIndex];
 					StatKey<string, string, string> statKey = new StatKey<string, string, string>(mode, direction, stat);
 					statsData.Add(statKey, 0);
 				}
@@ -200,11 +204,44 @@ public static class SaveSystem
 
 
 	#region Get Data
-	public static Texture2D GetCustomMapTexture(string mapmetaFullFilepath)
+	public static string[] GetCustomMapFileNamesByCreationTime()
 	{
-		int gridDimension = int.Parse(GetMapmetaInfo(mapmetaFullFilepath, EMapmetaInfo.GridDimension));
-		string mapFilepath = mapmetaFullFilepath.Replace($".{m_mapMetaExtension}", $".{m_mapExtension}");
+		string[] allFiles = Directory.GetFiles(m_customMapsDirectory);
+		string[] fileNames = new string[0];
+		long[] fileCreationTimes = new long[0];
+		
+		for (int i = 0; i < allFiles.Length; ++i)
+		{
+			if (allFiles[i].Contains($".{m_mapMetaExtension}"))
+			{
+				string fileName = FullPathToCustomFileName(allFiles[i]);
+				fileNames = fileNames.Add(fileName);
 
+				string mapmetaFile = File.ReadAllText(allFiles[i]);
+				MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
+				long creationTime = long.Parse(mapmetaInfo[$"{EMapmetaInfo.CreationTime}"]);
+				fileCreationTimes = fileCreationTimes.Add(creationTime);
+			}
+		}
+
+		int[] creationTimesOrder = fileCreationTimes.RetrieveListOrder();
+		string[] orderedFileNames = new string[fileNames.Length];
+
+		for (int i = 0; i < fileNames.Length; ++i)
+		{
+			int orderIndex = creationTimesOrder[i];
+			orderedFileNames[orderIndex] = fileNames[i];
+		}
+
+		return orderedFileNames;
+	}
+
+
+	public static Texture2D GetCustomMapTexture(string mapFileName)
+	{
+		string mapFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
+
+		int gridDimension = int.Parse(GetMapmetaInfo(mapFileName, EMapmetaInfo.GridDimension));
 		Texture2D texture = new Texture2D(gridDimension, gridDimension);		
 		FileStream reader = new FileStream(mapFilepath, FileMode.Open, FileAccess.Read, FileShare.None);
 
@@ -225,29 +262,13 @@ public static class SaveSystem
 		return texture;
 	}
 
-	// [TODO] GetStatData , GetMetaData
-	// [Q] Also need GetMapData? Or if implementing via saving the sprite itself, GetMap?
-	public static string[] GetCustomMapmetaFilepaths()
-	{
-		string[] allFiles = Directory.GetFiles(m_customMapsDirectory);
-		string[] mapmetaFiles = new string[0];
-		for (int i = 0; i < allFiles.Length; ++i)
-		{
-			if (allFiles[i].Contains($".{m_mapMetaExtension}"))
-				mapmetaFiles = mapmetaFiles.Add(allFiles[i]);
-		}
-		return mapmetaFiles;
-	}
 
-	public static MapmetaData<string, string> GetMapmetaContents(string fullFilepath)
+	public static string GetMapmetaInfo(string mapFileName, EMapmetaInfo infoType)
 	{
+		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
 		string mapmetaFile = File.ReadAllText(fullFilepath);
-		return JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
-	}
+		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
 
-	public static string GetMapmetaInfo(string fullFilepath, EMapmetaInfo infoType)
-	{
-		MapmetaData<string, string> mapmetaInfo = GetMapmetaContents(fullFilepath);
 		string infoString = mapmetaInfo[$"{infoType}"];
 		switch (infoType)
 		{
@@ -260,13 +281,31 @@ public static class SaveSystem
 			default:
 				break;
 		}
+
 		return infoString;
 	}
 
 
+	// [TODO] Implement!
 	public static string[] GetImportedMapmetaFilepaths()
 	{
 		return new string[0];
+	}
+
+
+	// [TODO] GetStatData , GetMetaData
+	// [Q] Also need GetMapData? Or if implementing via saving the sprite itself, GetMap?
+	#endregion
+
+
+	#region Tools
+	private static string FullPathToCustomFileName(string fullFilepath)
+	{
+		string fileName = fullFilepath.Replace($"{m_customMapsDirectory}", "");
+		fileName = fileName.Replace("/", "");
+		fileName = fileName.Replace("\\", "");
+		int extensionIndex = fileName.LastIndexOf(".");
+		return fileName.Substring(0, extensionIndex);
 	}
 	#endregion
 }

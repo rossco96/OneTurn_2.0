@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,7 +23,8 @@ public class LevelEditorMenuManager : MonoBehaviour
 	[Space]
 	[SerializeField] private Button m_buttonContinue;
 
-	private string[] m_existingMapmetaFilepathsByCreationTime;
+	private string[] m_existingMapFileNamesByCreationTime;
+	private string m_selectedMapFileName;
 
 	// [TODO] Implement!
 	// If editing an existing field (must check no fields empty)
@@ -32,7 +32,6 @@ public class LevelEditorMenuManager : MonoBehaviour
 	//private bool m_levelInfoDirty = false;
 
 
-	// [TODO] Refactor OnEnable pls
 	private void OnEnable()
 	{
 		// [TODO][Q] Implement input character limits?
@@ -41,20 +40,19 @@ public class LevelEditorMenuManager : MonoBehaviour
 		InitExistingLevelsOptions();
 	}
 
-	// [TODO] Rename this! As it's basically just initialising the existing levels dropdown...
+
 	private void InitExistingLevelsOptions()
 	{
-		string[] existingMapmetaFilepaths = SaveSystem.GetCustomMapmetaFilepaths();
-		m_buttonLoadLevel.interactable = existingMapmetaFilepaths.Length > 0;
-
-		if (existingMapmetaFilepaths.Length == 0) return;
-
-		m_existingMapmetaFilepathsByCreationTime = new string[0];
-		InitLoadLevelDropdown(existingMapmetaFilepaths);
+		m_existingMapFileNamesByCreationTime = SaveSystem.GetCustomMapFileNamesByCreationTime();
+		m_buttonLoadLevel.interactable = m_existingMapFileNamesByCreationTime.Length > 0;
+		if (m_existingMapFileNamesByCreationTime.Length == 0)
+			return;
+		InitLoadLevelDropdown();
 	}
 
-	private void InitLoadLevelDropdown(string[] filepaths)
+	private void InitLoadLevelDropdown()
 	{
+		/*
 		List<MapmetaData<string, string>> mapmetaDatas = new List<MapmetaData<string, string>>();
 		for (int i = 0; i < filepaths.Length; ++i)
 		{
@@ -82,22 +80,21 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 			dropdownOptions.Add(mapmetaDatas[recentIndex][$"{EMapmetaInfo.MapName}"]);
 			mapmetaDatas.RemoveAt(recentIndex);
-			m_existingMapmetaFilepathsByCreationTime = m_existingMapmetaFilepathsByCreationTime.Add(filepaths[recentIndex]);
+			m_existingMapFileNamesByCreationTime = m_existingMapFileNamesByCreationTime.Add(filepaths[recentIndex]);
 			filepaths = filepaths.RemoveAt(recentIndex);
+		}
+		//*/
+
+		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < m_existingMapFileNamesByCreationTime.Length; ++i)
+		{
+			string mapName = SaveSystem.GetMapmetaInfo(m_existingMapFileNamesByCreationTime[i], EMapmetaInfo.MapName);
+			dropdownOptions.Add(mapName);
 		}
 
 		m_loadLevelDropdown.AddOptions(dropdownOptions);
 		m_loadLevelDropdown.value = 0;
 	}
-
-
-	// DELETE!!!
-	[ContextMenu("TEST_CreateMapmetaFile")]
-	public void TEST_CreateMapmetaFile()
-	{
-		SaveSystem.CreateCustomMapmetaFile();
-	}
-	// DELETE!!!
 
 
 	#region UI Button Methods
@@ -141,17 +138,17 @@ public class LevelEditorMenuManager : MonoBehaviour
 		//m_updatedTime.text = 
 
 		int index = dropdown.value;
+		m_selectedMapFileName = m_existingMapFileNamesByCreationTime[index];
 
-		m_inputAuthorName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.AuthorName);
-		m_inputMapName.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.MapName);
-		m_inputDescription.text = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.Description);
+		m_inputAuthorName.text = SaveSystem.GetMapmetaInfo(m_selectedMapFileName, EMapmetaInfo.AuthorName);
+		m_inputMapName.text = SaveSystem.GetMapmetaInfo(m_selectedMapFileName, EMapmetaInfo.MapName);
+		m_inputDescription.text = SaveSystem.GetMapmetaInfo(m_selectedMapFileName, EMapmetaInfo.Description);
 		
-		string gridDimension = SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[index], EMapmetaInfo.GridDimension);
+		string gridDimension = SaveSystem.GetMapmetaInfo(m_selectedMapFileName, EMapmetaInfo.GridDimension);
 		m_gridDimensionsText.text = $"Size: {gridDimension}x{gridDimension}";
 
-		Texture2D texture = SaveSystem.GetCustomMapTexture(m_existingMapmetaFilepathsByCreationTime[index]);
-		//m_mapImage.sprite = Sprite.Create(texture, new Rect(Vector2.zero, int.Parse(gridDimension) * Vector2.one), 0.5f * Vector2.one);	// Commented out for testing only!
-		m_mapImage.sprite = Sprite.Create(texture, new Rect(Vector2.zero, 9 * Vector2.one), 0.5f * Vector2.one);							// (delete this after testing
+		Texture2D texture = SaveSystem.GetCustomMapTexture(m_selectedMapFileName);
+		m_mapImage.sprite = Sprite.Create(texture, new Rect(Vector2.zero, int.Parse(gridDimension) * Vector2.one), 0.5f * Vector2.one);
 
 		// [NOTE] Only needed if clicking the LOAD button. Not required for dropdown value changes (could put in separate method?)
 		m_mapImage.gameObject.SetActive(true);
@@ -169,22 +166,24 @@ public class LevelEditorMenuManager : MonoBehaviour
 	public void CreateNewLevel()
 	{
 		// Create mapmeta file through SaveSystem
-		string fullFilepath = SaveSystem.CreateCustomMapmetaFile();
+		string randomFileName = SaveSystem.CreateCustomMapmetaFile();
 		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.AuthorName, m_inputAuthorName.text);
 		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.MapName, m_inputMapName.text);
 		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.Description, m_inputDescription.text);
 		SaveSystem.SaveCustomMapmetaFile();
 
-		SaveSystem.CreateCustomMapFile(fullFilepath);
+		// Create blank map file
+		SaveSystem.CreateCustomMapFile(randomFileName);
 		SaveSystem.SaveCustomMapFile();
 
-		// [TODO]
-		//SaveSystem.CreateCustomStatFile(randomFileName);
+		// Create stat file
+		SaveSystem.CreateCustomStatFile(randomFileName);
 
 		// Set LevelEditorData
 		LevelEditorData.LoadExistingLevel = false;
-		LevelEditorData.CustomMapFullFilepath = fullFilepath;
+		LevelEditorData.CustomMapFileName = randomFileName;
 
+		// LoadScene!
 		SceneManager.LoadScene("LevelEditor");
 	}
 
@@ -192,10 +191,11 @@ public class LevelEditorMenuManager : MonoBehaviour
 	{
 		// Set LevelEditorData
 		LevelEditorData.LoadExistingLevel = true;
-		LevelEditorData.CustomMapFullFilepath = m_existingMapmetaFilepathsByCreationTime[m_loadLevelDropdown.value];    // [TODO] Cache currently selected filepath?
-		LevelEditorData.GridTexture = SaveSystem.GetCustomMapTexture(m_existingMapmetaFilepathsByCreationTime[m_loadLevelDropdown.value]);
-		LevelEditorData.GridDimension = int.Parse(SaveSystem.GetMapmetaInfo(m_existingMapmetaFilepathsByCreationTime[m_loadLevelDropdown.value], EMapmetaInfo.GridDimension));
+		LevelEditorData.CustomMapFileName = m_selectedMapFileName;
+		LevelEditorData.GridTexture = SaveSystem.GetCustomMapTexture(m_selectedMapFileName);
+		LevelEditorData.GridDimension = int.Parse(SaveSystem.GetMapmetaInfo(m_selectedMapFileName, EMapmetaInfo.GridDimension));
 
+		// LoadScene!
 		SceneManager.LoadScene("LevelEditor");
 	}
 	#endregion
