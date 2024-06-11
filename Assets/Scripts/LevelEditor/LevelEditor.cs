@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // [TODO] Refactor this into separate classes -- Grid, Tool, Tutorial, Metadata, Other Menu Buttons
@@ -21,9 +22,32 @@ public class LevelEditor : MonoBehaviour
 	//[SerializeField] private Image m_toolImage;												// [DELETE] Just use dropdown, potensh include tool image in dropdown
 	//[SerializeField] private TextMeshProUGUI m_toolLabel;
 
-	private string m_levelFileName;                                                             // [TODO] Implement!
+	[Space]
+	[SerializeField] private GameObject m_tutorialPopup;
+	[SerializeField] private GameObject m_mainMenuPopup;
+	[SerializeField] private GameObject m_testOptionsPopup;
 
-	private int m_gridDimensions = 9;
+	[Space]
+	[SerializeField] private TextMeshProUGUI m_toolItemsRemaining;
+	// Note the two TextMeshProUGUI below could be GameObjects, but want consistency when setting active
+	[SerializeField] private TextMeshProUGUI m_extraInfoRotationRight_Label;
+	[SerializeField] private TextMeshProUGUI m_extraInfoRotationLeft_Label;
+	[SerializeField] private TMP_Dropdown m_extraInfoRotationRight_Dropdown;
+	[SerializeField] private TMP_Dropdown m_extraInfoRotationLeft_Dropdown;
+
+	// [TODO] Move the below to their own TestModePopup script???
+	[Space]
+	[SerializeField] private TMP_Dropdown m_gameModeDropdown;
+	[SerializeField] private TMP_Dropdown m_turnDirectionDropdown;
+	[SerializeField] private Toggle m_startAtSecondSpawnToggle;
+	[SerializeField] private Toggle m_moveThroughWallsToggle;
+
+
+	private bool m_levelDataDirty = false;
+
+	//private string m_levelFileName;                                                           // [TODO] Implement! ... Or just use LevelEditorData.CustomMapFileName ?
+
+	private int m_gridDimension = 9;
 	private ELevelGeneratorColorName m_currentTool = ELevelGeneratorColorName.BlankSquare;
 
 
@@ -32,8 +56,46 @@ public class LevelEditor : MonoBehaviour
 		InitGridButtons();
 		InitToolsDropdown();
 
-		//m_levelFileName = LevelSelectData.CustomData.											// [TODO] Implement!
+		InitExtraInfoDropdowns();
+		InitTestDropdowns();
+
+		//m_levelFileName = LevelSelectData.CustomData.											// [TODO] Implement? Or just use LevelEditorData.CustomMapFileName?
 		// [TODO] Also display level name on the screen?
+	}
+
+
+	private void InitExtraInfoDropdowns()
+	{
+		System.Collections.Generic.List<string> rotations = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < System.Enum.GetValues(typeof(EFacingDirection)).Length; ++i)
+		{
+			rotations.Add($"{(EFacingDirection)i}");
+		}
+		m_extraInfoRotationRight_Dropdown.AddOptions(rotations);
+		m_extraInfoRotationRight_Dropdown.value = 0;
+		m_extraInfoRotationLeft_Dropdown.AddOptions(rotations);
+		m_extraInfoRotationLeft_Dropdown.value = 0;
+	}
+
+	private void InitTestDropdowns()
+	{
+		System.Collections.Generic.List<string> gameModes = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
+		{
+			string gameMode = $"{(EGameMode)i}";
+			if (gameMode.StartsWith("M_")) continue;
+			gameModes.Add(gameMode);
+		}
+		m_gameModeDropdown.AddOptions(gameModes);
+		m_gameModeDropdown.value = 0;
+
+		System.Collections.Generic.List<string> turnDirections = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < System.Enum.GetValues(typeof(ETurnDirection)).Length; ++i)
+		{
+			turnDirections.Add($"{(ETurnDirection)i}");
+		}
+		m_turnDirectionDropdown.AddOptions(turnDirections);
+		m_turnDirectionDropdown.value = 0;
 	}
 
 
@@ -97,33 +159,35 @@ public class LevelEditor : MonoBehaviour
 
 	public void OnGridButtonClicked(GridButton gb)
 	{
+		m_levelDataDirty = true;
 		gb.SetPropertyColor(m_colorData.GetColorByName(m_currentTool));
 	}
 
 	public void UpdateGridLayout(Slider slider)
 	{
-		m_gridDimensions = ((int)slider.value * 2) + 7;
+		m_gridDimension = ((int)slider.value * 2) + 7;
 		SetNewGridSize();
-		m_sliderLabel.text = $"Size: {m_gridDimensions}x{m_gridDimensions}";
+		m_sliderLabel.text = $"Size: {m_gridDimension}x{m_gridDimension}";
 	}
 
 	private void SetNewGridSize()
 	{
-		// [TODO] There is still some space to play around with on the edges. Unsure why!
-		int buttonSize = Screen.width / m_gridDimensions;
-		m_gridParent.cellSize = 2 * new Vector2(buttonSize * m_gridDimensions, buttonSize);
-		for (int i = 0; i < m_gridRows.Length; ++i)
+		// Take 40 away, since we want some buffer from the edges of the screen
+		int buttonSize = (Screen.width - 40) / m_gridDimension;
+		// [Q][IMPORTANT] Why do we multipluy cellSize by 3 and not by 2? I mean, why do we even need to multiply it by two??
+		m_gridParent.cellSize = 3 * new Vector2(buttonSize * m_gridDimension, buttonSize);
+		for (int i = 0; i < k_maxGridSize; ++i)
 		{
 			GameObject row = m_gridRows[i];
-			row.SetActive(i < m_gridDimensions);
-			if (i < m_gridDimensions)
+			row.SetActive(i < m_gridDimension);
+			if (i < m_gridDimension)
 			{
 				GridLayoutGroup layoutGroup = row.GetComponent<GridLayoutGroup>();
-				layoutGroup.cellSize = 2 * new Vector2(buttonSize, buttonSize);
+				layoutGroup.cellSize = 3 * new Vector2(buttonSize, buttonSize);
 				GridButton[] gridButtons = row.GetComponentsInChildren<GridButton>(true);
-				for (int j = 0; j < gridButtons.Length; ++j)
+				for (int j = 0; j < k_maxGridSize; ++j)
 				{
-					gridButtons[j].gameObject.SetActive(j < m_gridDimensions);
+					gridButtons[j].gameObject.SetActive(j < m_gridDimension);
 				}
 			}
 		}
@@ -132,43 +196,57 @@ public class LevelEditor : MonoBehaviour
 
 
 	#region Menu Buttons
-	public void TestLevel()
+	public void ReturnToMenu()
 	{
-		// Call Save() before testing! Then load LevelScene...
-		Save();
-		MapData mapData = new MapData();
-		//mapData.GridLayout = 
-		LevelSelectData.SetMapData(mapData);
-		//LevelSelectData.SetTestMode(true);							// Implement, then set this to false upon reaching the MainMenu scene? How best guarantee with fewest calls?
+		// Must set this to false on returning to the main menu as LevelScene checks this
+		LevelEditorData.IsTestingLevel = false;
+		if (m_levelDataDirty)
+			m_mainMenuPopup.SetActive(true);
+		else
+			SceneManager.LoadScene("MainMenu");
 	}
 	
 	public void Save()
 	{
-		Debug.LogWarning("[LevelEditor::Save] Method not yet implemented.");
-		//SaveSystem.CreateCustomMapFile(LevelEditorData.ExistingFileName, m_gridDimensions);			// OLD (delete)
-		//SaveSystem.UpdateCustomMapFile(LevelEditorData.ExistingFileName, m_gridDimensions);			// NEW (UpdateCustomMapFile needs creating)
-	}
-	#endregion
-
-
-	/*
-	public void TEST_GenerateCustomMapFile()
-	{
-		SaveSystem.CreateCustomMapFile("abcd1234", m_gridDimensions);
-		
-		for (int i = 0; i < m_gridDimensions; ++i)
+		SaveSystem.CreateCustomMapFile(LevelEditorData.CustomMapFileName, m_gridDimension);
+		for (int i = 0; i < m_gridDimension; ++i)
 		{
 			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
-			for (int j = 0; j < m_gridDimensions; ++j)
+			for (int j = 0; j < m_gridDimension; ++j)
 			{
-				// Can't select i as the y-component since Texture creation runs from bottom left
-				// and GridLayoutGroup runs from top right. Have to use "m_gridDimensions - i - 1"
-				// to reverse it
-				SaveSystem.AddToCustomMapFile(gridButtons[j].PropertyColor, j, (m_gridDimensions - i - 1));
+				Color color = gridButtons[j].PropertyColor;
+				SaveSystem.AddToCustomMapFile(color, j, m_gridDimension - i - 1);
 			}
 		}
-
 		SaveSystem.SaveCustomMapFile();
+		m_levelDataDirty = false;
+		// [TODO] "Saved" popup? Or brief text bubble which doesn't get in the way?
 	}
-	//*/
+
+	public void TestLevel()
+	{
+		LevelEditorData.IsTestingLevel = true;
+		//LevelSelectData.SetTestMode(true);								// Implement, then set this to false upon reaching the MainMenu scene? How best guarantee with fewest calls?
+		
+		LevelEditorData.GameMode = (EGameMode)m_gameModeDropdown.value;
+		LevelEditorData.TurnDirection = (ETurnDirection)m_turnDirectionDropdown.value;
+		LevelEditorData.StartAtSecondSpawnPoint = m_startAtSecondSpawnToggle.isOn;
+		LevelEditorData.AllowMoveThroughWalls = m_moveThroughWallsToggle.isOn;
+
+		// [TODO][IMPORTANT][Q] Do we want to load additive?
+		// If not, and if we're not saving, how do we return to our unsaved data? Save as a temp file?
+		// If so, delete after saving
+		// (can also check for m_levelDataDirty here to help with that?)
+		SceneManager.LoadScene("LevelScene", LoadSceneMode.Additive);
+		return;
+
+		// DO NOT Call Save() before testing! They may not want to edit the level the way they have
+		//Save();
+
+		// [Q][IMPORTANT] Do we need to do any of this???
+		//MapData mapData = new MapData();
+		//mapData.GridLayout = 
+		//LevelSelectData.SetMapData(mapData);
+	}
+	#endregion
 }
