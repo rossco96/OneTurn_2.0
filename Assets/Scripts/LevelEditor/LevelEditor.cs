@@ -9,7 +9,8 @@ public class LevelEditor : MonoBehaviour
 {
 	private const int k_maxGridSize = 15;														// [Q] Do this here? Also include k_minGridSize = 9?
 
-	[SerializeField] private LevelGeneratorColorData m_colorData;
+
+	[SerializeField] private MapPropertyColorData m_colorData;
 
 	[Space]
 	[SerializeField] private TextMeshProUGUI m_sliderLabel;
@@ -28,7 +29,7 @@ public class LevelEditor : MonoBehaviour
 	[SerializeField] private GameObject m_testOptionsPopup;
 
 	[Space]
-	[SerializeField] private TextMeshProUGUI m_toolItemsRemaining;
+	[SerializeField] private TextMeshProUGUI m_extraInfoToolItemsUsed;
 	// Note the two TextMeshProUGUI below could be GameObjects, but want consistency when setting active
 	[SerializeField] private TextMeshProUGUI m_extraInfoRotationRight_Label;
 	[SerializeField] private TextMeshProUGUI m_extraInfoRotationLeft_Label;
@@ -42,13 +43,21 @@ public class LevelEditor : MonoBehaviour
 	[SerializeField] private Toggle m_startAtSecondSpawnToggle;
 	[SerializeField] private Toggle m_moveThroughWallsToggle;
 
-
 	private bool m_levelDataDirty = false;
 
 	//private string m_levelFileName;                                                           // [TODO] Implement! ... Or just use LevelEditorData.CustomMapFileName ?
 
 	private int m_gridDimension = 9;
-	private ELevelGeneratorColorName m_currentTool = ELevelGeneratorColorName.BlankSquare;
+	private EMapPropertyColorName m_currentTool = EMapPropertyColorName.BlankSquare;
+
+	private int m_maxItems = 8;
+	private int m_maxExits = 1;
+	private int m_maxSpawnPoints = 1;
+
+	private int m_placedExits = 0;
+	private int m_placedItems = 0;
+	private int m_placedSpawnPointsPrimary = 0;
+	private int m_placedSpawnPointsSecondary = 0;
 
 
 	private void Awake()
@@ -103,11 +112,11 @@ public class LevelEditor : MonoBehaviour
 	private void InitToolsDropdown()
 	{
 		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
-		for (int i = 0; i < System.Enum.GetValues(typeof(ELevelGeneratorColorName)).Length; ++i)
+		for (int i = 0; i < System.Enum.GetValues(typeof(EMapPropertyColorName)).Length; ++i)
 		{
 			// [TODO][Q] Also add sprites? Show sprites next to it with the name of the tool?
-			if ((ELevelGeneratorColorName)i == ELevelGeneratorColorName.Special) continue;
-			string option = $"{(ELevelGeneratorColorName)i}";
+			if ((EMapPropertyColorName)i == EMapPropertyColorName.Special) continue;
+			string option = $"{(EMapPropertyColorName)i}";
 			if (option.CanFormatCamelCase(out string optionFormat))
 				dropdownOptions.Add(optionFormat);
 			else
@@ -119,8 +128,49 @@ public class LevelEditor : MonoBehaviour
 
 	public void OnToolChanged(TMP_Dropdown dropdown)
 	{
-		m_currentTool = (ELevelGeneratorColorName)dropdown.value;
-		// [TODO] Update text (and image?) for the chosen tool
+		m_currentTool = (EMapPropertyColorName)dropdown.value;
+		switch (m_currentTool)
+		{
+			case EMapPropertyColorName.Item:
+				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
+				m_extraInfoToolItemsUsed.text = $"Items placed: {m_placedItems}/{m_maxItems}";
+				m_extraInfoRotationRight_Label.gameObject.SetActive(false);
+				m_extraInfoRotationLeft_Label.gameObject.SetActive(false);
+				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(false);
+				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(false);
+				break;
+			case EMapPropertyColorName.Exit:
+				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
+				m_extraInfoToolItemsUsed.text = $"Exits placed: {m_placedExits}/{m_maxExits}";
+				m_extraInfoRotationRight_Label.gameObject.SetActive(true);
+				m_extraInfoRotationLeft_Label.gameObject.SetActive(true);
+				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(true);
+				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(true);
+				break;
+			case EMapPropertyColorName.SpawnPointPrimary:
+				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
+				m_extraInfoToolItemsUsed.text = $"Primary spawns placed: {m_placedSpawnPointsPrimary}/{m_maxSpawnPoints}";
+				m_extraInfoRotationRight_Label.gameObject.SetActive(true);
+				m_extraInfoRotationLeft_Label.gameObject.SetActive(true);
+				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(true);
+				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(true);
+				break;
+			case EMapPropertyColorName.SpawnPointSecondary:
+				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
+				m_extraInfoToolItemsUsed.text = $"Secondary spawns placed: {m_placedSpawnPointsSecondary}/{m_maxSpawnPoints}";
+				m_extraInfoRotationRight_Label.gameObject.SetActive(true);
+				m_extraInfoRotationLeft_Label.gameObject.SetActive(true);
+				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(true);
+				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(true);
+				break;
+			default:
+				m_extraInfoToolItemsUsed.gameObject.SetActive(false);
+				m_extraInfoRotationRight_Label.gameObject.SetActive(false);
+				m_extraInfoRotationLeft_Label.gameObject.SetActive(false);
+				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(false);
+				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(false);
+				break;
+		}
 	}
 	#endregion
 
@@ -130,6 +180,7 @@ public class LevelEditor : MonoBehaviour
 	{
 		int gridDimension = LevelEditorData.GridDimension;
 		m_gridSlider.value = (gridDimension - 7) / 2;
+		m_maxItems = ((int)m_gridSlider.value * (int)m_gridSlider.value) + (int)m_gridSlider.value + 6;
 
 		for (int i = 0; i < k_maxGridSize; ++i)
 		{
@@ -146,12 +197,12 @@ public class LevelEditor : MonoBehaviour
 					(
 						(LevelEditorData.LoadExistingLevel)
 							? LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1)
-							: m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare)
+							: m_colorData.GetColorByName(EMapPropertyColorName.BlankSquare)
 					);
 				}
 				else
 				{
-					gb.SetPropertyColor(m_colorData.GetColorByName(ELevelGeneratorColorName.BlankSquare));
+					gb.SetPropertyColor(m_colorData.GetColorByName(EMapPropertyColorName.BlankSquare));
 				}
 			}
 		}
@@ -159,13 +210,78 @@ public class LevelEditor : MonoBehaviour
 
 	public void OnGridButtonClicked(GridButton gb)
 	{
+		EMapPropertyColorName property = m_colorData.GetNameByColor(gb.PropertyColor);
+		if (UpdateGridPropertiesCount(property) == false)
+			return;
 		m_levelDataDirty = true;
 		gb.SetPropertyColor(m_colorData.GetColorByName(m_currentTool));
+	}
+
+	private bool UpdateGridPropertiesCount(EMapPropertyColorName property)
+	{
+		if (m_currentTool == property)
+			return false;
+
+		switch (m_currentTool)
+		{
+			case EMapPropertyColorName.Item:
+				if (m_placedItems >= m_maxItems)
+					return false;
+				m_placedItems++;
+				m_extraInfoToolItemsUsed.text = $"Items placed: {m_placedItems}/{m_maxItems}";
+				break;
+			case EMapPropertyColorName.Exit:
+				if (m_placedExits >= m_maxExits)
+					return false;
+				m_placedExits++;
+				m_extraInfoToolItemsUsed.text = $"Exits placed: {m_placedExits}/{m_maxExits}";
+				break;
+			case EMapPropertyColorName.SpawnPointPrimary:
+				if (m_placedSpawnPointsPrimary > m_maxSpawnPoints)
+					return false;
+				m_placedSpawnPointsPrimary++;
+				m_extraInfoToolItemsUsed.text = $"Primary spawns placed: {m_placedSpawnPointsPrimary}/{m_maxSpawnPoints}";
+				break;
+			case EMapPropertyColorName.SpawnPointSecondary:
+				if (m_placedSpawnPointsSecondary > m_maxSpawnPoints)
+					return false;
+				m_placedSpawnPointsSecondary++;
+				m_extraInfoToolItemsUsed.text = $"Secondary spawns placed: {m_placedSpawnPointsSecondary}/{m_maxSpawnPoints}";
+				break;
+			default:
+				break;
+		}
+
+		switch (property)
+		{
+			case EMapPropertyColorName.Item:
+				if (m_currentTool != EMapPropertyColorName.Item)
+					m_placedItems--;
+				break;
+			case EMapPropertyColorName.Exit:
+				if (m_currentTool != EMapPropertyColorName.Exit)
+					m_placedExits--;
+				break;
+			case EMapPropertyColorName.SpawnPointPrimary:
+				if (m_currentTool != EMapPropertyColorName.SpawnPointPrimary)
+					m_placedSpawnPointsPrimary--;
+				break;
+			case EMapPropertyColorName.SpawnPointSecondary:
+				if (m_currentTool != EMapPropertyColorName.SpawnPointSecondary)
+					m_placedSpawnPointsSecondary--;
+				break;
+			default:
+				break;
+		}
+
+		return true;
 	}
 
 	public void UpdateGridLayout(Slider slider)
 	{
 		m_gridDimension = ((int)slider.value * 2) + 7;
+		m_maxItems = ((int)slider.value * (int)slider.value) + (int)slider.value + 6;
+		m_extraInfoToolItemsUsed.text = $"Items placed: {m_placedItems}/{m_maxItems}";
 		SetNewGridSize();
 		m_sliderLabel.text = $"Size: {m_gridDimension}x{m_gridDimension}";
 	}

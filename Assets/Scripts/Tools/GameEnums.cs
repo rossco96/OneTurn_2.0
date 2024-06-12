@@ -30,7 +30,7 @@ public enum EInputMode
 
 // [TODO] Consider renaming this! As used within the level editor as well. Perhaps EMapBlockType?
 [System.Serializable]
-public enum ELevelGeneratorColorName
+public enum EMapPropertyColorName
 {
 	BlankSquare,
 	Wall,

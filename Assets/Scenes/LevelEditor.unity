@@ -9494,7 +9494,7 @@ MonoBehaviour:
   m_tutorialPopup: {fileID: 450434317}
   m_mainMenuPopup: {fileID: 691474505}
   m_testOptionsPopup: {fileID: 34478917}
-  m_toolItemsRemaining: {fileID: 979171561}
+  m_extraInfoToolItemsUsed: {fileID: 979171561}
   m_extraInfoRotationRight_Label: {fileID: 751871907}
   m_extraInfoRotationLeft_Label: {fileID: 281551845}
   m_extraInfoRotationRight_Dropdown: {fileID: 1593979465}
@@ -19849,7 +19849,7 @@ GameObject:
   - component: {fileID: 979171562}
   - component: {fileID: 979171561}
   m_Layer: 5
-  m_Name: ToolRemaining
+  m_Name: ToolsUsedText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19894,7 +19894,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Remaining: 24/24'
+  m_text: 'Items used: 26/26'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

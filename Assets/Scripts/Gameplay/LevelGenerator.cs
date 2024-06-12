@@ -7,7 +7,7 @@ public class LevelGenerator : MonoBehaviour
 	// Same concern with if we ever want height and width to be different (i.e. rectangular and not square)
 	private readonly List<int> m_validGridSizes = new List<int>() { 9, 11, 13, 15, 17 };
 
-	[SerializeField] private LevelGeneratorColorData m_colorData;
+	[SerializeField] private MapPropertyColorData m_colorData;
 
 	[Space]
 	[SerializeField] private HUDManager m_hudManager;
@@ -196,20 +196,20 @@ public class LevelGenerator : MonoBehaviour
 					}
 				}
 				
-				ELevelGeneratorColorName colorName = m_colorData.ColorDatas[index].Name;
+				EMapPropertyColorName colorName = m_colorData.ColorDatas[index].Name;
 				switch (colorName)
 				{
-					case ELevelGeneratorColorName.BlankSquare:
+					case EMapPropertyColorName.BlankSquare:
 						// Do nothing
 						break;
-					case ELevelGeneratorColorName.Wall:
+					case EMapPropertyColorName.Wall:
 						PlaceWall(x, y);
 						break;
-					case ELevelGeneratorColorName.Item:
+					case EMapPropertyColorName.Item:
 						if (LevelSelectData.GameMode == EGameMode.Items)
 							PlaceOnGrid(m_itemPrefab, x, y);
 						break;
-					case ELevelGeneratorColorName.Exit:
+					case EMapPropertyColorName.Exit:
 						if (LevelSelectData.GameMode == EGameMode.Exit)
 							PlaceOnGrid(m_exitPrefab, x, y, (m_turnDirection == ETurnDirection.Right) ? m_mapData.ExitFacingDirectionRight : m_mapData.ExitFacingDirectionLeft);
 						else
@@ -217,7 +217,7 @@ public class LevelGenerator : MonoBehaviour
 							// ... Or would it be better to just have it in its own place?
 							PlaceWall(x, y);
 						break;
-					case ELevelGeneratorColorName.SpawnPointPrimary:
+					case EMapPropertyColorName.SpawnPointPrimary:
 						GameObject playerControllerPrimary = PlaceOnGrid
 						(
 							m_playerControllerPrefab, x, y,
@@ -231,7 +231,7 @@ public class LevelGenerator : MonoBehaviour
 							playerControllerPrimary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[0]);
 						}
 						break;
-					case ELevelGeneratorColorName.SpawnPointSecondary:
+					case EMapPropertyColorName.SpawnPointSecondary:
 						if (LevelSelectData.IsMultiplayer)
 						{
 							GameObject playerControllerSecondary = PlaceOnGrid
@@ -246,7 +246,7 @@ public class LevelGenerator : MonoBehaviour
 							m_multiplayerSpawnIndex++;
 						}
 						break;
-					case ELevelGeneratorColorName.Special:
+					case EMapPropertyColorName.Special:
 						// [NOTE] DO NOT DEAL WITH IN HERE?
 						// Or have reference to the script, if it's a special level, and call Script.Spawn()?
 						// ... As in, spawn the script here? And INIT
