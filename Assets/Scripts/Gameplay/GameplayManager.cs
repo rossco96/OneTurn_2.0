@@ -45,9 +45,10 @@ public abstract class GameplayManager : MonoBehaviour
 			OnPauseChanged += m_controllers[i].SetInputDisabled;
 			m_controllers[i].RespawnPlayer();
 		}
-		//InitSpawnPoint();														// [TODO] DELETE
 
-		InitInteractableBehaviour<Wall>(OnPlayerInteractWall);
+		InitInteractableBehaviour<Wall>(OnPlayerInteractWall);                  // [TODO] Must override these behaviours in GameplayManager_LevelEditor, in case of travelling through walls
+		InitInteractableBehaviour<Border>(OnPlayerInteractWall);
+
 		//InitInteractableBehaviour<Special>(OnPlayerInteractSpecial);			// e.g. booster or turn pads
 
 		InitHUD();

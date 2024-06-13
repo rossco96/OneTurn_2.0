@@ -13,25 +13,23 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private HUDManager m_hudManager;
 	[SerializeField] private Transform m_gameSpaceParent;
 
-	[Space]
-	[SerializeField] private GameObject m_borderPrefabStraight;
-	[SerializeField] private GameObject m_borderPrefabCorner;
-
 	// [TODO][Important]
 	// Only have one prefab here, but have an array of sprites within m_themeData which is edited
 	// (as with SetPrefabs) when spawning each OTController in GenerateMap()
 	[SerializeField] private GameObject m_playerControllerPrefab;
 	[SerializeField] private GameObject[] m_playerPrefabs;
-	
+
 	[SerializeField] private GameObject m_wallPrefab;
 	[SerializeField] private GameObject m_itemPrefab;
 	[SerializeField] private GameObject m_exitPrefab;
 	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
 
+	private bool m_levelEditorOverride = false;
 	private ThemeData m_themeData;
 	private MapData m_mapData;
 	private EGameMode m_gameMode;
 	private ETurnDirection m_turnDirection;
+	private bool m_isMultiplayer = false;
 
 	private int m_multiplayerSpawnIndex = 1;
 	private Bounds[] m_multiplayerBounds;
@@ -43,14 +41,18 @@ public class LevelGenerator : MonoBehaviour
 
 	private void Awake()
 	{
-		m_themeData = LevelSelectData.ThemeData;
-		m_mapData = LevelSelectData.MapData;
-		m_gameMode = LevelSelectData.GameMode;
-		m_turnDirection = LevelSelectData.TurnDirection;
+		m_levelEditorOverride = LevelEditorData.IsTestingLevel;
 
-		if (LevelSelectData.IsMultiplayer)
+		m_themeData = (m_levelEditorOverride) ? LevelEditorData.ThemeData : LevelSelectData.ThemeData;
+		m_mapData = (m_levelEditorOverride) ? LevelEditorData.MapData : LevelSelectData.MapData;
+		m_gameMode = (m_levelEditorOverride) ? LevelEditorData.GameMode : LevelSelectData.GameMode;
+		m_turnDirection =  (m_levelEditorOverride) ? LevelEditorData.TurnDirection : LevelSelectData.TurnDirection;
+
+		m_isMultiplayer = (m_levelEditorOverride == false && LevelSelectData.IsMultiplayer);
+
+		if (m_isMultiplayer)
 		{
-			InitMultiplayerBounds();
+			InitLocalMultiplayerBounds();
 			PositionGameSpaceLocalMultiplayer();
 		}
 
@@ -58,7 +60,6 @@ public class LevelGenerator : MonoBehaviour
 		if (SetGridInfo() == false)
 			return;
 
-		GenerateBorder();
 		GenerateMap();
 
 		if (m_themeData.IsSpecialLevel)
@@ -76,11 +77,19 @@ public class LevelGenerator : MonoBehaviour
 
 	private void SetPrefabs()
 	{
+		// [TODO][Q] Allow player selectin their own character sprite? Rather than forcing it for each theme
+
 		//m_playerPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.PlayerSprite;			// COMMENTED OUT FOR TESTING ONLY
 		m_wallPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.WallSprite;
 
 		switch (m_gameMode)
 		{
+			case EGameMode._LevelEditor:
+				if (LevelEditorData.GameMode == EGameMode.Items)
+					m_itemPrefab.GetComponent<SpriteRenderer>().sprite = LevelEditorData.ThemeData.ItemSprite;
+				else if (LevelEditorData.GameMode == EGameMode.Exit)
+					m_exitPrefab.GetComponent<SpriteRenderer>().sprite = LevelEditorData.ThemeData.ExitSprite;
+				break;
 			case EGameMode.Items:
 				m_itemPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.ItemSprite;
 				break;
@@ -121,58 +130,6 @@ public class LevelGenerator : MonoBehaviour
 	}
 
 
-
-	// [TODO][Q] How to better optimise this???
-	private void GenerateBorder()
-	{
-		// 0.05 is half of the width
-		// 0.15 composed of the width plus half of the width
-		// 0.6 is half the border height plus 1 full width
-
-		float gridDimensionPlusBorder = m_gridDimension + 0.15f;
-
-		// Set corners:
-		GameObject border = Instantiate(m_borderPrefabCorner, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-		Vector2 pos = 0.05f * Vector2.one;
-		border.transform.localPosition = pos;
-
-		border = Instantiate(m_borderPrefabCorner, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-		pos = new Vector2(gridDimensionPlusBorder, 0.05f);
-		border.transform.localPosition = pos;
-
-		border = Instantiate(m_borderPrefabCorner, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-		pos = new Vector2(0.05f, gridDimensionPlusBorder);
-		border.transform.localPosition = pos;
-
-		border = Instantiate(m_borderPrefabCorner, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-		pos = new Vector2(gridDimensionPlusBorder, gridDimensionPlusBorder);
-		border.transform.localPosition = pos;
-
-
-		for (int i = 0; i < m_gridDimension; ++i)
-		{
-			// Set vertical sides:
-			border = Instantiate(m_borderPrefabStraight, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-			pos = new Vector2(0.05f, i + 0.6f);
-			border.transform.localPosition = pos;
-
-			border = Instantiate(m_borderPrefabStraight, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-			pos = new Vector2(gridDimensionPlusBorder, i + 0.6f);
-			border.transform.localPosition = pos;
-
-			// Set horizontal sides:
-			border = Instantiate(m_borderPrefabStraight, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-			pos = new Vector2(i + 0.6f, 0.05f);
-			border.transform.localPosition = pos;
-			border.transform.Rotate(0, 0, 90);
-
-			border = Instantiate(m_borderPrefabStraight, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
-			pos = new Vector2(i + 0.6f, gridDimensionPlusBorder);
-			border.transform.localPosition = pos;
-			border.transform.Rotate(0, 0, 90);
-		}
-	}
-
 	private void GenerateMap()
 	{
 		for (int x = 0; x < m_gridDimension; ++x)
@@ -180,23 +137,7 @@ public class LevelGenerator : MonoBehaviour
 			// [NOTE] This will need changing if allowing rectangular levels!
 			for (int y = 0; y < m_gridDimension; ++y)
 			{
-				Color color = m_mapData.GridLayout.GetPixel(x, y);
-				
-				int index;
-				for (index = 0; index < m_colorData.ColorDatas.Length; ++index)
-				{
-					if (m_colorData.ColorDatas[index].Color == color)
-					{
-						break;
-					}
-					else if (index == m_colorData.ColorDatas.Length - 1)
-					{
-						Debug.LogError($"[LevelGenerator::GenerateMap] Color not recognised! {color} at pixel [{x},{y}].");
-						return;
-					}
-				}
-				
-				EMapPropertyColorName colorName = m_colorData.ColorDatas[index].Name;
+				EMapPropertyColorName colorName = m_colorData.GetNameByColor(m_mapData.GridLayout.GetPixel(x, y));
 				switch (colorName)
 				{
 					case EMapPropertyColorName.BlankSquare:
@@ -206,11 +147,11 @@ public class LevelGenerator : MonoBehaviour
 						PlaceWall(x, y);
 						break;
 					case EMapPropertyColorName.Item:
-						if (LevelSelectData.GameMode == EGameMode.Items)
+						if (m_gameMode == EGameMode.Items)
 							PlaceOnGrid(m_itemPrefab, x, y);
 						break;
 					case EMapPropertyColorName.Exit:
-						if (LevelSelectData.GameMode == EGameMode.Exit)
+						if (m_gameMode == EGameMode.Exit)
 							PlaceOnGrid(m_exitPrefab, x, y, (m_turnDirection == ETurnDirection.Right) ? m_mapData.ExitFacingDirectionRight : m_mapData.ExitFacingDirectionLeft);
 						else
 							// [NOTE] Ensure when desigining that we're taking this into account!
@@ -226,13 +167,13 @@ public class LevelGenerator : MonoBehaviour
 								: m_mapData.PlayerSpawnDirectionLeft[0]
 						);
 						playerControllerPrimary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[0]);
-						if (LevelSelectData.IsMultiplayer)
+						if (m_isMultiplayer)
 						{
 							playerControllerPrimary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[0]);
 						}
 						break;
 					case EMapPropertyColorName.SpawnPointSecondary:
-						if (LevelSelectData.IsMultiplayer)
+						if (m_isMultiplayer)
 						{
 							GameObject playerControllerSecondary = PlaceOnGrid
 							(
@@ -335,7 +276,7 @@ public class LevelGenerator : MonoBehaviour
 
 
 
-	private void InitMultiplayerBounds()
+	private void InitLocalMultiplayerBounds()
 	{
 		m_multiplayerBounds = new Bounds[2];
 		m_multiplayerBounds[0].center = new Vector3(Screen.width * 0.5f, Screen.height * 0.25f, 0.0f);
