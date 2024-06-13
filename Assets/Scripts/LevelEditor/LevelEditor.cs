@@ -122,6 +122,9 @@ public class LevelEditor : MonoBehaviour
 		}
 		m_toolsDropdown.AddOptions(dropdownOptions);
 		m_toolsDropdown.value = 0;
+
+		// [TODO][Q] I don't think this will be possible. Looks like if setting sprites in the dropdown, it can only reference one item image?
+		//m_toolsDropdown.itemImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
 	}
 
 	public void OnToolChanged(TMP_Dropdown dropdown)
@@ -169,10 +172,9 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(false);
 				break;
 		}
-		//m_toolsDropdown.image.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);				// DO NOT USE THIS
 		
+		// [TODO] Must set this up in the editor!
 		m_toolsDropdown.captionImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
-		//m_toolsDropdown.itemImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
 	}
 	#endregion
 
