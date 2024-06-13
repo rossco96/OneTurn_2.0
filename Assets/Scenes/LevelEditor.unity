@@ -9470,7 +9470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8555c602fe2f3ef449c1ee832eacd653, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_colorData: {fileID: 11400000, guid: 5c143bb75e5de014280b5d7d0eff8228, type: 2}
+  m_mapPropertyData: {fileID: 11400000, guid: 5c143bb75e5de014280b5d7d0eff8228, type: 2}
   m_sliderLabel: {fileID: 1848619883}
   m_gridSlider: {fileID: 2146165373}
   m_gridParent: {fileID: 1627027972}

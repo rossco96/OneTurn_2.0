@@ -291,14 +291,11 @@ public static class SaveSystem
 	{
 		return new string[0];
 	}
-
-
-	// [TODO] GetStatData , GetMetaData
-	// [Q] Also need GetMapData? Or if implementing via saving the sprite itself, GetMap?
 	#endregion
 
 
 	#region Tools
+	// [TODO] Feels hacky replacing "/" and "\\", but it's needed and it works?
 	private static string FullPathToCustomFileName(string fullFilepath)
 	{
 		string fileName = fullFilepath.Replace($"{m_customMapsDirectory}", "");

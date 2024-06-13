@@ -6360,7 +6360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966ac1cd899aa3a4284c687b47b4145b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_colorData: {fileID: 11400000, guid: 5c143bb75e5de014280b5d7d0eff8228, type: 2}
+  m_mapPropertyData: {fileID: 11400000, guid: 5c143bb75e5de014280b5d7d0eff8228, type: 2}
   m_hudManager: {fileID: 700921782}
   m_gameSpaceParent: {fileID: 607657834}
   m_playerControllerPrefab: {fileID: 7641189692405293461, guid: 5129dda3e4dafda46b90873c5e0d7fab, type: 3}

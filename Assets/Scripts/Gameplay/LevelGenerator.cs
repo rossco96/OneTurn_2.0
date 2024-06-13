@@ -7,7 +7,7 @@ public class LevelGenerator : MonoBehaviour
 	// Same concern with if we ever want height and width to be different (i.e. rectangular and not square)
 	private readonly List<int> m_validGridSizes = new List<int>() { 9, 11, 13, 15, 17 };
 
-	[SerializeField] private MapPropertyColorData m_colorData;
+	[SerializeField] private MapPropertyData m_mapPropertyData;
 
 	[Space]
 	[SerializeField] private HUDManager m_hudManager;
@@ -137,20 +137,23 @@ public class LevelGenerator : MonoBehaviour
 			// [NOTE] This will need changing if allowing rectangular levels!
 			for (int y = 0; y < m_gridDimension; ++y)
 			{
-				EMapPropertyColorName colorName = m_colorData.GetNameByColor(m_mapData.GridLayout.GetPixel(x, y));
+				EMapPropertyName colorName = m_mapPropertyData.GetNameByColor(m_mapData.GridLayout.GetPixel(x, y));
 				switch (colorName)
 				{
-					case EMapPropertyColorName.BlankSquare:
+					case EMapPropertyName.BlankSquare:
 						// Do nothing
 						break;
-					case EMapPropertyColorName.Wall:
+
+					case EMapPropertyName.Wall:
 						PlaceWall(x, y);
 						break;
-					case EMapPropertyColorName.Item:
+
+					case EMapPropertyName.Item:
 						if (m_gameMode == EGameMode.Items)
 							PlaceOnGrid(m_itemPrefab, x, y);
 						break;
-					case EMapPropertyColorName.Exit:
+
+					case EMapPropertyName.Exit:
 						if (m_gameMode == EGameMode.Exit)
 							PlaceOnGrid(m_exitPrefab, x, y, (m_turnDirection == ETurnDirection.Right) ? m_mapData.ExitFacingDirectionRight : m_mapData.ExitFacingDirectionLeft);
 						else
@@ -158,7 +161,10 @@ public class LevelGenerator : MonoBehaviour
 							// ... Or would it be better to just have it in its own place?
 							PlaceWall(x, y);
 						break;
-					case EMapPropertyColorName.SpawnPointPrimary:
+
+					case EMapPropertyName.SpawnPointPrimary:
+						if (m_levelEditorOverride && LevelEditorData.StartAtSecondSpawnPoint)
+							break;
 						GameObject playerControllerPrimary = PlaceOnGrid
 						(
 							m_playerControllerPrefab, x, y,
@@ -168,30 +174,34 @@ public class LevelGenerator : MonoBehaviour
 						);
 						playerControllerPrimary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[0]);
 						if (m_isMultiplayer)
-						{
 							playerControllerPrimary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[0]);
-						}
 						break;
-					case EMapPropertyColorName.SpawnPointSecondary:
-						if (m_isMultiplayer)
+
+					case EMapPropertyName.SpawnPointSecondary:
+						if ((m_levelEditorOverride && LevelEditorData.StartAtSecondSpawnPoint) || m_isMultiplayer)
 						{
 							GameObject playerControllerSecondary = PlaceOnGrid
 							(
-								m_playerControllerPrefab, x, y, 
+								m_playerControllerPrefab, x, y,
 								(m_turnDirection == ETurnDirection.Right)
 									? m_mapData.PlayerSpawnDirectionRight[m_multiplayerSpawnIndex]
 									: m_mapData.PlayerSpawnDirectionLeft[m_multiplayerSpawnIndex]
 							);
-							playerControllerSecondary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[m_multiplayerSpawnIndex]);
 							playerControllerSecondary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[m_multiplayerSpawnIndex]);
-							m_multiplayerSpawnIndex++;
+							if (m_isMultiplayer)
+							{
+								playerControllerSecondary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[m_multiplayerSpawnIndex]);
+								m_multiplayerSpawnIndex++;
+							}
 						}
 						break;
-					case EMapPropertyColorName.Special:
+
+					case EMapPropertyName.Special:
 						// [NOTE] DO NOT DEAL WITH IN HERE?
 						// Or have reference to the script, if it's a special level, and call Script.Spawn()?
 						// ... As in, spawn the script here? And INIT
 						break;
+
 					default:
 						break;
 				}

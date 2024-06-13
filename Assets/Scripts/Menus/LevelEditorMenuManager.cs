@@ -52,46 +52,12 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 	private void InitLoadLevelDropdown()
 	{
-		/*
-		List<MapmetaData<string, string>> mapmetaDatas = new List<MapmetaData<string, string>>();
-		for (int i = 0; i < filepaths.Length; ++i)
-		{
-			MapmetaData<string, string> mapmetaData = SaveSystem.GetMapmetaContents(filepaths[i]);
-			mapmetaDatas.Add(mapmetaData);
-		}
-		
-		// Order the maps by the most recently created on top:
-
-		List<string> dropdownOptions = new List<string>();
-		for (int i = mapmetaDatas.Count - 1; i >= 0; --i)
-		{
-			int recentIndex = 0;
-			long recentTime = 0;
-			for (int j = mapmetaDatas.Count - 1; j >= 0; --j)
-			{
-				// [TODO][Q] Do we want creation time or most recently edited time?
-				long mapmetaCreationTime = long.Parse(mapmetaDatas[j][$"{EMapmetaInfo.CreationTime}"]);
-				if (mapmetaCreationTime > recentTime)
-				{
-					recentTime = mapmetaCreationTime;
-					recentIndex = j;
-				}
-			}
-
-			dropdownOptions.Add(mapmetaDatas[recentIndex][$"{EMapmetaInfo.MapName}"]);
-			mapmetaDatas.RemoveAt(recentIndex);
-			m_existingMapFileNamesByCreationTime = m_existingMapFileNamesByCreationTime.Add(filepaths[recentIndex]);
-			filepaths = filepaths.RemoveAt(recentIndex);
-		}
-		//*/
-
 		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
 		for (int i = 0; i < m_existingMapFileNamesByCreationTime.Length; ++i)
 		{
 			string mapName = SaveSystem.GetMapmetaInfo(m_existingMapFileNamesByCreationTime[i], EMapmetaInfo.MapName);
 			dropdownOptions.Add(mapName);
 		}
-
 		m_loadLevelDropdown.AddOptions(dropdownOptions);
 		m_loadLevelDropdown.value = 0;
 	}
