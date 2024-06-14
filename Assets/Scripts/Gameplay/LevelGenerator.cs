@@ -84,12 +84,6 @@ public class LevelGenerator : MonoBehaviour
 
 		switch (m_gameMode)
 		{
-			case EGameMode._LevelEditor:
-				if (LevelSelectData.GameMode == EGameMode.Items)
-					m_itemPrefab.GetComponent<SpriteRenderer>().sprite = LevelSelectData.ThemeData.ItemSprite;
-				else if (LevelSelectData.GameMode == EGameMode.Exit)
-					m_exitPrefab.GetComponent<SpriteRenderer>().sprite = LevelSelectData.ThemeData.ExitSprite;
-				break;
 			case EGameMode.Items:
 				m_itemPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.ItemSprite;
 				break;
@@ -266,23 +260,27 @@ public class LevelGenerator : MonoBehaviour
 	{
 		GameObject gmGameObject = new GameObject("GameplayManager");
 		GameplayManager gameplayManager = default;
-		switch (m_gameMode)
+		if (LevelEditorData.IsTestingLevel)
 		{
-			case EGameMode._LevelEditor:
-				gameplayManager = gmGameObject.AddComponent<GameplayManager_LevelEditor>();
-				break;
-			case EGameMode.Items:
-				gameplayManager = gmGameObject.AddComponent<GameplayManager_Items>();
-				break;
-			case EGameMode.Exit:
-				gameplayManager = gmGameObject.AddComponent<GameplayManager_Exit>();
-				break;
-			case EGameMode.M_Bomb:
-				break;
-			case EGameMode.M_Chase:
-				break;
-			default:
-				break;
+			gameplayManager = gmGameObject.AddComponent<GameplayManager_LevelEditor>();
+		}
+		else
+		{
+			switch (m_gameMode)
+			{
+				case EGameMode.Items:
+					gameplayManager = gmGameObject.AddComponent<GameplayManager_Items>();
+					break;
+				case EGameMode.Exit:
+					gameplayManager = gmGameObject.AddComponent<GameplayManager_Exit>();
+					break;
+				case EGameMode.M_Bomb:
+					break;
+				case EGameMode.M_Chase:
+					break;
+				default:
+					break;
+			}
 		}
 		gameplayManager.SetHUDManager(m_hudManager);
 	}

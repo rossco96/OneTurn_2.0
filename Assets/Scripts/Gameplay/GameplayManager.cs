@@ -46,8 +46,11 @@ public abstract class GameplayManager : MonoBehaviour
 			m_controllers[i].RespawnPlayer();
 		}
 
-		InitInteractableBehaviour<Wall>(OnPlayerInteractWall);                  // [TODO] Must override these behaviours in GameplayManager_LevelEditor, in case of travelling through walls
-		InitInteractableBehaviour<Border>(OnPlayerInteractWall);
+		if (LevelEditorData.IsTestingLevel == false)
+		{
+			InitInteractableBehaviour<Border>(OnPlayerInteractWall);
+			InitInteractableBehaviour<Wall>(OnPlayerInteractWall);
+		}
 
 		//InitInteractableBehaviour<Special>(OnPlayerInteractSpecial);			// e.g. booster or turn pads
 
@@ -105,6 +108,7 @@ public abstract class GameplayManager : MonoBehaviour
 		}
 		else
 		{
+			// [NOTE] This may also need to be overriden if testing a level editor level! Not essential, though
 			m_hudManager.UpdateLivesCount(LevelSelectData.LivesCount);              // [TODO] May want to allow user choosing 1, 3, 5, or unlimited lives
 		}
 	}

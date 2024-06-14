@@ -78,7 +78,8 @@ public class GameplayManager_Items : GameplayManager
 			m_hudManager.UpdateItemsCount(controller.Stats.Items, m_totalItems);
 		}
 		
-		m_itemCount++;													// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when cleared?
+		// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when level cleared?
+		m_itemCount++;
 		if (m_itemCount == m_totalItems)
 		{
 			if (LevelSelectData.IsMultiplayer)

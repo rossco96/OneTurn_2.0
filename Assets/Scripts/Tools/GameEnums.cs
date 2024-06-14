@@ -9,7 +9,6 @@ public enum EFacingDirection
 [System.Serializable]
 public enum EGameMode
 {
-	_LevelEditor,
 	Items,
 	Exit,
 	M_Bomb,

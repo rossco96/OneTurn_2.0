@@ -4,5 +4,6 @@ public class Border : Interactable_Base
 	{
 		// [TODO] Consider spawning some VFX particles of some kind, to show a crash
 		// (or could/should be part of player death animation?)
+		UnityEngine.Debug.Log("BORDER");
 	}
 }

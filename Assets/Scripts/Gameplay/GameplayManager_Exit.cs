@@ -29,13 +29,11 @@ public class GameplayManager_Exit : GameplayManager
 	}
 
 	private void OnPlayerInteractExit(OTController controller)
-	//private void OnPlayerInteractExit(int index)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)
 		// Otherwise then yeah, obviously win condition
 
-		Debug.LogWarning("[GameplayManager::OnPlayerInteract] EXIT");
 		// END GAME -- win
 		EndGame(true, controller);
 	}

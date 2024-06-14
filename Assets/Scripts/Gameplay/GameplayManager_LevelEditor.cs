@@ -2,13 +2,35 @@ using UnityEngine;
 
 public class GameplayManager_LevelEditor : GameplayManager
 {
+	#region Vars
 	private float m_levelTimeCountUp = 0.0f;
 	private int m_levelTimeInt = 0;
 
+	private int m_totalItems = 0;
+	private int m_itemCount = 0;
+	#endregion
+
+
+	#region Start / Init / Update
 	protected override void Start()
 	{
 		base.Start();
-		InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
+
+		InitInteractableBehaviour<Border>(OnPlayerInteractWallLevelEditor);
+		if (LevelEditorData.AllowMoveThroughWalls == false)
+			InitInteractableBehaviour<Wall>(OnPlayerInteractWallLevelEditor);
+
+		if (LevelSelectData.GameMode == EGameMode.Items)
+			InitInteractableBehaviour<Item>(OnPlayerInteractItem);
+		else if (LevelSelectData.GameMode == EGameMode.Items)
+			InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
+	}
+
+	protected override void InitHUD()
+	{
+		base.InitHUD();
+		m_hudManager.SetItemsCountActive(false);
+		m_hudManager.SetTimerSliderActive(false);
 	}
 
 	protected override void UpdateTimer()
@@ -20,27 +42,50 @@ public class GameplayManager_LevelEditor : GameplayManager
 			m_hudManager.UpdateTimerTextExit(m_levelTimeInt);
 		}
 	}
+	#endregion
 
-	protected override void InitHUD()
+
+	#region OnPlayerInteracts
+	private void OnPlayerInteractWallLevelEditor(OTController controller)
 	{
-		base.InitHUD();
-		m_hudManager.SetItemsCountActive(false);
-		m_hudManager.SetTimerSliderActive(false);
+		controller.SetInputDisabled(true);
+		controller.DestroyPlayerGameObject();
+		m_hudManager.UpdateLivesCount(controller.Stats.Lives);
+
+		// [NOTE] This should be done after the death animation is complete! Need another callback...
+		// [NOTE] Need also a spawn animation, and THEN can resume control of player
+		controller.RespawnPlayer();
+
+		// [TODO] DO THIS ELSEWHERE! Needs to be done after death animation complete
+		controller.SetInputDisabled(false);
+	}
+
+	private void OnPlayerInteractItem(OTController controller)
+	{
+		controller.Stats.AddItem();
+		m_hudManager.UpdateItemsCount(controller.Stats.Items, m_totalItems);
+
+		// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when level cleared?
+		m_itemCount++;
+		if (m_itemCount == m_totalItems)
+		{
+			//EndGame(true, controller);
+			// [TODO][IMPORTANT] Show the level editor finish popup -- prompt if wanting to continue, reset, or return to the level editor
+		}
 	}
 
 	private void OnPlayerInteractExit(OTController controller)
-	//private void OnPlayerInteractExit(int index)
 	{
 		// [TODO]
 		// SHOW A LEVEL_EDITOR POPUP
-		// --> Say win/lose and ask if they'd like to go again or return to the editor
+		// --> Say win/lose and ask if they'd like to continue playing, go again, or return to the editor
 
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)
 		// Otherwise then yeah, obviously win condition
 
-		Debug.LogWarning("[GameplayManager::OnPlayerInteract] EXIT");
 		// END GAME -- win
-		EndGame(true, controller);
+		//EndGame(true, controller);
 	}
+	#endregion
 }
