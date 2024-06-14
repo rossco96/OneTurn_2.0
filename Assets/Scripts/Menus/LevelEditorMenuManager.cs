@@ -159,7 +159,6 @@ public class LevelEditorMenuManager : MonoBehaviour
 		LevelEditorData.LoadExistingLevel = true;
 		LevelEditorData.CustomMapFileName = m_selectedMapFileName;
 		LevelEditorData.GridTexture = SaveSystem.GetCustomMapTexture(m_selectedMapFileName);
-		LevelEditorData.GridDimension = int.Parse(SaveSystem.GetMapmetaInfo(m_selectedMapFileName, EMapmetaInfo.GridDimension));
 
 		// LoadScene!
 		SceneManager.LoadScene("LevelEditor");

@@ -43,8 +43,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_mapIndex = 0;
 		m_currentTheme = m_themesList.ThemesData[0];
 		m_numberOfMaps = m_currentTheme.Maps.Length;
-		LevelSelectData.SetThemeData(m_currentTheme);
+		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
+
 		m_buttonThemeUp.interactable = false;
 		m_buttonMapUp.interactable = false;
 		// ^^^^^ ^^^^^ ^^^^^
@@ -83,7 +84,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		if (m_mapIndex == m_numberOfMaps - 1)
 			m_buttonMapDown.interactable = false;
 
-		LevelSelectData.SetThemeData(m_currentTheme);
+		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
 
 		// [TODO][IMPORTANT] 'else' commented out here (and in UpdateMapIndex below) since testing with such small numbers of indexes - there's some overlap!
@@ -107,6 +108,14 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_mapIndex += indexDirection;
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
+		/*
+		m_mapData = mapData;
+		m_gridDimension = m_mapData.GridLayout.width;
+		// [NOTE][IMPORTANT] 0.2f at the end is because the border is *CURRENTLY* 1/10th the width of the walls (multiplied by two lots of borders, one each side of the screen)
+		// [TODO][Q] Make sure we're calculating the difference?? Ask an artist about import settings??
+		// Border should always be the same size, regardless of grid dimnsion!
+		m_gridSizeMultiplier = (UnityEngine.Camera.main.aspect * UnityEngine.Camera.main.orthographicSize * 2.0f) / (m_gridDimension + 0.2f);
+		//*/
 
 		if (m_mapIndex == 0)
 			m_buttonMapUp.interactable = false;
@@ -134,7 +143,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		else if (m_gameModeDropdown.value == 1)
 			gameModeValue = 1;
 
-		LevelSelectData.SetIsMultiplayer(isMultiplayerToggle.isOn);
+		LevelSelectData.IsMultiplayer = isMultiplayerToggle.isOn;
 
 		m_gameModeDropdown.ClearOptions();
 		System.Collections.Generic.List<string> gameModes = new System.Collections.Generic.List<string>();
@@ -161,15 +170,13 @@ public class LevelSelectMenuManager : MonoBehaviour
 	public void UpdateGameMode(TMPro.TMP_Dropdown dropdown)
 	{
 		EGameMode gameMode = (EGameMode)dropdown.value;
-		//Debug.Log($"[LevelSelectMenuManager::UpdateGameMode] If generated in the correct order, we should be selecting: '{gameMode}'");
-		LevelSelectData.SetGameMode(gameMode);
+		LevelSelectData.GameMode = gameMode;
 	}
 
 	public void UpdateTurnDirection(TMPro.TMP_Dropdown dropdown)
 	{
 		ETurnDirection turnDirection = (ETurnDirection)dropdown.value;
-		//Debug.Log($"[LevelSelectMenuManager::UpdateTurnDirection] If generated in the correct order, we should be selecting: '{turnDirection}'");
-		LevelSelectData.SetTurnDirection(turnDirection);
+		LevelSelectData.TurnDirection = turnDirection;
 	}
 
 

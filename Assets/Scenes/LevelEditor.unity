@@ -9471,6 +9471,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_mapPropertyData: {fileID: 11400000, guid: 5c143bb75e5de014280b5d7d0eff8228, type: 2}
+  m_themesList: {fileID: 11400000, guid: 2c6cbfe053feb4c4eaa9e88d10edcd34, type: 2}
   m_sliderLabel: {fileID: 1848619883}
   m_gridSlider: {fileID: 2146165373}
   m_gridParent: {fileID: 1627027972}
@@ -9491,6 +9492,7 @@ MonoBehaviour:
   - {fileID: 1462084992}
   - {fileID: 573482904}
   m_toolsDropdown: {fileID: 91013436}
+  m_themeDropdown: {fileID: 781010923}
   m_tutorialPopup: {fileID: 450434317}
   m_mainMenuPopup: {fileID: 691474505}
   m_testOptionsPopup: {fileID: 34478917}

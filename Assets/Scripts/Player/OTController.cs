@@ -34,14 +34,10 @@ public class OTController : MonoBehaviour
 	{
 		Vector2 screenDimensions = new Vector2(Screen.width, Screen.height);
 		m_minSwipeDistance = k_screenPercentSwipe * screenDimensions.magnitude;
-		// [TODO] If doing like this, need to delete const
-		// ... Also, work this out in the controller or elsewhere?
 		m_gridSizeMultiplier = LevelSelectData.GridSizeMultiplier;
-
-		m_isMultiplayer = LevelSelectData.IsMultiplayer;
+		m_isMultiplayer = (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer);
 		m_turnDirection = LevelSelectData.TurnDirection;
-
-		m_stats.SetLives(LevelSelectData.LivesCount);
+		m_stats.SetLives(LevelSelectData.LivesCount);					// [TODO][NOTE] Make sure we do NOT remove the life in GameplayManager_LevelEditor
 	}
 
 	private void Update()

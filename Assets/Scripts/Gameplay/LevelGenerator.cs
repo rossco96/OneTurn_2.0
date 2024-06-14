@@ -43,10 +43,10 @@ public class LevelGenerator : MonoBehaviour
 	{
 		m_levelEditorOverride = LevelEditorData.IsTestingLevel;
 
-		m_themeData = (m_levelEditorOverride) ? LevelEditorData.ThemeData : LevelSelectData.ThemeData;
-		m_mapData = (m_levelEditorOverride) ? LevelEditorData.MapData : LevelSelectData.MapData;
-		m_gameMode = (m_levelEditorOverride) ? LevelEditorData.GameMode : LevelSelectData.GameMode;
-		m_turnDirection =  (m_levelEditorOverride) ? LevelEditorData.TurnDirection : LevelSelectData.TurnDirection;
+		m_themeData = LevelSelectData.ThemeData;
+		m_mapData = LevelSelectData.MapData;
+		m_gameMode = LevelSelectData.GameMode;
+		m_turnDirection = LevelSelectData.TurnDirection;
 
 		m_isMultiplayer = (m_levelEditorOverride == false && LevelSelectData.IsMultiplayer);
 
@@ -85,10 +85,10 @@ public class LevelGenerator : MonoBehaviour
 		switch (m_gameMode)
 		{
 			case EGameMode._LevelEditor:
-				if (LevelEditorData.GameMode == EGameMode.Items)
-					m_itemPrefab.GetComponent<SpriteRenderer>().sprite = LevelEditorData.ThemeData.ItemSprite;
-				else if (LevelEditorData.GameMode == EGameMode.Exit)
-					m_exitPrefab.GetComponent<SpriteRenderer>().sprite = LevelEditorData.ThemeData.ExitSprite;
+				if (LevelSelectData.GameMode == EGameMode.Items)
+					m_itemPrefab.GetComponent<SpriteRenderer>().sprite = LevelSelectData.ThemeData.ItemSprite;
+				else if (LevelSelectData.GameMode == EGameMode.Exit)
+					m_exitPrefab.GetComponent<SpriteRenderer>().sprite = LevelSelectData.ThemeData.ExitSprite;
 				break;
 			case EGameMode.Items:
 				m_itemPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.ItemSprite;
@@ -268,6 +268,9 @@ public class LevelGenerator : MonoBehaviour
 		GameplayManager gameplayManager = default;
 		switch (m_gameMode)
 		{
+			case EGameMode._LevelEditor:
+				gameplayManager = gmGameObject.AddComponent<GameplayManager_LevelEditor>();
+				break;
 			case EGameMode.Items:
 				gameplayManager = gmGameObject.AddComponent<GameplayManager_Items>();
 				break;

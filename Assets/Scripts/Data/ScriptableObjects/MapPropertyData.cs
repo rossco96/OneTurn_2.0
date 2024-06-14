@@ -36,6 +36,7 @@ public class MapPropertyData : ScriptableObject
 	}
 }
 
+// [TODO][Q] Move to its own file?
 [System.Serializable]
 public struct PropertyInfo
 {

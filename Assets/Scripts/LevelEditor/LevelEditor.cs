@@ -11,6 +11,7 @@ public class LevelEditor : MonoBehaviour
 
 
 	[SerializeField] private MapPropertyData m_mapPropertyData;
+	[SerializeField] private ThemesList m_themesList;
 
 	[Space]
 	[SerializeField] private TextMeshProUGUI m_sliderLabel;
@@ -20,6 +21,7 @@ public class LevelEditor : MonoBehaviour
 
 	[Space]
 	[SerializeField] private TMP_Dropdown m_toolsDropdown;
+	[SerializeField] private TMP_Dropdown m_themeDropdown;
 
 	[Space]
 	[SerializeField] private GameObject m_tutorialPopup;
@@ -57,11 +59,20 @@ public class LevelEditor : MonoBehaviour
 	private int m_placedSpawnPointsPrimary = 0;
 	private int m_placedSpawnPointsSecondary = 0;
 
+	// [TODO][Q] Better way to do this?
+	private EFacingDirection m_exitDirectionRight = EFacingDirection.Up;
+	private EFacingDirection m_exitDirectionLeft = EFacingDirection.Up;
+	private EFacingDirection m_spawnPrimaryDirectionRight = EFacingDirection.Up;
+	private EFacingDirection m_spawnPrimaryDirectionLeft = EFacingDirection.Up;
+	private EFacingDirection m_spawnSecondaryDirectionRight = EFacingDirection.Up;
+	private EFacingDirection m_spawnSecondaryDirectionLeft = EFacingDirection.Up;
+
 
 	private void Awake()
 	{
 		InitGridButtons();
 		InitToolsDropdown();
+		InitThemesDropdown();
 		InitExtraInfoDropdowns();
 		InitTestDropdowns();
 
@@ -73,7 +84,7 @@ public class LevelEditor : MonoBehaviour
 	#region INIT
 	private void InitGridButtons()
 	{
-		int gridDimension = LevelEditorData.GridDimension;
+		int gridDimension = LevelEditorData.GridTexture.width;
 		m_gridSlider.value = (gridDimension - 7) / 2;
 		m_maxItems = ((int)m_gridSlider.value * (int)m_gridSlider.value) + (int)m_gridSlider.value + 6;
 
@@ -121,6 +132,17 @@ public class LevelEditor : MonoBehaviour
 
 		// [TODO][Q] I don't think this will be possible. Looks like if setting sprites in the dropdown, it can only reference one item image?
 		//m_toolsDropdown.itemImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
+	}
+
+	private void InitThemesDropdown()
+	{
+		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < m_themesList.ThemesData.Length; ++i)
+		{
+			dropdownOptions.Add(m_themesList.ThemesData[i].ThemeName);
+		}
+		m_themeDropdown.AddOptions(dropdownOptions);
+		m_themeDropdown.value = 0;
 	}
 
 	private void InitExtraInfoDropdowns()
@@ -329,6 +351,8 @@ public class LevelEditor : MonoBehaviour
 	
 	public void Save()
 	{
+		// [TODO][IMPORTANT] Must also save the metadata!!!
+		// ... Is that done via any of the SaveSystem._CustomMapFile() methods?
 		SaveSystem.CreateCustomMapFile(LevelEditorData.CustomMapFileName, m_gridDimension);
 		for (int i = 0; i < m_gridDimension; ++i)
 		{
@@ -344,30 +368,39 @@ public class LevelEditor : MonoBehaviour
 		// [TODO] "Saved" popup? Or brief text bubble which doesn't get in the way?
 	}
 
+	// [TODO] If can't make look more effecient, at least refactor?
 	public void TestLevel()
 	{
 		LevelEditorData.IsTestingLevel = true;
-		//LevelSelectData.SetTestMode(true);								// Implement, then set this to false upon reaching the MainMenu scene? How best guarantee with fewest calls?
-		
-		LevelEditorData.GameMode = (EGameMode)m_gameModeDropdown.value;
-		LevelEditorData.TurnDirection = (ETurnDirection)m_turnDirectionDropdown.value;
+
+		// [TODO][Q] Must be better way of doing this?
+		MapData map = ScriptableObject.CreateInstance<MapData>();
+		map.ExitFacingDirectionLeft = m_exitDirectionLeft;
+		map.ExitFacingDirectionRight = m_exitDirectionRight;
+		map.PlayerSpawnDirectionRight = new EFacingDirection[] { m_spawnPrimaryDirectionRight, m_spawnSecondaryDirectionRight };
+		map.PlayerSpawnDirectionLeft = new EFacingDirection[] { m_spawnPrimaryDirectionLeft, m_spawnSecondaryDirectionLeft };
+
+		LevelEditorData.ResetGridTexture(m_gridDimension);
+		for (int i = 0; i < m_gridDimension; ++i)
+		{
+			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
+			for (int j = 0; j < m_gridDimension; ++j)
+			{
+				Color color = gridButtons[j].PropertyColor;
+				LevelEditorData.AddToGridTexture(color, j, m_gridDimension - i - 1);
+			}
+		}
+		map.GridLayout = LevelEditorData.GridTexture;
+
+		LevelSelectData.SetMapData(map);
+		LevelSelectData.ThemeData = m_themesList.ThemesData[m_themeDropdown.value];
+
+		LevelSelectData.GameMode = (EGameMode)m_gameModeDropdown.value;
+		LevelSelectData.TurnDirection = (ETurnDirection)m_turnDirectionDropdown.value;
 		LevelEditorData.StartAtSecondSpawnPoint = m_startAtSecondSpawnToggle.isOn;
 		LevelEditorData.AllowMoveThroughWalls = m_moveThroughWallsToggle.isOn;
 
-		// [TODO][IMPORTANT][Q] Do we want to load additive?
-		// If not, and if we're not saving, how do we return to our unsaved data? Save as a temp file?
-		// If so, delete after saving
-		// (can also check for m_levelDataDirty here to help with that?)
-		SceneManager.LoadScene("LevelScene", LoadSceneMode.Additive);
-		return;
-
-		// DO NOT Call Save() before testing! They may not want to edit the level the way they have
-		//Save();
-
-		// [Q][IMPORTANT] Do we need to do any of this???
-		//MapData mapData = new MapData();
-		//mapData.GridLayout = 
-		//LevelSelectData.SetMapData(mapData);
+		SceneManager.LoadScene("LevelScene");
 	}
 	#endregion
 }
