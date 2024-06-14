@@ -141,6 +141,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
 		{
 			string gameMode = $"{(EGameMode)i}";
+			if (gameMode.StartsWith("_"))
+				continue;
+
 			if (gameMode.StartsWith("M_"))
 			{
 				if (isMultiplayerToggle.isOn == false)

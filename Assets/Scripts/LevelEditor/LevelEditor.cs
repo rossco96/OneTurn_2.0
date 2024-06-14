@@ -142,7 +142,7 @@ public class LevelEditor : MonoBehaviour
 		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
 		{
 			string gameMode = $"{(EGameMode)i}";
-			if (gameMode.StartsWith("M_")) continue;
+			if (gameMode.StartsWith("_") || gameMode.StartsWith("M_")) continue;
 			gameModes.Add(gameMode);
 		}
 		m_gameModeDropdown.AddOptions(gameModes);
