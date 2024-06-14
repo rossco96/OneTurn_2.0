@@ -62,7 +62,6 @@ public class LevelEditor : MonoBehaviour
 	{
 		InitGridButtons();
 		InitToolsDropdown();
-
 		InitExtraInfoDropdowns();
 		InitTestDropdowns();
 
@@ -70,6 +69,59 @@ public class LevelEditor : MonoBehaviour
 		// [TODO] Also display level name on the screen?
 	}
 
+
+	#region INIT
+	private void InitGridButtons()
+	{
+		int gridDimension = LevelEditorData.GridDimension;
+		m_gridSlider.value = (gridDimension - 7) / 2;
+		m_maxItems = ((int)m_gridSlider.value * (int)m_gridSlider.value) + (int)m_gridSlider.value + 6;
+
+		for (int i = 0; i < k_maxGridSize; ++i)
+		{
+			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
+			m_gridRows[i].SetActive(i < gridDimension);
+			for (int j = 0; j < k_maxGridSize; ++j)
+			{
+				GridButton gb = gridButtons[j];
+				gb.gameObject.SetActive(j < gridDimension);
+				gb.RegisterOnButtonSelected(OnGridButtonClicked);
+				if (i < gridDimension && j < gridDimension)
+				{
+					gb.SetPropertyColor
+					(
+						(LevelEditorData.LoadExistingLevel)
+							? LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1)
+							: m_mapPropertyData.GetColorByName(EMapPropertyName.BlankSquare)
+					);
+				}
+				else
+				{
+					gb.SetPropertyColor(m_mapPropertyData.GetColorByName(EMapPropertyName.BlankSquare));
+				}
+			}
+		}
+	}
+
+	private void InitToolsDropdown()
+	{
+		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < System.Enum.GetValues(typeof(EMapPropertyName)).Length; ++i)
+		{
+			// [TODO][Q] Also add sprites? Show sprites next to it with the name of the tool?
+			if ((EMapPropertyName)i == EMapPropertyName.Special) continue;
+			string option = $"{(EMapPropertyName)i}";
+			if (option.CanFormatCamelCase(out string optionFormat))
+				dropdownOptions.Add(optionFormat);
+			else
+				dropdownOptions.Add(option);
+		}
+		m_toolsDropdown.AddOptions(dropdownOptions);
+		m_toolsDropdown.value = 0;
+
+		// [TODO][Q] I don't think this will be possible. Looks like if setting sprites in the dropdown, it can only reference one item image?
+		//m_toolsDropdown.itemImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
+	}
 
 	private void InitExtraInfoDropdowns()
 	{
@@ -104,29 +156,10 @@ public class LevelEditor : MonoBehaviour
 		m_turnDirectionDropdown.AddOptions(turnDirections);
 		m_turnDirectionDropdown.value = 0;
 	}
+	#endregion
 
 
 	#region Tools Dropdown
-	private void InitToolsDropdown()
-	{
-		System.Collections.Generic.List<string> dropdownOptions = new System.Collections.Generic.List<string>();
-		for (int i = 0; i < System.Enum.GetValues(typeof(EMapPropertyName)).Length; ++i)
-		{
-			// [TODO][Q] Also add sprites? Show sprites next to it with the name of the tool?
-			if ((EMapPropertyName)i == EMapPropertyName.Special) continue;
-			string option = $"{(EMapPropertyName)i}";
-			if (option.CanFormatCamelCase(out string optionFormat))
-				dropdownOptions.Add(optionFormat);
-			else
-				dropdownOptions.Add(option);
-		}
-		m_toolsDropdown.AddOptions(dropdownOptions);
-		m_toolsDropdown.value = 0;
-
-		// [TODO][Q] I don't think this will be possible. Looks like if setting sprites in the dropdown, it can only reference one item image?
-		//m_toolsDropdown.itemImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
-	}
-
 	public void OnToolChanged(TMP_Dropdown dropdown)
 	{
 		m_currentTool = (EMapPropertyName)dropdown.value;
@@ -180,38 +213,6 @@ public class LevelEditor : MonoBehaviour
 
 
 	#region Grid Buttons
-	private void InitGridButtons()
-	{
-		int gridDimension = LevelEditorData.GridDimension;
-		m_gridSlider.value = (gridDimension - 7) / 2;
-		m_maxItems = ((int)m_gridSlider.value * (int)m_gridSlider.value) + (int)m_gridSlider.value + 6;
-
-		for (int i = 0; i < k_maxGridSize; ++i)
-		{
-			GridButton[] gridButtons = m_gridRows[i].GetComponentsInChildren<GridButton>(true);
-			m_gridRows[i].SetActive(i < gridDimension);
-			for (int j = 0; j < k_maxGridSize; ++j)
-			{
-				GridButton gb = gridButtons[j];
-				gb.gameObject.SetActive(j < gridDimension);
-				gb.RegisterOnButtonSelected(OnGridButtonClicked);
-				if (i < gridDimension && j < gridDimension)
-				{
-					gb.SetPropertyColor
-					(
-						(LevelEditorData.LoadExistingLevel)
-							? LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1)
-							: m_mapPropertyData.GetColorByName(EMapPropertyName.BlankSquare)
-					);
-				}
-				else
-				{
-					gb.SetPropertyColor(m_mapPropertyData.GetColorByName(EMapPropertyName.BlankSquare));
-				}
-			}
-		}
-	}
-
 	public void OnGridButtonClicked(GridButton gb)
 	{
 		EMapPropertyName property = m_mapPropertyData.GetNameByColor(gb.PropertyColor);
