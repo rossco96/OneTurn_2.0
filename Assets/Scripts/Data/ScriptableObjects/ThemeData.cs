@@ -7,7 +7,7 @@ public class ThemeData : ScriptableObject
 	public MapData[] Maps;
 
 	public int PointsToUnlock;
-	public int TimeLimit;
+	public LevelPlayInfo LevelPlayInfo;
 
 	public Sprite LevelSelectIcon;
 	public Sprite BackgroundSprite;

@@ -113,6 +113,7 @@ public class OTController : MonoBehaviour
 	private void MoveForward()
 	{
 		m_player.transform.position += m_gridSizeMultiplier * m_player.transform.up;
+		Stats.AddMove();
 	}
 
 
@@ -120,9 +121,8 @@ public class OTController : MonoBehaviour
 	// [TODO][Q] Will eventually want to remove this method, and call via animation instead?
 	public void SetInputDisabled(bool disabled)
 	{
-		Debug.Log($"[OTController::SetInputDisabled][{gameObject.GetInstanceID()}] {disabled}");
-		
 		// [TODO] THIS IS SUPER HACKY -- and don't like that I'm using LateUpdate() either...
+		// ... But it seems this is how the touch input works?
 		if (m_inputDisabled)
 		{
 			m_inputDisabledPendingValue = disabled;

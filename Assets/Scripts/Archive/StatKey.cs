@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 
 [System.Serializable]
@@ -23,3 +24,4 @@ public class StatKey<T1, T2, T3> : System.Tuple<T1, T2, T3>
 	public new T2 Item2 { get => value2; }
 	public new T3 Item3 { get => value3; }
 }
+//*/

@@ -45,6 +45,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_numberOfMaps = m_currentTheme.Maps.Length;
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
+		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.imageContentsHash}";
+		LevelSelectData.MapType = EMapType.Game;
 
 		m_buttonThemeUp.interactable = false;
 		m_buttonMapUp.interactable = false;
@@ -86,6 +88,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
+		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.imageContentsHash}";
 
 		// [TODO][IMPORTANT] 'else' commented out here (and in UpdateMapIndex below) since testing with such small numbers of indexes - there's some overlap!
 		if (m_themeIndex == 0)
@@ -108,6 +111,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_mapIndex += indexDirection;
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
+		LevelSelectData.FileName = $"{m_currentTheme.Maps[m_mapIndex].GridLayout.imageContentsHash}";
 		/*
 		m_mapData = mapData;
 		m_gridDimension = m_mapData.GridLayout.width;

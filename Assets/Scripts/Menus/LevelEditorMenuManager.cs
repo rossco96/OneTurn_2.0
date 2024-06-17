@@ -143,7 +143,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 		SaveSystem.SaveCustomMapFile();
 
 		// Create stat file
-		SaveSystem.CreateCustomStatFile(randomFileName);
+		SaveSystem.CreateStatFileCustomMap(randomFileName);
 
 		// Set LevelEditorData
 		LevelEditorData.LoadExistingLevel = false;

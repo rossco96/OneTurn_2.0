@@ -6,6 +6,13 @@ public enum EFacingDirection
 	Left
 }
 
+public enum EMapType
+{
+	Game,
+	Custom,
+	Imported
+}
+
 [System.Serializable]
 public enum EGameMode
 {

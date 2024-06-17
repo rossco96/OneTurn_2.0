@@ -3,8 +3,13 @@ using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
+	// [TODO]
 	// Too hacky? What if we want to change this?
 	// Same concern with if we ever want height and width to be different (i.e. rectangular and not square)
+	// [Q]
+	// Do we want to keep this, but attach total number of items and time limit to each?
+	// --> Create scriptable object!
+	// --> Or not bother with this at all and just put that info in the ThemeData...
 	private readonly List<int> m_validGridSizes = new List<int>() { 9, 11, 13, 15, 17 };
 
 	[SerializeField] private MapPropertyData m_mapPropertyData;
@@ -41,7 +46,8 @@ public class LevelGenerator : MonoBehaviour
 
 	private void Awake()
 	{
-		m_levelEditorOverride = LevelEditorData.IsTestingLevel;
+		//m_levelEditorOverride = LevelEditorData.IsTestingLevel;								// [TODO] Uncomment!
+		m_levelEditorOverride = false;															// This is for testing only!
 
 		m_themeData = LevelSelectData.ThemeData;
 		m_mapData = LevelSelectData.MapData;
@@ -106,6 +112,7 @@ public class LevelGenerator : MonoBehaviour
 
 	private bool SetGridInfo()
 	{
+		// [TODO][Q] Remove this check?
 		if (m_mapData.GridLayout.width != m_mapData.GridLayout.height || 
 			m_validGridSizes.Contains(m_mapData.GridLayout.width) == false)
 		{

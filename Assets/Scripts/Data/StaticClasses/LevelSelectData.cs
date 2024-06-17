@@ -1,6 +1,9 @@
 public static class LevelSelectData
 {
-    public static ThemeData ThemeData;
+	public static string FileName = string.Empty;
+	public static EMapType MapType = EMapType.Game;
+
+	public static ThemeData ThemeData;
 	public static MapData MapData;
 	public static void SetMapData(MapData mapData)
 	{

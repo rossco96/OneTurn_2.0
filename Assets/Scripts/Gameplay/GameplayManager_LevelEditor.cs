@@ -2,15 +2,6 @@ using UnityEngine;
 
 public class GameplayManager_LevelEditor : GameplayManager
 {
-	#region Vars
-	private float m_levelTimeCountUp = 0.0f;
-	private int m_levelTimeInt = 0;
-
-	private int m_totalItems = 0;
-	private int m_itemCount = 0;
-	#endregion
-
-
 	#region Start / Init / Update
 	protected override void Start()
 	{
@@ -35,10 +26,10 @@ public class GameplayManager_LevelEditor : GameplayManager
 
 	protected override void UpdateTimer()
 	{
-		m_levelTimeCountUp = Time.time - m_levelStartTime - m_totalTimePaused;
-		if (Mathf.FloorToInt(m_levelTimeCountUp) != m_levelTimeInt)
+		m_levelTimeFloat = Time.time - m_levelStartTime - m_totalTimePaused;
+		if (Mathf.FloorToInt(m_levelTimeFloat) != m_levelTimeInt)
 		{
-			m_levelTimeInt = Mathf.FloorToInt(m_levelTimeCountUp);
+			m_levelTimeInt = Mathf.FloorToInt(m_levelTimeFloat);
 			m_hudManager.UpdateTimerTextExit(m_levelTimeInt);
 		}
 	}
@@ -63,11 +54,11 @@ public class GameplayManager_LevelEditor : GameplayManager
 	private void OnPlayerInteractItem(OTController controller)
 	{
 		controller.Stats.AddItem();
-		m_hudManager.UpdateItemsCount(controller.Stats.Items, m_totalItems);
+		m_hudManager.UpdateItemsCount(controller.Stats.Items);
 
 		// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when level cleared?
 		m_itemCount++;
-		if (m_itemCount == m_totalItems)
+		if (m_itemCount == LevelSelectData.ThemeData.LevelPlayInfo.TotalItems)
 		{
 			//EndGame(true, controller);
 			// [TODO][IMPORTANT] Show the level editor finish popup -- prompt if wanting to continue, reset, or return to the level editor

@@ -3,8 +3,13 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+// [TODO] Refactor intoi separate scripts for in-game stats, popups, end game stats (any others?)
+// And link those behaviours through here... So GameplayManager can still reference HUDManager only
+
 public class HUDManager : MonoBehaviour
 {
+	#region Vars
+	[Header("Stats (single player)")]
 	[SerializeField] private GameObject m_statsParent;
 	[SerializeField] private GameObject m_statsParentP2;					// [TODO][Q] Is this the best way to do this?
 	[SerializeField] private TextMeshProUGUI m_timerText;
@@ -13,18 +18,44 @@ public class HUDManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI m_itemsCount;
 	
 	[Space]
-	[SerializeField] private GameObject m_pauseMenu;
+	[Header("Pause")]
 	[SerializeField] private Button m_pauseButton;
-	[SerializeField] private Button m_resumeButton;							// [TODO][Q] Do we want this in its own PauseManager?
+	[SerializeField] private Button m_resumeButton;                         // [TODO][Q] Do we want this in its own PauseManager?
 
+	[Space]
+	[Header("End Game (single player)")]
+	[SerializeField] private GameObject m_endScreenParent;
+	[SerializeField] private TextMeshProUGUI m_levelTitle;
+	[SerializeField] private TextMeshProUGUI m_winLoseTitle;
+	[SerializeField] private TextMeshProUGUI m_endTimer;
+	[SerializeField] private TextMeshProUGUI m_endMovesCount;
+	[SerializeField] private TextMeshProUGUI m_endLivesCount;
+	[SerializeField] private TextMeshProUGUI m_endItemsCount;
+	[SerializeField] private TextMeshProUGUI m_endTotalScore;
+	[SerializeField] private Button m_nextLevelButton;
+	#endregion
 
 
 	private void Awake()
 	{
-		// [TODO][IMPORTANT] Must calculate what the y-position is! Using aspectRatio, etc.
-		m_statsParent.transform.localPosition = new Vector3(0, -140, 0);
-	}
+		// [TODO][IMPORTANT] This wiil also change for multiplayer! Calculate!	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		
+		// [Q] Is this a correct formula??? Or good enough???
+		m_statsParent.transform.localPosition = new Vector3(0, -(Camera.main.aspect * Camera.main.aspect * Screen.width), 0);
 
+		// [TODO] Move this elsewhere! Will no doubt want to use multiple times?
+		// Pretty sure we already try do something like this when setting end screen stats!
+		int currentLevelIndex = 0;
+		for (int i = 0; i < LevelSelectData.ThemeData.Maps.Length; ++i)
+		{
+			if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[i])
+			{
+				currentLevelIndex = i + i;
+				break;
+			}
+		}
+		m_levelTitle.text = $"{LevelSelectData.ThemeData.ThemeName} : {currentLevelIndex}";
+	}
 
 
 	public void SetTimerSliderActive(bool active)
@@ -44,9 +75,9 @@ public class HUDManager : MonoBehaviour
 		m_livesCount.text = $"Lives: {lives}";
 	}
 
-	public void UpdateItemsCount(int items, int totalItems)
+	public void UpdateItemsCount(int items)
 	{
-		m_itemsCount.text = $"Items: {items}/{totalItems}";
+		m_itemsCount.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
 	}
 
 	public void UpdateTimerTextExit(int timeTaken)
@@ -59,9 +90,9 @@ public class HUDManager : MonoBehaviour
 		m_timerText.text = $"Time Left: {timeLeft}s";
 	}
 
-	public void UpdateTimerSlider(float timeLeft, int timeLimit)
+	public void UpdateTimerSlider(float timeLeft)
 	{
-		m_timerSlider.value = 1 - (timeLeft / timeLimit);
+		m_timerSlider.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit);
 	}
 
 
@@ -77,10 +108,38 @@ public class HUDManager : MonoBehaviour
 		m_resumeButton.onClick.AddListener(onResume);
 	}
 
-
-
-	public void SetPauseMenuActive(bool active)
+	public void AssignNextLevelButton(UnityAction onNextLevel)
 	{
-		m_pauseMenu.SetActive(active);
+		m_nextLevelButton.onClick.AddListener(onNextLevel);
+	}
+
+
+
+	public void SetEndScreenStats(int totalScore, float time, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	{
+		m_endTotalScore.text = $"Total Score: {totalScore:n0}";
+		m_endTimer.text = (isItemsGameMode) ? $"Time Left: {time}s" : $"Time Taken: {time}s";
+		m_endMovesCount.text = $"Moves Taken: {movesTaken}";
+		m_endLivesCount.text = $"Lives Left: {livesLeft}";
+		if (isItemsGameMode)
+			m_endItemsCount.text = $"Items Found: {itemsCollected}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		else
+			m_endItemsCount.gameObject.SetActive(false);
+	}
+
+	public void ShowEndScreen(bool isWin)
+	{
+		m_winLoseTitle.text = (isWin) ? "Yay! You Win!" : "Uh-oh! You lost!";
+		if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
+		{
+			m_nextLevelButton.gameObject.SetActive(false);
+		}
+		else
+		{
+			// [TODO] If failed, switch the position (function) of the RETRY button and the SKIP button
+			// ... If doing that, will have to switch back upon winning, if we're not reloading the scene... Or do we just reload the scene?
+			m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = (isWin) ? "Next Level" : "Skip Level?";
+		}
+		m_endScreenParent.SetActive(true);
 	}
 }

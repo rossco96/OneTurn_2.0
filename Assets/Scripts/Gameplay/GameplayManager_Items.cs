@@ -2,52 +2,39 @@ using UnityEngine;
 
 public class GameplayManager_Items : GameplayManager
 {
-	private int m_timeLimit = 0;
-	private float m_levelTimeCountDown = 0.0f;
-	private int m_levelTimeInt = 0;
-
-	private int m_totalItems = 0;
-	private int m_itemCount = 0;
-
-
-
 	protected override void Start()
 	{
 		InitInteractableBehaviour<Item>(OnPlayerInteractItem);
-		m_timeLimit = LevelSelectData.ThemeData.TimeLimit;
-		m_totalItems = FindObjectsOfType<Item>().Length;                        // [TODO] Change... Is this too hacky?
+		m_timeLimit = LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
 		base.Start();
-
-		// [TODO][DELETE] TIMER TESTING ONLY!
-		//m_timeLimit = 15;
 	}
 
 
 
 	protected override void UpdateTimer()
 	{
-		m_levelTimeCountDown = m_timeLimit - (Time.time - m_levelStartTime - m_totalTimePaused);
+		m_levelTimeFloat = m_timeLimit - (Time.time - m_levelStartTime - m_totalTimePaused);
 		
-		if (m_levelTimeCountDown < 10.0f)
+		if (m_levelTimeFloat < 10.0f)
 		{
-			if (m_levelTimeCountDown <= 0.0f)
+			if (m_levelTimeFloat <= 0.0f)
 			{
 				m_hudManager.UpdateTimerTextItems(0.0f);
-				m_hudManager.UpdateTimerSlider(0.0f, m_timeLimit);
+				m_hudManager.UpdateTimerSlider(0.0f);
 				// END GAME -- lose
 				EndGame(false, null);											// [TODO] Ideally don't want to be passing null to this???
 				return;
 			}
 
-			m_hudManager.UpdateTimerTextItems(m_levelTimeCountDown.RoundDP(2));
+			m_hudManager.UpdateTimerTextItems(m_levelTimeFloat.RoundDP(2));
 		}
-		else if (Mathf.CeilToInt(m_levelTimeCountDown) != m_levelTimeInt)
+		else if (Mathf.CeilToInt(m_levelTimeFloat) != m_levelTimeInt)
 		{
-			m_levelTimeInt = Mathf.CeilToInt(m_levelTimeCountDown);
+			m_levelTimeInt = Mathf.CeilToInt(m_levelTimeFloat);
 			m_hudManager.UpdateTimerTextItems(m_levelTimeInt);
 		}
 
-		m_hudManager.UpdateTimerSlider(m_levelTimeCountDown, m_timeLimit);
+		m_hudManager.UpdateTimerSlider(m_levelTimeFloat);
 	}
 
 
@@ -61,7 +48,7 @@ public class GameplayManager_Items : GameplayManager
 		}
 		else
 		{
-			m_hudManager.UpdateItemsCount(0, m_totalItems);
+			m_hudManager.UpdateItemsCount(0);
 		}
 		m_hudManager.UpdateTimerTextItems(m_timeLimit);
 	}
@@ -75,12 +62,12 @@ public class GameplayManager_Items : GameplayManager
 		}
 		else
 		{
-			m_hudManager.UpdateItemsCount(controller.Stats.Items, m_totalItems);
+			m_hudManager.UpdateItemsCount(controller.Stats.Items);
 		}
 		
 		// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when level cleared?
 		m_itemCount++;
-		if (m_itemCount == m_totalItems)
+		if (m_itemCount == LevelSelectData.ThemeData.LevelPlayInfo.TotalItems)
 		{
 			if (LevelSelectData.IsMultiplayer)
 			{
@@ -102,5 +89,43 @@ public class GameplayManager_Items : GameplayManager
 				EndGame(true, controller);
 			}
 		}
+	}
+
+
+
+	protected override void EndGame(bool isWin, OTController controller)
+	{
+		base.EndGame(isWin, controller);
+
+		int totalScore = GetTotalScore(m_levelTimeFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Items);
+		m_hudManager.SetEndScreenStats(totalScore, m_levelTimeFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, true, m_controllers[0].Stats.Items);
+
+		if (SaveSystem.StatFileSaveRequired())
+		{
+			SaveSystem.SaveStatFileInfo(totalScore, m_controllers[0].Stats.Lives, m_levelTimeFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
+		}
+	}
+
+	// [TODO]
+	// Check if the stats are better than the existing ones, then save file if so
+	//	o Items mode will have heirarchy of what to base on. E.g. items collected, then lives lost, then time, then moves
+
+	// [TODO][IMPORTANT]
+	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
+	private int GetTotalScore(float time, int moves, int lives, int items)
+	{
+		if (lives == 0 || items == 0) return 0;
+
+		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
+		float itemsRatio = (float)items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems;
+		float timeRatio = time / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
+		const int scoreMultiplier = 10000;
+		const int livesMultiplier = 1000;
+
+		// [TODO] How to involve #moves? If at all?
+
+		int score = Mathf.RoundToInt((gridRatio * itemsRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
+		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {itemsRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		return Mathf.Max(0, score);
 	}
 }

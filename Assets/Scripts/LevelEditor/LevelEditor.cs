@@ -394,6 +394,7 @@ public class LevelEditor : MonoBehaviour
 
 		LevelSelectData.SetMapData(map);
 		LevelSelectData.ThemeData = m_themesList.ThemesData[m_themeDropdown.value];
+		LevelSelectData.FileName = LevelEditorData.CustomMapFileName;
 
 		LevelSelectData.GameMode = (EGameMode)m_gameModeDropdown.value;
 		LevelSelectData.TurnDirection = (ETurnDirection)m_turnDirectionDropdown.value;

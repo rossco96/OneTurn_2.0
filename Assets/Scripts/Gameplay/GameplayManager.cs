@@ -11,6 +11,7 @@ public abstract class GameplayManager : MonoBehaviour
 		m_hudManager = hudManager;
 		m_hudManager.AssignPauseButton(SetPause);
 		m_hudManager.AssignResumeButton(SetResume);
+		m_hudManager.AssignNextLevelButton(NextLevel);
 	}
 
 	// [NOTE] Want to know Grid Dimension so can determine the points multiplier -- Do here? Or separate ScoreManager?
@@ -34,6 +35,12 @@ public abstract class GameplayManager : MonoBehaviour
 
 	protected float m_levelStartTime = 0.0f;
 	protected float m_totalTimePaused = 0.0f;
+
+	// Note the below are used in children only
+	protected float m_levelTimeFloat = 0.0f;		// items and exit
+	protected int m_levelTimeInt = 0;				// items and exit
+	protected int m_timeLimit = 0;                  // items
+	protected int m_itemCount = 0;					// items
 
 
 
@@ -123,7 +130,6 @@ public abstract class GameplayManager : MonoBehaviour
 	{
 		controller.SetInputDisabled(true);
 		controller.DestroyPlayerGameObject();
-		m_hudManager.UpdateLivesCount(controller.Stats.Lives);
 
 		if (controller.Stats.RemoveLife() == false)
 		{
@@ -138,32 +144,62 @@ public abstract class GameplayManager : MonoBehaviour
 			// [TODO] DO THIS ELSEWHERE! Needs to be done after death animation complete
 			controller.SetInputDisabled(false);
 		}
+
+		m_hudManager.UpdateLivesCount(controller.Stats.Lives);
 	}
 
 
 
-	protected void EndGame(bool isWin, OTController controller)
+	// [TODO][Q] Can we delete OTController?
+	// Also can we please sort out whatever is going on with m_controllers indexing - this looks terrible
+	protected virtual void EndGame(bool isWin, OTController controller)
+	{
+		m_hasEnded = true;
+		m_controllers[0].SetInputDisabled(true);
+		m_hudManager.ShowEndScreen(isWin);
+	}
+
+	protected void EndGameMultiplayer()
 	{
 		m_hasEnded = true;
 		for (int i = 0; i < m_controllers.Length; ++i)
 		{
-			if (m_controllers[i] != null)
-				m_controllers[i].SetInputDisabled(true);
+			//if (m_controllers[i] != null)								// [TODO][Q] Should no longer need this nullcheck? No longer destroying the controller!
+			m_controllers[i].SetInputDisabled(true);
 		}
 
-		Debug.LogWarning($"END GAME : win? {isWin}");
+		Debug.LogWarning($"END GAME MULTIPLAYER");
 	}
 
 
 
 
+
+	#region UI Buttons
+	// [NOTE] This *is* currently in use! Don't need to label it "TEST"?
+	public void NextLevel()
+	{
+		Debug.Log("[GameplayManager::NextLevel]");
+
+		//LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.]		// [TODO] Implement!
+		UnityEngine.SceneManagement.SceneManager.LoadScene("LevelScene");							// [Q] Is this the best way to do it? Probably
+	}
 
 	// [TODO] Turn into an actual 'exit' button, in the pause menu.
 	// [TODO] Ask the player if they're sure they want to quit!
 	// [TODO] Implement via EndGame(EGameEndState.Quit) ???
 	//			Or can just delete that EGameEndState?
-	public void TEST_ReturnToMainMenu()
+	// Used by both pause menu and the end screen... Only want to show 'are you sure' popup if we're in the pause menu
+	public void ReturnToMainMenu()
 	{
+		Debug.Log("[GameplayManager::ReturnToMainMenu]");
 		UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
 	}
+
+	public void ReturnToLevelEditor()
+	{
+		Debug.Log("[GameplayManager::ReturnToMainMenu]");
+		UnityEngine.SceneManagement.SceneManager.LoadScene("LevelEditor");
+	}
+	#endregion
 }

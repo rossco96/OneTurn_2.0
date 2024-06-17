@@ -8,6 +8,7 @@ public static class SaveSystem
 {
 	#region Vars
 	private static readonly string m_initFullFilepath = $"{Application.persistentDataPath}/{Application.productName}.init";
+	//private static readonly string m_settingsFullFilepath = $"{Application.persistentDataPath}/Settings.info";	// [TODO] Implement - store e.g. volume, input type, previously played level, etc.
 	private static readonly string m_gameMapsDirectory = $"{Application.persistentDataPath}/Maps/Game";
 	private static readonly string m_customMapsDirectory = $"{Application.persistentDataPath}/Maps/Custom";
 	private static readonly string m_importedMapsDirectory = $"{Application.persistentDataPath}/Maps/Imported";
@@ -30,7 +31,6 @@ public static class SaveSystem
 	#region Init / Version Check
 	public static void Init()																// [TODO][IMPORTANT] Ensure this is being called from GameStartup or Splash script!
 	{
-		InitCustomImportDirectories();														// [TODO] delete delete delete delete delete delete delete
 		string currentVersion = Application.version;
 		
 		if (File.Exists(m_initFullFilepath))
@@ -72,13 +72,16 @@ public static class SaveSystem
 			{
 				string completeFilePath = $"{themeDirectory}/{themeMaps[j].GridLayout.imageContentsHash}.{m_mapStatsExtension}";
 				if (File.Exists(completeFilePath) == false)
-					GenerateStatFile(completeFilePath);
+					CreateStatFile($"{completeFilePath}");
 			}
 		}
 	}
 
+	// [TODO][IMPORTANT][Q] Do we also need to call Directory.CreateDirectory(m_gameMapsDirectory) ?
+	// --> If so, also rename the method!
 	private static void InitCustomImportDirectories()
 	{
+		//Directory.CreateDirectory(m_gameMapsDirectory);
 		Directory.CreateDirectory(m_customMapsDirectory);
 		Directory.CreateDirectory(m_importedMapsDirectory);
 	}
@@ -161,15 +164,22 @@ public static class SaveSystem
 
 
 	#region Stat Files
-	public static void CreateCustomStatFile(string mapFileName)
+	public static void CreateStatFileCustomMap(string mapFileName)
 	{
-		string mapFilePath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
-		GenerateStatFile(mapFilePath);
+		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapStatsExtension}";
+		CreateStatFile(fullFilepath);
 	}
 
-	private static void GenerateStatFile(string filePath)
+	public static void CreateStatFileImportedMap(string mapFileName)
 	{
-		StatsData<StatKey<string, string, string>, float> statsData = new StatsData<StatKey<string, string, string>, float>();
+		string fullFilepath = $"{m_importedMapsDirectory}/{mapFileName}.{m_mapStatsExtension}";
+		CreateStatFile(fullFilepath);
+	}
+
+	private static void CreateStatFile(string fullFilepath)
+	{
+		StatsDictionary statsData = new StatsDictionary();
+
 		string[] gameModes = Enum.GetNames(typeof(EGameMode));
 		string[] turnDirection = Enum.GetNames(typeof(ETurnDirection));
 		string[] statsSection = Enum.GetNames(typeof(EStatsSection));
@@ -185,20 +195,67 @@ public static class SaveSystem
 				{
 					if ((EGameMode)gameModeIndex == EGameMode.Exit && (EStatsSection)statsSectionIndex == EStatsSection.Items) continue;
 					string stat = statsSection[statsSectionIndex];
-					StatKey<string, string, string> statKey = new StatKey<string, string, string>(mode, direction, stat);
-					statsData.Add(statKey, 0);
+					statsData.Add($"{mode}{direction}{stat}", 0);
 				}
 			}
 		}
 
 		string jsonData = JsonUtility.ToJson(statsData);
-		if (File.Exists(filePath))
-			File.SetAttributes(filePath, FileAttributes.Normal);
-		StreamWriter dictWriter = File.CreateText(filePath);
+		if (File.Exists(fullFilepath))
+			File.SetAttributes(fullFilepath, FileAttributes.Normal);
+		StreamWriter dictWriter = File.CreateText(fullFilepath);
 		dictWriter.Write(jsonData);
 		dictWriter.Close();
-		File.SetAttributes(filePath, FileAttributes.ReadOnly);
-		//File.SetAttributes(filePath, FileAttributes.Hidden);
+		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+	}
+
+	public static bool StatFileSaveRequired()
+	{
+		// [TODO] IMPLEMENT CHECKING, PRIORITY OF DIFFERENT THINGS
+		// e.g. for exit mode: first number of lives, then amount of time, then number of moves
+		// Currently always writing to the save file...
+		return true;
+	}
+
+	public static void SaveStatFileInfo(int score, int lives, float time, int moves, int items = -1)
+	{
+		string statFullFilepath = string.Empty;
+		switch (LevelSelectData.MapType)
+		{
+			case EMapType.Game:
+				statFullFilepath = $"{m_gameMapsDirectory}/{LevelSelectData.ThemeData.ThemeName}/{LevelSelectData.FileName}.{m_mapStatsExtension}";
+				break;
+			case EMapType.Custom:
+				statFullFilepath = $"{m_customMapsDirectory}/{LevelSelectData.FileName}.{m_mapStatsExtension}";
+				break;
+			case EMapType.Imported:
+				// [TODO][IMPORTANT] This will need changing if wanting to categorise by author!!!
+				statFullFilepath = $"{m_importedMapsDirectory}/{LevelSelectData.FileName}.{m_mapStatsExtension}";
+				break;
+			default:
+				break;
+		}
+
+		string statFile = File.ReadAllText(statFullFilepath);
+		StatsDictionary statsData = JsonUtility.FromJson<StatsDictionary>(statFile);
+		string statBase = $"{LevelSelectData.GameMode}{LevelSelectData.TurnDirection}";
+
+		statsData[$"{statBase}{EStatsSection.Score}"] = score;
+		statsData[$"{statBase}{EStatsSection.Lives}"] = lives;
+		statsData[$"{statBase}{EStatsSection.Time}"] = time.RoundDP(2);
+		statsData[$"{statBase}{EStatsSection.Moves}"] = moves;
+
+		if (items >= 0)
+			statsData[$"{statBase}{EStatsSection.Items}"] = items;
+
+		string jsonData = JsonUtility.ToJson(statsData);
+		File.SetAttributes(statFullFilepath, FileAttributes.Normal);
+		StreamWriter dictWriter = File.CreateText(statFullFilepath);
+		dictWriter.Write(jsonData);
+		dictWriter.Close();
+		File.SetAttributes(statFullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(statFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 

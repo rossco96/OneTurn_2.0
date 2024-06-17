@@ -1,3 +1,4 @@
+/*
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -46,3 +47,4 @@ public class StatsData<k, v> : Dictionary<k, v>, ISerializationCallbackReceiver 
 		return default;
 	}
 }
+//*/

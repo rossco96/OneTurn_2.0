@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e674de22ce8e81640a810e57d699efe9, type: 3}
-  m_Name: ThemeData_TEST_Garden
+  m_Name: ThemeData_TEST01_Garden
   m_EditorClassIdentifier: 
   ThemeName: Garden
   Maps:
   - {fileID: 11400000, guid: 6d3e094db0df538478595142978e2ccb, type: 2}
   - {fileID: 11400000, guid: 5571c39d1396bcf42bcd54cce4ae1f5e, type: 2}
   PointsToUnlock: 0
-  TimeLimit: 40
+  LevelPlayInfo: {fileID: 11400000, guid: 1239eb8a4ee704b4ca264424015133c4, type: 2}
   LevelSelectIcon: {fileID: 0}
   BackgroundSprite: {fileID: 0}
   PlayerSprite: {fileID: 21300000, guid: 8b45a4bddca66c940b161336744f411f, type: 3}
