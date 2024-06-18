@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+// [TODO] Refactor entire class into subclasses
+
 public class LevelSelectMenuManager : MonoBehaviour
 {
 	[SerializeField] private ThemesList m_themesList;
@@ -26,12 +28,18 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private TMP_Dropdown m_gameModeDropdown;
 
 	[Space]
+	[Header("Single Player Stats")]
+	[SerializeField] private GameObject m_statsParentSinglePlayer;
 	[SerializeField] private TextMeshProUGUI m_statTime;
 	[SerializeField] private TextMeshProUGUI m_statMoves;
 	[SerializeField] private TextMeshProUGUI m_statLives;
 	[SerializeField] private TextMeshProUGUI m_statItems;
 	[SerializeField] private TextMeshProUGUI m_statScore;
 	[SerializeField] private TextMeshProUGUI m_statTotalPoints;
+
+	[Space]
+	[Header("Multiplayer Stats")]
+	[SerializeField] private GameObject m_statsParentMultiplayer;
 
 	private ThemeData m_currentTheme;
 
@@ -42,6 +50,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 
 
+	// [TODO] Refactor OnEnable()
 	private void OnEnable()
 	{
 		m_numberOfThemes = m_themesList.ThemesData.Length;
@@ -71,9 +80,16 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// 3 is the number of tabs. 80.0f is the pre-defined height
 		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, 80.0f);
 
-		UpdateLevelStats();
-		//UpdateTotalPoints();
+		if (LevelSelectData.IsMultiplayer == false)
+			UpdateLevelStatsSinglePlayer();
+		else
+			UpdateStatsMultiplayer();
+
 		m_statTotalPoints.text = $"Total Points: {SaveSystem.GetTotalPoints(m_themesList):n0}";
+		// [TODO] Figure out if we're displaying the total points - only if it was a GameMap that was played previously! Similarly, also set the correct tab.
+		
+		m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
+		m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
 	}
 
 
@@ -81,6 +97,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 	public void SelectGameTab()
 	{
 		LevelSelectData.MapType = EMapType.Game;
+
+		m_statTotalPoints.gameObject.SetActive(true);
 	}
 
 	public void SelectCustomTab()
@@ -90,11 +108,15 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// [TODO][Q] For stats on custom levels. Do we force reset upon any editing?
 		// Otherwise could create a straight line of items for max points and then turn it into a really hard level
 		// ... Does it matter?
+
+		m_statTotalPoints.gameObject.SetActive(false);
 	}
 
 	public void SelectImportedTab()
 	{
 		LevelSelectData.MapType = EMapType.Imported;
+
+		m_statTotalPoints.gameObject.SetActive(false);
 	}
 
 
@@ -119,7 +141,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
 		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.imageContentsHash}";
 
-		UpdateLevelStats();
+		if (LevelSelectData.IsMultiplayer == false)
+			UpdateLevelStatsSinglePlayer();
 
 		// [TODO][IMPORTANT] 'else' commented out here (and in UpdateMapIndex below) since testing with such small numbers of indexes - there's some overlap!
 		if (m_themeIndex == 0)
@@ -144,7 +167,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
 		LevelSelectData.FileName = $"{m_currentTheme.Maps[m_mapIndex].GridLayout.imageContentsHash}";
 
-		UpdateLevelStats();
+		if (LevelSelectData.IsMultiplayer == false)
+			UpdateLevelStatsSinglePlayer();
 
 		if (m_mapIndex == 0)
 			m_buttonMapUp.interactable = false;
@@ -156,7 +180,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 			m_buttonMapDown.interactable = true;
 	}
 
-	private void UpdateLevelStats()
+	private void UpdateLevelStatsSinglePlayer()
 	{
 		m_statTime.text = $"Time Taken: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Time)}s";
 		m_statMoves.text = $"Moves Taken: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Moves)}";
@@ -166,21 +190,10 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_statScore.text = $"Level Score: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Score):n0}";
 	}
 
-	/*
-	private void UpdateTotalPoints()
+	private void UpdateStatsMultiplayer()
 	{
-		int totalPoints = 0;
-		for (int i = 0; i < m_themesList.ThemesData.Length; ++i)
-		{
-			for (int j = 0; j < m_themesList.ThemesData[i].Maps.Length; ++j)
-			{
-				string fileName = m_themesList.ThemesData[i].Maps[j].FileName;
-				totalPoints += (int)SaveSystem.GetStatsInfo(fileName, EStatsSection.Score);
-			}
-		}
-		m_statTotalPoints.text = $"Total Points: {totalPoints:n0}";
+
 	}
-	//*/
 
 
 
@@ -214,21 +227,32 @@ public class LevelSelectMenuManager : MonoBehaviour
 			}
 			gameModes.Add(gameMode);
 		}
+		m_gameModeDropdown.AddOptions(gameModes);
 		
 		if (gameModeValue == 1)
 			m_gameModeDropdown.value = 1;
+
+		m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
+		m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
 	}
 
 	public void UpdateGameMode(TMP_Dropdown dropdown)
 	{
 		EGameMode gameMode = (EGameMode)dropdown.value;
 		LevelSelectData.GameMode = gameMode;
+		if (LevelSelectData.IsMultiplayer == false)
+		{
+			m_statItems.gameObject.SetActive(gameMode == EGameMode.Items);
+			UpdateLevelStatsSinglePlayer();
+		}
 	}
 
 	public void UpdateTurnDirection(TMP_Dropdown dropdown)
 	{
 		ETurnDirection turnDirection = (ETurnDirection)dropdown.value;
 		LevelSelectData.TurnDirection = turnDirection;
+		if (LevelSelectData.IsMultiplayer == false)
+			UpdateLevelStatsSinglePlayer();
 	}
 
 
