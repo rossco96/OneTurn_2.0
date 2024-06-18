@@ -3,6 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MapData_", menuName = "Data/Map Data")]
 public class MapData : ScriptableObject
 {
+	public string FileName => $"{GridLayout.imageContentsHash}";					// [TODO] THIS IS ONLY CORRECT FOR GAME MAPS! MUST FIGURE OUT HOW TO DO THIS IN GENERAL!
+	
 	public Texture2D GridLayout;
 	
 	// [NOTE] The below feels somewhat hacky but, if generating using pixel grids, how else to do it?

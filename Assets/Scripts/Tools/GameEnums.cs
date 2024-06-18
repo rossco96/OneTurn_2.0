@@ -18,6 +18,7 @@ public enum EGameMode
 {
 	Items,
 	Exit,
+	//Travel,						// New game mode idea! Cover every (possible?) square in the time limit.
 	M_Bomb,
 	M_Chase
 }

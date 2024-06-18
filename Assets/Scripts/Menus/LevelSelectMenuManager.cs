@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,8 +8,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private ThemesList m_themesList;
 
 	[Space]
+	[SerializeField] private GridLayoutGroup m_mapTabsParentGridLayoutGroup;
+	[SerializeField] private RectTransform m_mapTabsParentRectTransform;
 	[SerializeField] private Button m_buttonGameTab;
 	[SerializeField] private Button m_buttonCustomTab;
+	[SerializeField] private Button m_buttonImportedTab;
 
 	[Space]
 	[SerializeField] private Image m_themeIconImage;
@@ -19,7 +23,15 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private Button m_buttonMapDown;
 
 	[Space]
-	[SerializeField] private TMPro.TMP_Dropdown m_gameModeDropdown;
+	[SerializeField] private TMP_Dropdown m_gameModeDropdown;
+
+	[Space]
+	[SerializeField] private TextMeshProUGUI m_statTime;
+	[SerializeField] private TextMeshProUGUI m_statMoves;
+	[SerializeField] private TextMeshProUGUI m_statLives;
+	[SerializeField] private TextMeshProUGUI m_statItems;
+	[SerializeField] private TextMeshProUGUI m_statScore;
+	[SerializeField] private TextMeshProUGUI m_statTotalPoints;
 
 	private ThemeData m_currentTheme;
 
@@ -55,19 +67,37 @@ public class LevelSelectMenuManager : MonoBehaviour
 		//m_currentTheme = 
 		//m_themeIndex = 
 		//m_mapIndex = 
+
+		// 3 is the number of tabs. 80.0f is the pre-defined height
+		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, 80.0f);
+
+		UpdateLevelStats();
+		//UpdateTotalPoints();
+		m_statTotalPoints.text = $"Total Points: {SaveSystem.GetTotalPoints(m_themesList):n0}";
 	}
 
 
 
 	public void SelectGameTab()
 	{
-
+		LevelSelectData.MapType = EMapType.Game;
 	}
 
 	public void SelectCustomTab()
 	{
+		LevelSelectData.MapType = EMapType.Custom;
 
+		// [TODO][Q] For stats on custom levels. Do we force reset upon any editing?
+		// Otherwise could create a straight line of items for max points and then turn it into a really hard level
+		// ... Does it matter?
 	}
+
+	public void SelectImportedTab()
+	{
+		LevelSelectData.MapType = EMapType.Imported;
+	}
+
+
 
 	public void UpdateThemeIndex(int indexDirection)
 	{
@@ -80,8 +110,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_mapIndex = 0;
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		m_buttonMapUp.interactable = false;
-		if (m_buttonMapDown.interactable == false)
-			m_buttonMapDown.interactable = true;
+		m_buttonMapDown.interactable = true;
 		// [TODO] For testing only! Will never need this, unless only one map in a given theme
 		if (m_mapIndex == m_numberOfMaps - 1)
 			m_buttonMapDown.interactable = false;
@@ -89,6 +118,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
 		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.imageContentsHash}";
+
+		UpdateLevelStats();
 
 		// [TODO][IMPORTANT] 'else' commented out here (and in UpdateMapIndex below) since testing with such small numbers of indexes - there's some overlap!
 		if (m_themeIndex == 0)
@@ -112,14 +143,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
 		LevelSelectData.FileName = $"{m_currentTheme.Maps[m_mapIndex].GridLayout.imageContentsHash}";
-		/*
-		m_mapData = mapData;
-		m_gridDimension = m_mapData.GridLayout.width;
-		// [NOTE][IMPORTANT] 0.2f at the end is because the border is *CURRENTLY* 1/10th the width of the walls (multiplied by two lots of borders, one each side of the screen)
-		// [TODO][Q] Make sure we're calculating the difference?? Ask an artist about import settings??
-		// Border should always be the same size, regardless of grid dimnsion!
-		m_gridSizeMultiplier = (UnityEngine.Camera.main.aspect * UnityEngine.Camera.main.orthographicSize * 2.0f) / (m_gridDimension + 0.2f);
-		//*/
+
+		UpdateLevelStats();
 
 		if (m_mapIndex == 0)
 			m_buttonMapUp.interactable = false;
@@ -130,6 +155,32 @@ public class LevelSelectMenuManager : MonoBehaviour
 		/*else*/ if (m_mapIndex == m_numberOfMaps - 2 && m_buttonMapDown.interactable == false)
 			m_buttonMapDown.interactable = true;
 	}
+
+	private void UpdateLevelStats()
+	{
+		m_statTime.text = $"Time Taken: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Time)}s";
+		m_statMoves.text = $"Moves Taken: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Moves)}";
+		m_statLives.text = $"Lives Left: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Lives)}";	// [TODO][Q] Do we want time left, quickest time, or different depending on items or exit mode?
+		if (LevelSelectData.GameMode == EGameMode.Items)
+			m_statItems.text = $"Items Collected: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Items)}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		m_statScore.text = $"Level Score: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Score):n0}";
+	}
+
+	/*
+	private void UpdateTotalPoints()
+	{
+		int totalPoints = 0;
+		for (int i = 0; i < m_themesList.ThemesData.Length; ++i)
+		{
+			for (int j = 0; j < m_themesList.ThemesData[i].Maps.Length; ++j)
+			{
+				string fileName = m_themesList.ThemesData[i].Maps[j].FileName;
+				totalPoints += (int)SaveSystem.GetStatsInfo(fileName, EStatsSection.Score);
+			}
+		}
+		m_statTotalPoints.text = $"Total Points: {totalPoints:n0}";
+	}
+	//*/
 
 
 
@@ -168,13 +219,13 @@ public class LevelSelectMenuManager : MonoBehaviour
 			m_gameModeDropdown.value = 1;
 	}
 
-	public void UpdateGameMode(TMPro.TMP_Dropdown dropdown)
+	public void UpdateGameMode(TMP_Dropdown dropdown)
 	{
 		EGameMode gameMode = (EGameMode)dropdown.value;
 		LevelSelectData.GameMode = gameMode;
 	}
 
-	public void UpdateTurnDirection(TMPro.TMP_Dropdown dropdown)
+	public void UpdateTurnDirection(TMP_Dropdown dropdown)
 	{
 		ETurnDirection turnDirection = (ETurnDirection)dropdown.value;
 		LevelSelectData.TurnDirection = turnDirection;

@@ -360,7 +360,7 @@ public static class SaveSystem
 
 	public static string GetMapmetaInfo(string mapFileName, EMapmetaInfo infoType)
 	{
-		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
+		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";						// [TODO] This may need changing! LevelSelectData.MapType
 		string mapmetaFile = File.ReadAllText(fullFilepath);
 		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
 
@@ -381,8 +381,61 @@ public static class SaveSystem
 	}
 
 
+	public static float GetStatsInfo(string mapFileName, EStatsSection statType)
+	{
+		string fullFilepath = string.Empty;
+		switch (LevelSelectData.MapType)
+		{
+			case EMapType.Game:
+				fullFilepath += $"{m_gameMapsDirectory}/{LevelSelectData.ThemeData.ThemeName}/";
+				break;
+			case EMapType.Custom:
+				fullFilepath += $"{m_customMapsDirectory}/";
+				break;
+			case EMapType.Imported:
+				fullFilepath += $"{m_importedMapsDirectory}/";
+				break;
+			default:
+				break;
+		}
+		fullFilepath += $"{mapFileName}.{m_mapStatsExtension}";
+		string statsFile = File.ReadAllText(fullFilepath);
+		MapmetaData<string, float> mapStats = JsonUtility.FromJson<MapmetaData<string, float>>(statsFile);
+		return mapStats[$"{LevelSelectData.GameMode}{LevelSelectData.TurnDirection}{statType}"];
+	}
+
+	public static int GetTotalPoints(ThemesList themesList)
+	{
+		int totalPoints = 0;
+
+		for (int i = 0; i < themesList.ThemesData.Length; ++i)
+		{
+			string[] allThemeFiles = Directory.GetFiles($"{m_gameMapsDirectory}/{themesList.ThemesData[i].ThemeName}");
+			for (int j = 0; j < allThemeFiles.Length; ++j)
+			{
+				if (allThemeFiles[j].Contains($".{m_mapStatsExtension}"))
+				{
+					string statFile = File.ReadAllText(allThemeFiles[j]);
+					MapmetaData<string, float> statsInfo = JsonUtility.FromJson<MapmetaData<string, float>>(statFile);
+
+					for (int gm = 0; gm < Enum.GetValues(typeof(EGameMode)).Length; ++gm)
+					{
+						if ($"{(EGameMode)gm}".StartsWith(m_multiplayerGameModePrefix)) continue;
+						for (int td = 0; td < Enum.GetValues(typeof(ETurnDirection)).Length; ++td)
+						{
+							totalPoints += (int)statsInfo[$"{(EGameMode)gm}{(ETurnDirection)td}{(EStatsSection.Score)}"];
+						}
+					}
+				}
+			}
+		}
+
+		return totalPoints;
+	}
+
+
 	// [TODO] Implement!
-	public static string[] GetImportedMapmetaFilepaths()
+	public static string[] GetImportedMapFileNamesByAuthorName()
 	{
 		return new string[0];
 	}
