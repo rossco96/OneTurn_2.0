@@ -37,8 +37,8 @@ public static class SaveSystem
 		{
 			string text = File.ReadAllText(m_initFullFilepath);
 			// If it's the same version, no new levels (etc.)
-			if (text == currentVersion)
-				return;
+			//if (text == currentVersion)
+			//	return;
 			File.SetAttributes(m_initFullFilepath, FileAttributes.Normal);
 		}
 		else

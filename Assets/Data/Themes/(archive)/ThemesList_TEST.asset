@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: ThemesList_TEST
   m_EditorClassIdentifier: 
   ThemesData:
+  - {fileID: 11400000, guid: 4b14589e9075e4b4a8e7a8e2597dc0d6, type: 2}
   - {fileID: 11400000, guid: 508bb233f095bc34d928142bd235c907, type: 2}
   - {fileID: 11400000, guid: a1d4b0ed3af8d604c88b29a8e8899c24, type: 2}

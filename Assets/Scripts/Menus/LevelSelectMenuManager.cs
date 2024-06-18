@@ -143,9 +143,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		m_buttonMapUp.interactable = false;
 		m_buttonMapDown.interactable = true;
-		// [TODO] For testing only! Will never need this, unless only one map in a given theme
-		if (m_mapIndex == m_numberOfMaps - 1)
-			m_buttonMapDown.interactable = false;
 
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
@@ -155,14 +152,14 @@ public class LevelSelectMenuManager : MonoBehaviour
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
 
-		// [TODO][IMPORTANT] 'else' commented out here (and in UpdateMapIndex below) since testing with such small numbers of indexes - there's some overlap!
 		if (m_themeIndex == 0)
 			m_buttonThemeUp.interactable = false;
-		/*else*/ if (m_themeIndex == 1 && m_buttonThemeUp.interactable == false)
+		else if (m_themeIndex == 1 && m_buttonThemeUp.interactable == false)
 			m_buttonThemeUp.interactable = true;
-		/*else*/ if (m_themeIndex == m_numberOfThemes - 1)
+		
+		if (m_themeIndex == m_numberOfThemes - 1)
 			m_buttonThemeDown.interactable = false;
-		/*else*/ if (m_themeIndex == m_numberOfThemes - 2 && m_buttonThemeDown.interactable == false)
+		else if (m_themeIndex == m_numberOfThemes - 2 && m_buttonThemeDown.interactable == false)
 			m_buttonThemeDown.interactable = true;
 	}
 
@@ -184,11 +181,12 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		if (m_mapIndex == 0)
 			m_buttonMapUp.interactable = false;
-		/*else*/ if (m_mapIndex == 1 && m_buttonMapUp.interactable == false)
+		else if (m_mapIndex == 1 && m_buttonMapUp.interactable == false)
 			m_buttonMapUp.interactable = true;
-		/*else*/ if (m_mapIndex == m_numberOfMaps - 1)
+		
+		if (m_mapIndex == m_numberOfMaps - 1)
 			m_buttonMapDown.interactable = false;
-		/*else*/ if (m_mapIndex == m_numberOfMaps - 2 && m_buttonMapDown.interactable == false)
+		else if (m_mapIndex == m_numberOfMaps - 2 && m_buttonMapDown.interactable == false)
 			m_buttonMapDown.interactable = true;
 	}
 
@@ -283,5 +281,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 		//	SceneManager.LoadScene("LevelScene_Multiplayer");
 		//else
 			SceneManager.LoadScene("LevelScene");
+	}
+
+	[ContextMenu("TEST")]
+	public void TEST()
+	{
+		SaveSystem.Init();
 	}
 }
