@@ -66,7 +66,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_numberOfMaps = m_currentTheme.Maps.Length;
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.imageContentsHash}";
+		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.GetHashCode()}";
 		LevelSelectData.MapType = EMapType.Game;
 
 		m_buttonThemeUp.interactable = false;
@@ -139,7 +139,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.imageContentsHash}";
+		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.GetHashCode()}";
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
@@ -165,7 +165,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_mapIndex += indexDirection;
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
-		LevelSelectData.FileName = $"{m_currentTheme.Maps[m_mapIndex].GridLayout.imageContentsHash}";
+		LevelSelectData.FileName = $"{m_currentTheme.Maps[m_mapIndex].GridLayout.GetHashCode()}";
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();

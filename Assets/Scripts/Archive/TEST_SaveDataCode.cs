@@ -40,8 +40,8 @@ public class TEST_SaveDataCode : MonoBehaviour
 
 		return;
 
-		//string mapPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.imageContentsHash}.map";
-		string mapPath = $"{Application.persistentDataPath}\\{m_sprite.texture.imageContentsHash}.map";
+		//string mapPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.GetHashCode()}.map";
+		string mapPath = $"{Application.persistentDataPath}\\{m_sprite.texture.GetHashCode()}.map";
 		Debug.Log(mapPath);
 		if (System.IO.File.Exists(mapPath))
 			System.IO.File.SetAttributes(mapPath, System.IO.FileAttributes.Normal);
@@ -51,7 +51,7 @@ public class TEST_SaveDataCode : MonoBehaviour
 		System.IO.File.SetAttributes(mapPath, System.IO.FileAttributes.ReadOnly);
 		//System.IO.File.SetAttributes(mapPath, System.IO.FileAttributes.Hidden);
 
-		string metaPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.imageContentsHash}.mapmeta";
+		string metaPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.GetHashCode()}.mapmeta";
 		if (System.IO.File.Exists(metaPath))
 			System.IO.File.SetAttributes(metaPath, System.IO.FileAttributes.Normal);
 		System.IO.StreamWriter metaWriter = System.IO.File.CreateText(metaPath);
@@ -66,7 +66,7 @@ public class TEST_SaveDataCode : MonoBehaviour
 	[ContextMenu("Create Sprite From Text File")]
 	public void CreateSpriteFromTextFile()
 	{
-		string textFile = System.IO.File.ReadAllText($"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.imageContentsHash}.map");
+		string textFile = System.IO.File.ReadAllText($"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.GetHashCode()}.map");
 		string[] textFileArray = textFile.Split('\n');
 		int dimension = textFileArray.Length;
 		// [NOTE] Can just do textFileArray.Length for both, since only ever dealing with square grids.
@@ -145,7 +145,7 @@ public class TEST_SaveDataCode : MonoBehaviour
 		}
 
 		string dictjson = JsonUtility.ToJson(statsData);
-		string statPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.imageContentsHash}.stat";
+		string statPath = $"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.GetHashCode()}.stat";
 		if (System.IO.File.Exists(statPath))
 			System.IO.File.SetAttributes(statPath, System.IO.FileAttributes.Normal);
 		System.IO.StreamWriter dictWriter = System.IO.File.CreateText(statPath);
@@ -158,7 +158,7 @@ public class TEST_SaveDataCode : MonoBehaviour
 	[ContextMenu("DEBUG (view save file)")]
 	public void DebugViewSaveFile()
 	{
-		string s = System.IO.File.ReadAllText($"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.imageContentsHash}.stat");
+		string s = System.IO.File.ReadAllText($"C:\\Users\\rossc\\Documents\\TEMP\\{m_sprite.texture.GetHashCode()}.stat");
 
 		// [NOTE][IMPORTANT] This throws an error but still functions! Error below...
 		StatsData<StatKey<string, string, string>, float> saveData = JsonUtility.FromJson<StatsData<StatKey<string, string, string>, float>>(s);

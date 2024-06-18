@@ -70,7 +70,7 @@ public static class SaveSystem
 			MapData[] themeMaps = currentTheme.Maps;
 			for (int j = 0; j < themeMaps.Length; ++j)
 			{
-				string completeFilePath = $"{themeDirectory}/{themeMaps[j].GridLayout.imageContentsHash}.{m_mapStatsExtension}";
+				string completeFilePath = $"{themeDirectory}/{themeMaps[j].GridLayout.GetHashCode()}.{m_mapStatsExtension}";
 				if (File.Exists(completeFilePath) == false)
 					CreateStatFile($"{completeFilePath}");
 			}
