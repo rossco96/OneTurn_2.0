@@ -26,11 +26,11 @@ public class GameplayManager_LevelEditor : GameplayManager
 
 	protected override void UpdateTimer()
 	{
-		m_levelTimeFloat = Time.time - m_levelStartTime - m_totalTimePaused;
-		if (Mathf.FloorToInt(m_levelTimeFloat) != m_levelTimeInt)
+		m_levelTimeElapsedFloat = Time.time - m_levelStartTime - m_totalTimePaused;
+		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
 		{
-			m_levelTimeInt = Mathf.FloorToInt(m_levelTimeFloat);
-			m_hudManager.UpdateTimerTextExit(m_levelTimeInt);
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
+			m_hudManager.UpdateTimerTextExit(m_levelDisplayTimeInt);
 		}
 	}
 	#endregion

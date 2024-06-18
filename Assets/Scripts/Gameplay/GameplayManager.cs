@@ -37,10 +37,11 @@ public abstract class GameplayManager : MonoBehaviour
 	protected float m_totalTimePaused = 0.0f;
 
 	// Note the below are used in children only
-	protected float m_levelTimeFloat = 0.0f;		// items and exit
-	protected int m_levelTimeInt = 0;				// items and exit
-	protected int m_timeLimit = 0;                  // items
-	protected int m_itemCount = 0;					// items
+	protected float m_levelTimeElapsedFloat = 0.0f;		// items and exit
+	protected int m_levelDisplayTimeInt = 0;			// items and exit
+	protected float m_itemTimeRemainingFloat = 0.0f;	// items
+	protected int m_timeLimit = 0;						// items
+	protected int m_itemCount = 0;						// items
 
 
 

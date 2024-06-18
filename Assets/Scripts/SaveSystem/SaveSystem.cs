@@ -210,15 +210,53 @@ public static class SaveSystem
 		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 
-	public static bool StatFileSaveRequired()
+	public static bool StatFileSaveRequired(float time, int lives, int moves, int items = -1)
 	{
+		string statFullFilepath = string.Empty;
+		switch (LevelSelectData.MapType)
+		{
+			case EMapType.Game:
+				statFullFilepath = $"{m_gameMapsDirectory}/{LevelSelectData.ThemeData.ThemeName}/{LevelSelectData.FileName}.{m_mapStatsExtension}";
+				break;
+			case EMapType.Custom:
+				statFullFilepath = $"{m_customMapsDirectory}/{LevelSelectData.FileName}.{m_mapStatsExtension}";
+				break;
+			case EMapType.Imported:
+				// [TODO][IMPORTANT] This will need changing if wanting to categorise by author!!!
+				statFullFilepath = $"{m_importedMapsDirectory}/{LevelSelectData.FileName}.{m_mapStatsExtension}";
+				break;
+			default:
+				break;
+		}
+
+		string statFile = File.ReadAllText(statFullFilepath);
+		StatsDictionary statsData = JsonUtility.FromJson<StatsDictionary>(statFile);
+		string statBase = $"{LevelSelectData.GameMode}{LevelSelectData.TurnDirection}";
+
+		// [Q] Is this the order of priorities for what classes as a more successful level? Figure out in testing!
+		if (items > 0)
+		{
+			// ITEMS game mode
+			if (statsData[$"{statBase}{EStatsSection.Items}"] > items)		return false;
+			if (statsData[$"{statBase}{EStatsSection.Time}"] < time)		return false;
+			if (statsData[$"{statBase}{EStatsSection.Lives}"] > lives)		return false;
+			if (statsData[$"{statBase}{EStatsSection.Moves}"] < moves)		return false;
+		}
+		else
+		{
+			// EXIT game mode
+			if (statsData[$"{statBase}{EStatsSection.Time}"] < time)		return false;
+			if (statsData[$"{statBase}{EStatsSection.Lives}"] > lives)		return false;
+			if (statsData[$"{statBase}{EStatsSection.Moves}"] < moves)		return false;
+		}
+
 		// [TODO] IMPLEMENT CHECKING, PRIORITY OF DIFFERENT THINGS
 		// e.g. for exit mode: first number of lives, then amount of time, then number of moves
 		// Currently always writing to the save file...
 		return true;
 	}
 
-	public static void SaveStatFileInfo(int score, int lives, float time, int moves, int items = -1)
+	public static void SaveStatFileInfo(int score, float time, int lives, int moves, int items = -1)
 	{
 		string statFullFilepath = string.Empty;
 		switch (LevelSelectData.MapType)
@@ -242,8 +280,8 @@ public static class SaveSystem
 		string statBase = $"{LevelSelectData.GameMode}{LevelSelectData.TurnDirection}";
 
 		statsData[$"{statBase}{EStatsSection.Score}"] = score;
-		statsData[$"{statBase}{EStatsSection.Lives}"] = lives;
 		statsData[$"{statBase}{EStatsSection.Time}"] = time.RoundDP(2);
+		statsData[$"{statBase}{EStatsSection.Lives}"] = lives;
 		statsData[$"{statBase}{EStatsSection.Moves}"] = moves;
 
 		if (items >= 0)

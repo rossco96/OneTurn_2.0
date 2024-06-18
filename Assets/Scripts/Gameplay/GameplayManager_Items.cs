@@ -13,11 +13,14 @@ public class GameplayManager_Items : GameplayManager
 
 	protected override void UpdateTimer()
 	{
-		m_levelTimeFloat = m_timeLimit - (Time.time - m_levelStartTime - m_totalTimePaused);
+		// Still want m_levelTimeElapsed for calculating score at the end
+		// ... Or could just reverse engineer rather than have the extra calculation per frame?
+		m_levelTimeElapsedFloat = Time.time - m_levelStartTime - m_totalTimePaused;
+		m_itemTimeRemainingFloat = m_timeLimit - m_levelTimeElapsedFloat;
 		
-		if (m_levelTimeFloat < 10.0f)
+		if (m_itemTimeRemainingFloat < 10.0f)
 		{
-			if (m_levelTimeFloat <= 0.0f)
+			if (m_itemTimeRemainingFloat <= 0.0f)
 			{
 				m_hudManager.UpdateTimerTextItems(0.0f);
 				m_hudManager.UpdateTimerSlider(0.0f);
@@ -25,16 +28,15 @@ public class GameplayManager_Items : GameplayManager
 				EndGame(false, null);											// [TODO] Ideally don't want to be passing null to this???
 				return;
 			}
-
-			m_hudManager.UpdateTimerTextItems(m_levelTimeFloat.RoundDP(2));
+			m_hudManager.UpdateTimerTextItems(m_itemTimeRemainingFloat.RoundDP(2));
 		}
-		else if (Mathf.CeilToInt(m_levelTimeFloat) != m_levelTimeInt)
+		else if (Mathf.FloorToInt(m_itemTimeRemainingFloat) != m_levelDisplayTimeInt)
 		{
-			m_levelTimeInt = Mathf.CeilToInt(m_levelTimeFloat);
-			m_hudManager.UpdateTimerTextItems(m_levelTimeInt);
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_itemTimeRemainingFloat);
+			m_hudManager.UpdateTimerTextItems(m_levelDisplayTimeInt);
 		}
 
-		m_hudManager.UpdateTimerSlider(m_levelTimeFloat);
+		m_hudManager.UpdateTimerSlider(m_itemTimeRemainingFloat);
 	}
 
 
@@ -97,12 +99,12 @@ public class GameplayManager_Items : GameplayManager
 	{
 		base.EndGame(isWin, controller);
 
-		int totalScore = GetTotalScore(m_levelTimeFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Items);
-		m_hudManager.SetEndScreenStats(totalScore, m_levelTimeFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, true, m_controllers[0].Stats.Items);
+		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
+		m_hudManager.SetEndScreenStats(totalScore, m_levelTimeElapsedFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, true, m_controllers[0].Stats.Items);
 
-		if (SaveSystem.StatFileSaveRequired())
+		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items))
 		{
-			SaveSystem.SaveStatFileInfo(totalScore, m_controllers[0].Stats.Lives, m_levelTimeFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
+			SaveSystem.SaveStatFileInfo(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
 		}
 	}
 
@@ -112,7 +114,7 @@ public class GameplayManager_Items : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int moves, int lives, int items)
+	private int GetTotalScore(float time, int lives, int moves, int items)
 	{
 		if (lives == 0 || items == 0) return 0;
 

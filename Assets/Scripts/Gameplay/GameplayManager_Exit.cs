@@ -10,11 +10,11 @@ public class GameplayManager_Exit : GameplayManager
 
 	protected override void UpdateTimer()
 	{
-		m_levelTimeFloat = Time.time - m_levelStartTime - m_totalTimePaused;
-		if (Mathf.FloorToInt(m_levelTimeFloat) != m_levelTimeInt)
+		m_levelTimeElapsedFloat = Time.time - m_levelStartTime - m_totalTimePaused;
+		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
 		{
-			m_levelTimeInt = Mathf.FloorToInt(m_levelTimeFloat);
-			m_hudManager.UpdateTimerTextExit(m_levelTimeInt);
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
+			m_hudManager.UpdateTimerTextExit(m_levelDisplayTimeInt);
 		}
 	}
 
@@ -41,12 +41,12 @@ public class GameplayManager_Exit : GameplayManager
 	{
 		base.EndGame(isWin, controller);
 
-		int totalScore = GetTotalScore(m_levelTimeFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
-		m_hudManager.SetEndScreenStats(totalScore, m_levelTimeFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
+		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
+		m_hudManager.SetEndScreenStats(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
 
-		if (SaveSystem.StatFileSaveRequired())
+		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves))
 		{
-			SaveSystem.SaveStatFileInfo(totalScore, m_controllers[0].Stats.Lives, m_levelTimeFloat, m_controllers[0].Stats.Moves);
+			SaveSystem.SaveStatFileInfo(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
 		}
 	}
 
@@ -56,7 +56,7 @@ public class GameplayManager_Exit : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int moves, int lives)
+	private int GetTotalScore(float time, int lives, int moves)
 	{
 		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
 		if (lives == 0 || time > maxTime) return 0;
