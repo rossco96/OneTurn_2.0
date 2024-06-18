@@ -144,10 +144,10 @@ public class HUDManager : MonoBehaviour
 
 
 
-	public void SetEndScreenStats(int totalScore, float time, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	public void SetEndScreenStats(int totalScore, float timeTaken, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
 	{
 		m_endTotalScore.text = $"Total Score: {totalScore:n0}";
-		m_endTimer.text = (isItemsGameMode) ? $"Time Left: {time}s" : $"Time Taken: {time}s";
+		m_endTimer.text = $"Time Taken: {timeTaken}s";
 		m_endMovesCount.text = $"Moves Taken: {movesTaken}";
 		m_endLivesCount.text = $"Lives Left: {livesLeft}";
 		if (isItemsGameMode)

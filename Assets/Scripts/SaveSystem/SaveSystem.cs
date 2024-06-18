@@ -234,20 +234,28 @@ public static class SaveSystem
 		string statBase = $"{LevelSelectData.GameMode}{LevelSelectData.TurnDirection}";
 
 		// [Q] Is this the order of priorities for what classes as a more successful level? Figure out in testing!
-		if (items > 0)
+		// (changed to putting TIME last since very rarely will come down to the exact same time, so all other comparisons would be pointless)
+		if (items >= 0)
 		{
 			// ITEMS game mode
-			if (statsData[$"{statBase}{EStatsSection.Items}"] > items)		return false;
-			if (statsData[$"{statBase}{EStatsSection.Time}"] < time)		return false;
-			if (statsData[$"{statBase}{EStatsSection.Lives}"] > lives)		return false;
-			if (statsData[$"{statBase}{EStatsSection.Moves}"] < moves)		return false;
+			if (items > statsData[$"{statBase}{EStatsSection.Items}"])		return true;
+			else if (items < statsData[$"{statBase}{EStatsSection.Items}"])	return false;
+			else if (lives > statsData[$"{statBase}{EStatsSection.Lives}"])	return true;
+			else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"])	return false;
+			else if (moves < statsData[$"{statBase}{EStatsSection.Moves}"])	return true;
+			else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
+			else if (time < statsData[$"{statBase}{EStatsSection.Time}"])	return true;
+			else if (time > statsData[$"{statBase}{EStatsSection.Time}"])	return false;
 		}
 		else
 		{
 			// EXIT game mode
-			if (statsData[$"{statBase}{EStatsSection.Time}"] < time)		return false;
-			if (statsData[$"{statBase}{EStatsSection.Lives}"] > lives)		return false;
-			if (statsData[$"{statBase}{EStatsSection.Moves}"] < moves)		return false;
+			if (lives > statsData[$"{statBase}{EStatsSection.Lives}"])		return true;
+			else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"])	return false;
+			else if (moves < statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
+			else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
+			else if (time < statsData[$"{statBase}{EStatsSection.Time}"])	return true;
+			else if (time > statsData[$"{statBase}{EStatsSection.Time}"])	return false;
 		}
 
 		// [TODO] IMPLEMENT CHECKING, PRIORITY OF DIFFERENT THINGS
