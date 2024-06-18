@@ -240,11 +240,16 @@ public static class SaveSystem
 			// ITEMS game mode
 			if (items > statsData[$"{statBase}{EStatsSection.Items}"])		return true;
 			else if (items < statsData[$"{statBase}{EStatsSection.Items}"])	return false;
+			
 			else if (lives > statsData[$"{statBase}{EStatsSection.Lives}"])	return true;
 			else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"])	return false;
-			else if (moves < statsData[$"{statBase}{EStatsSection.Moves}"])	return true;
+			
+			else if (statsData[$"{statBase}{EStatsSection.Moves}"] == 0 ||
+				moves < statsData[$"{statBase}{EStatsSection.Moves}"])		return true;
 			else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
-			else if (time < statsData[$"{statBase}{EStatsSection.Time}"])	return true;
+			
+			else if (statsData[$"{statBase}{EStatsSection.Time}"] == 0 ||
+				time < statsData[$"{statBase}{EStatsSection.Time}"])		return true;
 			else if (time > statsData[$"{statBase}{EStatsSection.Time}"])	return false;
 		}
 		else
@@ -252,9 +257,13 @@ public static class SaveSystem
 			// EXIT game mode
 			if (lives > statsData[$"{statBase}{EStatsSection.Lives}"])		return true;
 			else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"])	return false;
-			else if (moves < statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
+			
+			else if (statsData[$"{statBase}{EStatsSection.Moves}"] == 0 ||
+				moves < statsData[$"{statBase}{EStatsSection.Moves}"])		return true;
 			else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
-			else if (time < statsData[$"{statBase}{EStatsSection.Time}"])	return true;
+			
+			else if (statsData[$"{statBase}{EStatsSection.Time}"] == 0 ||
+				time < statsData[$"{statBase}{EStatsSection.Time}"])		return true;
 			else if (time > statsData[$"{statBase}{EStatsSection.Time}"])	return false;
 		}
 

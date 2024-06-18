@@ -113,10 +113,11 @@ public class GameplayManager_Items : GameplayManager
 	//	o Items mode will have heirarchy of what to base on. E.g. items collected, then lives lost, then time, then moves
 
 	// [TODO][IMPORTANT]
-	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
+	// Work on the formula! Base on actual player testing -- not just what *I* can achieve in a level!
+	// Also note that none of this needs to be passed. Only leaving like this for now to highlight that #moves are not yet taken into account
 	private int GetTotalScore(float time, int lives, int moves, int items)
 	{
-		if (lives == 0 || items == 0) return 0;
+		if (m_itemTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
 		float itemsRatio = (float)items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems;
