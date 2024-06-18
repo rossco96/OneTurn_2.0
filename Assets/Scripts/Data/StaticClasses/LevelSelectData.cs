@@ -14,6 +14,7 @@ public static class LevelSelectData
 		// Border should always be the same size, regardless of grid dimnsion!
 		GridSizeMultiplier = (UnityEngine.Camera.main.aspect * UnityEngine.Camera.main.orthographicSize * 2.0f) / (GridDimension + 0.2f);
 	}
+	public static int ChosenMapIndex;
 
 	public static EGameMode GameMode = EGameMode.Items;
 	public static ETurnDirection TurnDirection = ETurnDirection.Right;
@@ -21,8 +22,8 @@ public static class LevelSelectData
 	public static int LivesCount = 3;										// [TODO] Implement properly!
 
 	public static bool IsMultiplayer = false;
-
-	//public static bool IsCustomMap = false;								// [Q] Do we need this?
+	// [TODO] This is needed for deciding which end level popups to show and if we're adding to stats and change of buttons etc.
+	public static bool IsCustomMap = false;
 
 	public static int GridDimension = 9;
 	public static float GridSizeMultiplier = 0.0f;

@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // [TODO] Refactor intoi separate scripts for in-game stats, popups, end game stats (any others?)
@@ -97,6 +98,7 @@ public class HUDManager : MonoBehaviour
 
 
 
+	#region UI Buttons
 	public void AssignPauseButton(UnityAction onPause)
 	{
 		m_pauseButton.onClick.AddListener(onPause);
@@ -108,10 +110,37 @@ public class HUDManager : MonoBehaviour
 		m_resumeButton.onClick.AddListener(onResume);
 	}
 
-	public void AssignNextLevelButton(UnityAction onNextLevel)
+
+	public void NextLevel()
 	{
-		m_nextLevelButton.onClick.AddListener(onNextLevel);
+		Debug.Log("[GameplayManager::NextLevel]");
+		LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex + 1];
+		RetryLevel();
 	}
+
+	public void RetryLevel()
+	{
+		Debug.Log("[GameplayManager::RetryLevel]");
+		SceneManager.LoadScene("LevelScene");                           // [Q] Is this the best way to do it? Probably
+	}
+
+	// [TODO] Turn into an actual 'exit' button, in the pause menu.
+	// [TODO] Ask the player if they're sure they want to quit!
+	// [TODO] Implement via EndGame(EGameEndState.Quit) ???
+	//			Or can just delete that EGameEndState?
+	// Used by both pause menu and the end screen... Only want to show 'are you sure' popup if we're in the pause menu
+	public void ReturnToMainMenu()
+	{
+		Debug.Log("[GameplayManager::ReturnToMainMenu]");
+		SceneManager.LoadScene("MainMenu");
+	}
+
+	public void ReturnToLevelEditor()
+	{
+		Debug.Log("[GameplayManager::ReturnToMainMenu]");
+		SceneManager.LoadScene("LevelEditor");
+	}
+	#endregion
 
 
 

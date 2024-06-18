@@ -49,6 +49,15 @@ public class LevelSelectMenuManager : MonoBehaviour
 	private int m_mapIndex;
 
 
+	
+	// [TODO][DELETE][TESTING ONLY]
+	private void Awake()
+	{
+		SaveSystem.Init();
+	}
+	// ----- ----- ----- ----- -----
+
+
 
 	// [TODO] Refactor OnEnable()
 	private void OnEnable()
@@ -66,7 +75,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_numberOfMaps = m_currentTheme.Maps.Length;
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.GetHashCode()}";
+		LevelSelectData.ChosenMapIndex = 0;
+		LevelSelectData.FileName = $"{Hash128.Compute(m_currentTheme.Maps[0].GridLayout.EncodeToPNG())}";
 		LevelSelectData.MapType = EMapType.Game;
 
 		m_buttonThemeUp.interactable = false;
@@ -139,7 +149,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		LevelSelectData.ThemeData = m_currentTheme;
 		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-		LevelSelectData.FileName = $"{m_currentTheme.Maps[0].GridLayout.GetHashCode()}";
+		LevelSelectData.ChosenMapIndex = 0;
+		LevelSelectData.FileName = $"{Hash128.Compute(m_currentTheme.Maps[0].GridLayout.EncodeToPNG())}";
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
@@ -165,7 +176,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_mapIndex += indexDirection;
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
-		LevelSelectData.FileName = $"{m_currentTheme.Maps[m_mapIndex].GridLayout.GetHashCode()}";
+		LevelSelectData.ChosenMapIndex = m_mapIndex;
+		LevelSelectData.FileName = $"{Hash128.Compute(m_currentTheme.Maps[m_mapIndex].GridLayout.EncodeToPNG())}";
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();

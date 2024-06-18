@@ -17,7 +17,7 @@ public static class SaveSystem
 	private static readonly string m_mapMetaExtension = "mapmeta";
 	private static readonly string m_mapStatsExtension = "stat";
 
-	private static readonly string m_multiplayerGameModePrefix = "M_";
+	private static readonly string m_multiplayerGameModePrefix = "M_";					// [TODO] Move as is also used elsewhere... Or make public
 
 	
 	private static string m_mapFullFilepath = string.Empty;
@@ -70,7 +70,7 @@ public static class SaveSystem
 			MapData[] themeMaps = currentTheme.Maps;
 			for (int j = 0; j < themeMaps.Length; ++j)
 			{
-				string completeFilePath = $"{themeDirectory}/{themeMaps[j].GridLayout.GetHashCode()}.{m_mapStatsExtension}";
+				string completeFilePath = $"{themeDirectory}/{Hash128.Compute(themeMaps[j].GridLayout.EncodeToPNG())}.{m_mapStatsExtension}";
 				if (File.Exists(completeFilePath) == false)
 					CreateStatFile($"{completeFilePath}");
 			}
@@ -452,5 +452,10 @@ public static class SaveSystem
 		int extensionIndex = fileName.LastIndexOf(".");
 		return fileName.Substring(0, extensionIndex);
 	}
+
+	//public string GetTextureHash(Texture2D texture)
+	//{
+	//	return $"{Hash128.Compute(texture.EncodeToPNG())}";
+	//}
 	#endregion
 }

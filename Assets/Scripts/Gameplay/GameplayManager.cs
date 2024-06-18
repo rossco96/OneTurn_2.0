@@ -11,7 +11,6 @@ public abstract class GameplayManager : MonoBehaviour
 		m_hudManager = hudManager;
 		m_hudManager.AssignPauseButton(SetPause);
 		m_hudManager.AssignResumeButton(SetResume);
-		m_hudManager.AssignNextLevelButton(NextLevel);
 	}
 
 	// [NOTE] Want to know Grid Dimension so can determine the points multiplier -- Do here? Or separate ScoreManager?
@@ -171,36 +170,4 @@ public abstract class GameplayManager : MonoBehaviour
 
 		Debug.LogWarning($"END GAME MULTIPLAYER");
 	}
-
-
-
-
-
-	#region UI Buttons
-	// [NOTE] This *is* currently in use! Don't need to label it "TEST"?
-	public void NextLevel()
-	{
-		Debug.Log("[GameplayManager::NextLevel]");
-
-		//LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.]		// [TODO] Implement!
-		UnityEngine.SceneManagement.SceneManager.LoadScene("LevelScene");							// [Q] Is this the best way to do it? Probably
-	}
-
-	// [TODO] Turn into an actual 'exit' button, in the pause menu.
-	// [TODO] Ask the player if they're sure they want to quit!
-	// [TODO] Implement via EndGame(EGameEndState.Quit) ???
-	//			Or can just delete that EGameEndState?
-	// Used by both pause menu and the end screen... Only want to show 'are you sure' popup if we're in the pause menu
-	public void ReturnToMainMenu()
-	{
-		Debug.Log("[GameplayManager::ReturnToMainMenu]");
-		UnityEngine.SceneManagement.SceneManager.LoadScene("MainMenu");
-	}
-
-	public void ReturnToLevelEditor()
-	{
-		Debug.Log("[GameplayManager::ReturnToMainMenu]");
-		UnityEngine.SceneManagement.SceneManager.LoadScene("LevelEditor");
-	}
-	#endregion
 }
