@@ -20,7 +20,8 @@ public enum EGameMode
 	Exit,
 	//Travel,						// New game mode idea! Cover every (possible?) square in the time limit.
 	M_Bomb,
-	M_Chase
+	M_Chase//,
+	// Think of a similar multiplayer to travel where you have to turn all the squares to your colour
 }
 
 [System.Serializable]
