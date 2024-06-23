@@ -8,6 +8,10 @@ public class CameraManager : MonoBehaviour
 
 	private void Awake()
 	{
+		// [TODO][Q][IMPORTANT]
+		// IS THERE A BETTER WAY TO DO THIS? WANT TO DO THIS HERE?
+		SetAllCanvasScalers();
+
 		if (m_camera == null)
 		{
 			DontDestroyOnLoad(gameObject);
@@ -17,6 +21,17 @@ public class CameraManager : MonoBehaviour
 		else if (m_camera != GetComponent<Camera>())
 		{
 			Destroy(gameObject);
+		}
+	}
+
+	private void SetAllCanvasScalers()
+	{
+		UnityEngine.UI.CanvasScaler[] canvasScalers = FindObjectsOfType<UnityEngine.UI.CanvasScaler>(true);
+		for (int i = 0; i < canvasScalers.Length; ++i)
+		{
+			canvasScalers[i].referenceResolution = new Vector2(Screen.currentResolution.width, Screen.currentResolution.height);
+			//canvasScalers[i].uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;								// Should not need
+			//canvasScalers[i].matchWidthOrHeight = 0.0f;																			// these two
 		}
 	}
 

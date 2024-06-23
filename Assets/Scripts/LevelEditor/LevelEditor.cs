@@ -315,10 +315,9 @@ public class LevelEditor : MonoBehaviour
 
 	private void SetNewGridSize()
 	{
-		// Take 40 away, since we want some buffer from the edges of the screen
+		// Take 40 away, since we want 20 pixel buffer from the edges of the screen
 		int buttonSize = (Screen.width - 40) / m_gridDimension;
-		// [Q][IMPORTANT] Why do we multipluy cellSize by 3 and not by 2? I mean, why do we even need to multiply it by two??
-		m_gridParent.cellSize = 3 * new Vector2(buttonSize * m_gridDimension, buttonSize);
+		m_gridParent.cellSize = new Vector2(buttonSize * m_gridDimension, buttonSize);
 		for (int i = 0; i < k_maxGridSize; ++i)
 		{
 			GameObject row = m_gridRows[i];
@@ -326,7 +325,7 @@ public class LevelEditor : MonoBehaviour
 			if (i < m_gridDimension)
 			{
 				GridLayoutGroup layoutGroup = row.GetComponent<GridLayoutGroup>();
-				layoutGroup.cellSize = 3 * new Vector2(buttonSize, buttonSize);
+				layoutGroup.cellSize = new Vector2(buttonSize, buttonSize);
 				GridButton[] gridButtons = row.GetComponentsInChildren<GridButton>(true);
 				for (int j = 0; j < k_maxGridSize; ++j)
 				{
