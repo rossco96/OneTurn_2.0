@@ -17,6 +17,7 @@ public class LevelGenerator : MonoBehaviour
 	[Space]
 	[SerializeField] private HUDManager m_hudManager;
 	[SerializeField] private Transform m_gameSpaceParent;
+	[SerializeField] private Transform m_borderParent;
 
 	// [TODO][Important]
 	// Only have one prefab here, but have an array of sprites within m_themeData which is edited
@@ -119,13 +120,17 @@ public class LevelGenerator : MonoBehaviour
 			return false;
 		}
 
-		m_gridDimension = m_mapData.GridLayout.width;
+		m_gridDimension = LevelSelectData.GridDimension;
+
 		// [NOTE][IMPORTANT] 0.2f at the end is because the border is *CURRENTLY* 1/10th the width of the walls (multiplied by two lots of borders, one each side of the screen)
 		// [TODO][Q] Make sure we're calculating the difference?? Ask an artist about import settings??
 		// Border should always be the same size, regardless of grid dimnsion!
 		m_gridSizeMultiplier = (Camera.main.aspect * Camera.main.orthographicSize * 2.0f) / (m_gridDimension + 0.2f);
 
 		m_gameSpaceParent.localScale = m_gridSizeMultiplier * Vector3.one;
+		float yOffset = -10.0f * ((Screen.currentResolution.height - Screen.safeArea.height) / Screen.currentResolution.height);	// [Q][IMPORTANT] Is this a correct and safe formula for all devices???
+		m_gameSpaceParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
+		m_borderParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
 
 		return true;
 	}

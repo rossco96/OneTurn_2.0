@@ -229,7 +229,7 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(false);
 				break;
 		}
-		
+
 		// [TODO] Must set this up in the editor!
 		// m_toolsDropdown.captionImage currently NULL!
 		//m_toolsDropdown.captionImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
