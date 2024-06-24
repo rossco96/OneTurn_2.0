@@ -30,8 +30,6 @@ public class CameraManager : MonoBehaviour
 		for (int i = 0; i < canvasScalers.Length; ++i)
 		{
 			canvasScalers[i].referenceResolution = new Vector2(Screen.currentResolution.width, Screen.currentResolution.height);
-			//canvasScalers[i].uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;								// Should not need
-			//canvasScalers[i].matchWidthOrHeight = 0.0f;																			// these two
 		}
 	}
 

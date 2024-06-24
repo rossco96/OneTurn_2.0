@@ -55,7 +55,6 @@ public class GridButton : Button
 		m_previousState = state;
 		base.DoStateTransition(state, instant);
 	}
-	#endregion
 
 
 	public override void OnPointerExit(PointerEventData eventData)
@@ -67,6 +66,7 @@ public class GridButton : Button
 			OnButtonSelected.Invoke(this);
 		}
 	}
+	#endregion
 }
 
 // [TODO] Move the below to its own editor script!

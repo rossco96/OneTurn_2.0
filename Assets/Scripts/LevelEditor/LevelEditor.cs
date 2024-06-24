@@ -112,6 +112,8 @@ public class LevelEditor : MonoBehaviour
 				}
 			}
 		}
+
+		// [Q] Save immediately if LevelEditorData.LoadExistingLevel == false ??
 	}
 
 	private void InitToolsDropdown()
@@ -264,13 +266,13 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoToolItemsUsed.text = $"Exits placed: {m_placedExits}/{m_maxExits}";
 				break;
 			case EMapPropertyName.SpawnPointPrimary:
-				if (m_placedSpawnPointsPrimary > m_maxSpawnPoints)
+				if (m_placedSpawnPointsPrimary >= m_maxSpawnPoints)
 					return false;
 				m_placedSpawnPointsPrimary++;
 				m_extraInfoToolItemsUsed.text = $"Primary spawns placed: {m_placedSpawnPointsPrimary}/{m_maxSpawnPoints}";
 				break;
 			case EMapPropertyName.SpawnPointSecondary:
-				if (m_placedSpawnPointsSecondary > m_maxSpawnPoints)
+				if (m_placedSpawnPointsSecondary >= m_maxSpawnPoints)
 					return false;
 				m_placedSpawnPointsSecondary++;
 				m_extraInfoToolItemsUsed.text = $"Secondary spawns placed: {m_placedSpawnPointsSecondary}/{m_maxSpawnPoints}";

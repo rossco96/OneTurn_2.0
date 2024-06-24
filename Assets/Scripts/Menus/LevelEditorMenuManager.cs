@@ -148,6 +148,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 		// Set LevelEditorData
 		LevelEditorData.LoadExistingLevel = false;
 		LevelEditorData.CustomMapFileName = randomFileName;
+		LevelEditorData.GridTexture = new Texture2D(9, 9);				// 9x9 is the smallest size and the standard upon creating a new map
 
 		// LoadScene!
 		SceneManager.LoadScene("LevelEditor");
