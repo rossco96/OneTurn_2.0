@@ -231,7 +231,8 @@ public class LevelEditor : MonoBehaviour
 		}
 		
 		// [TODO] Must set this up in the editor!
-		m_toolsDropdown.captionImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
+		// m_toolsDropdown.captionImage currently NULL!
+		//m_toolsDropdown.captionImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
 	}
 	#endregion
 
@@ -242,8 +243,8 @@ public class LevelEditor : MonoBehaviour
 		EMapPropertyName property = m_mapPropertyData.GetNameByColor(gb.PropertyColor);
 		if (UpdateGridPropertiesCount(property) == false)
 			return;
-		m_levelDataDirty = true;
 		gb.SetPropertyColor(m_mapPropertyData.GetColorByName(m_currentTool));
+		m_levelDataDirty = true;
 	}
 
 	private bool UpdateGridPropertiesCount(EMapPropertyName property)
@@ -313,6 +314,7 @@ public class LevelEditor : MonoBehaviour
 		m_extraInfoToolItemsUsed.text = $"Items placed: {m_placedItems}/{m_maxItems}";
 		SetNewGridSize();
 		m_sliderLabel.text = $"Size: {m_gridDimension}x{m_gridDimension}";
+		m_levelDataDirty = true;
 	}
 
 	private void SetNewGridSize()
@@ -352,6 +354,10 @@ public class LevelEditor : MonoBehaviour
 	
 	public void Save()
 	{
+		// [TODO] Just disable the SAVE button until something changed?
+		if (m_levelDataDirty == false)
+			return;
+
 		// [TODO][IMPORTANT] Must also save the metadata!!!
 		// ... Is that done via any of the SaveSystem._CustomMapFile() methods?
 		SaveSystem.CreateCustomMapFile(LevelEditorData.CustomMapFileName, m_gridDimension);
@@ -365,6 +371,14 @@ public class LevelEditor : MonoBehaviour
 			}
 		}
 		SaveSystem.SaveCustomMapFile();
+
+		int existingGridDimension = int.Parse(SaveSystem.GetMapmetaInfo(LevelEditorData.CustomMapFileName, EMapmetaInfo.GridDimension));
+		if (existingGridDimension != m_gridDimension)
+		{
+			SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.GridDimension, $"{m_gridDimension}");
+		}
+		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.UpdatedTime, $"{System.DateTime.Now.Ticks}");
+
 		m_levelDataDirty = false;
 		// [TODO] "Saved" popup? Or brief text bubble which doesn't get in the way?
 	}

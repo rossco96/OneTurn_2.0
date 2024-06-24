@@ -33,6 +33,7 @@ public class GridButton : Button
 	protected override void DoStateTransition(SelectionState state, bool instant)
 	{
 		// [NOTE] This feels very hacky, but absolutely (finally!) gives the desried workaround to navigate the grid
+		// [TODO] ... Editing required. This works for dragging your finger over multiple, but not just clicking on one singular square.
 
 		if (m_buttonClicked)
 		{

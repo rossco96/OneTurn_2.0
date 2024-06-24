@@ -133,9 +133,9 @@ public class LevelEditorMenuManager : MonoBehaviour
 	{
 		// Create mapmeta file through SaveSystem
 		string randomFileName = SaveSystem.CreateCustomMapmetaFile();
-		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.AuthorName, m_inputAuthorName.text);
-		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.MapName, m_inputMapName.text);
-		SaveSystem.AddToCustomMapmetaFile(EMapmetaInfo.Description, m_inputDescription.text);
+		SaveSystem.AddToNewCustomMapmetaFile(EMapmetaInfo.AuthorName, m_inputAuthorName.text);
+		SaveSystem.AddToNewCustomMapmetaFile(EMapmetaInfo.MapName, m_inputMapName.text);
+		SaveSystem.AddToNewCustomMapmetaFile(EMapmetaInfo.Description, m_inputDescription.text);
 		SaveSystem.SaveCustomMapmetaFile();
 
 		// Create blank map file

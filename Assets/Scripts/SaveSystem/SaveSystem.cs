@@ -146,7 +146,7 @@ public static class SaveSystem
 		return randomFileName;
 	}
 
-	public static void AddToCustomMapmetaFile(EMapmetaInfo infoType, string value)
+	public static void AddToNewCustomMapmetaFile(EMapmetaInfo infoType, string value)
 	{
 		m_customMapmetaInfo.Add($"{infoType}", value);
 	}
@@ -158,6 +158,22 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
+	}
+
+	public static void UpdateExistingMapmetaFile(string mapFileName, EMapmetaInfo infoType, string value)
+	{
+		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
+		string mapmetaFile = File.ReadAllText(fullFilepath);
+		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
+		mapmetaInfo[$"{infoType}"] = value;
+		string dataJson = JsonUtility.ToJson(mapmetaInfo);
+
+		File.SetAttributes(fullFilepath, FileAttributes.Normal);
+		StreamWriter metaWriter = File.CreateText(fullFilepath);
+		metaWriter.Write(dataJson);
+		metaWriter.Close();
+		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
 		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
@@ -377,7 +393,8 @@ public static class SaveSystem
 
 	public static string GetMapmetaInfo(string mapFileName, EMapmetaInfo infoType)
 	{
-		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";						// [TODO] This may need changing! LevelSelectData.MapType
+		// [TODO][IMPORTANT] This should need changing! LevelSelectData.MapType, not just m_customMapsDirectory
+		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
 		string mapmetaFile = File.ReadAllText(fullFilepath);
 		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
 
