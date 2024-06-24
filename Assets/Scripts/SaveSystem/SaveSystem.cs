@@ -37,8 +37,9 @@ public static class SaveSystem
 		{
 			string text = File.ReadAllText(m_initFullFilepath);
 			// If it's the same version, no new levels (etc.)
-			//if (text == currentVersion)
-			//	return;
+			// [TODO][IMPORTANT] This may not be the only info in the Init file! Checking "text == currentVersion" may not be appropriate!
+			if (text == currentVersion)
+				return;
 			File.SetAttributes(m_initFullFilepath, FileAttributes.Normal);
 		}
 		else

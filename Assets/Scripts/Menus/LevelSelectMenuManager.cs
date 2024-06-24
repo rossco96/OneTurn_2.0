@@ -50,15 +50,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 
 	
-	// [TODO][DELETE][TESTING ONLY]
-	private void Awake()
-	{
-		SaveSystem.Init();
-	}
-	// ----- ----- ----- ----- -----
-
-
-
 	// [TODO] Refactor OnEnable()
 	private void OnEnable()
 	{
@@ -281,11 +272,5 @@ public class LevelSelectMenuManager : MonoBehaviour
 		//	SceneManager.LoadScene("LevelScene_Multiplayer");
 		//else
 			SceneManager.LoadScene("LevelScene");
-	}
-
-	[ContextMenu("TEST")]
-	public void TEST()
-	{
-		SaveSystem.Init();
 	}
 }

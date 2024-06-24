@@ -21,7 +21,11 @@ public class CameraManager : MonoBehaviour
 		else if (m_camera != GetComponent<Camera>())
 		{
 			Destroy(gameObject);
+			return;												// RETURN TEMP HERE BECAUSE TEST CODE BELOW
 		}
+
+		// [TODO] TEMP HERE! PUT INTO GameStartup or SplashScreen
+		SaveSystem.Init();
 	}
 
 	private void SetAllCanvasScalers()

@@ -153,11 +153,11 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.DefaultCompany.com.unity.template.mobile2D
-    Lumin: com.DefaultCompany.com.unity.template.mobile2D
-    Standalone: com.DefaultCompany.com.unity.template.mobile2D
-    iPhone: com.DefaultCompany.com.unity.template.mobile2D
-    tvOS: com.DefaultCompany.com.unity.template.mobile2D
+    Android: com.AuburnZoneEntertainment.OneTurn
+    Lumin: com.AuburnZoneEntertainment.OneTurn
+    Standalone: com.AuburnZoneEntertainment.OneTurn
+    iPhone: com.AuburnZoneEntertainment.OneTurn
+    tvOS: com.AuburnZoneEntertainment.OneTurn
   buildNumber:
     Standalone: 0
     iPhone: 0
