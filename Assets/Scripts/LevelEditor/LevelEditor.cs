@@ -353,13 +353,20 @@ public class LevelEditor : MonoBehaviour
 	#region Menu Buttons
 	public void ReturnToMenu()
 	{
-		// Must set this to false on returning to the main menu as LevelScene checks this
-		LevelEditorData.IsTestingLevel = false;
+		// [TODO][IMPORTANT] Only set this to false on clicking onto LevelSelectMenu!
+		// Then can check for this open loading the scene below and activate the LevelEditorMenu popup, appropriately
+		//LevelEditorData.IsTestingLevel = false;
 		if (m_levelDataDirty)
 			m_unsavedDataPopup.SetActive(true);
 		else
 			SceneManager.LoadScene("MainMenu");
 	}
+
+	public void ForceReturnToMenu()
+	{
+		SceneManager.LoadScene("MainMenu");
+	}
+
 	
 	public void Save()
 	{

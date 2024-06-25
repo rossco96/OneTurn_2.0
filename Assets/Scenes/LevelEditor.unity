@@ -27619,7 +27619,7 @@ GameObject:
   - component: {fileID: 1365375534}
   - component: {fileID: 1365375533}
   m_Layer: 5
-  m_Name: MainMenu - DO POPUP IF UNSAVED (do not autosave?)
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38182,7 +38182,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 449290560}
         m_TargetAssemblyTypeName: LevelEditor, Assembly-CSharp
-        m_MethodName: ReturnToMenu
+        m_MethodName: ForceReturnToMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
