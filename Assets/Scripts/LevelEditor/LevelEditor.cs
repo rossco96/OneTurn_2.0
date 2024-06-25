@@ -100,14 +100,19 @@ public class LevelEditor : MonoBehaviour
 				GridButton gb = gridButtons[j];
 				gb.gameObject.SetActive(j < gridDimension);
 				gb.RegisterOnButtonSelected(OnGridButtonClicked);
-				if (i < gridDimension && j < gridDimension)
+				if (i < gridDimension && j < gridDimension && LevelEditorData.LoadExistingLevel)
 				{
-					gb.SetPropertyColor
-					(
-						(LevelEditorData.LoadExistingLevel)
-							? LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1)
-							: m_mapPropertyData.GetColorByName(EMapPropertyName.BlankSquare)
-					);
+					Color color = LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1);
+					gb.SetPropertyColor(color);
+					EMapPropertyName property = m_mapPropertyData.GetNameByColor(color);
+					switch (property)
+					{
+						case EMapPropertyName.Item:					m_placedItems++;				break;
+						case EMapPropertyName.Exit:					m_placedExits++;				break;
+						case EMapPropertyName.SpawnPointPrimary:	m_placedSpawnPointsPrimary++;	break;
+						case EMapPropertyName.SpawnPointSecondary:	m_placedSpawnPointsSecondary++;	break;
+						default:																	break;
+					}
 				}
 				else
 				{
