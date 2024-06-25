@@ -24,9 +24,9 @@ public class LevelEditor : MonoBehaviour
 	[SerializeField] private TMP_Dropdown m_themeDropdown;
 
 	[Space]
-	[SerializeField] private GameObject m_tutorialPopup;
-	[SerializeField] private GameObject m_mainMenuPopup;
-	[SerializeField] private GameObject m_testOptionsPopup;
+	[SerializeField] private GameObject m_tutorialPopup;					// Not currently used in script
+	[SerializeField] private GameObject m_unsavedDataPopup;
+	[SerializeField] private GameObject m_testOptionsPopup;					// Not currently used in script
 
 	[Space]
 	[SerializeField] private TextMeshProUGUI m_extraInfoToolItemsUsed;
@@ -43,6 +43,7 @@ public class LevelEditor : MonoBehaviour
 	[SerializeField] private Toggle m_startAtSecondSpawnToggle;
 	[SerializeField] private Toggle m_moveThroughWallsToggle;
 
+	private bool m_initComplete = false;
 	private bool m_levelDataDirty = false;
 
 	//private string m_levelFileName;                                                           // [TODO] Implement! ... Or just use LevelEditorData.CustomMapFileName ?
@@ -78,6 +79,8 @@ public class LevelEditor : MonoBehaviour
 
 		//m_levelFileName = LevelSelectData.CustomData.											// [TODO] Implement? Or just use LevelEditorData.CustomMapFileName?
 		// [TODO] Also display level name on the screen?
+
+		m_initComplete = true;
 	}
 
 
@@ -314,7 +317,8 @@ public class LevelEditor : MonoBehaviour
 		m_extraInfoToolItemsUsed.text = $"Items placed: {m_placedItems}/{m_maxItems}";
 		SetNewGridSize();
 		m_sliderLabel.text = $"Size: {m_gridDimension}x{m_gridDimension}";
-		m_levelDataDirty = true;
+		if (m_initComplete)
+			m_levelDataDirty = true;
 	}
 
 	private void SetNewGridSize()
@@ -347,7 +351,7 @@ public class LevelEditor : MonoBehaviour
 		// Must set this to false on returning to the main menu as LevelScene checks this
 		LevelEditorData.IsTestingLevel = false;
 		if (m_levelDataDirty)
-			m_mainMenuPopup.SetActive(true);
+			m_unsavedDataPopup.SetActive(true);
 		else
 			SceneManager.LoadScene("MainMenu");
 	}
