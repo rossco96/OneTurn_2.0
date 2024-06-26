@@ -21,11 +21,7 @@ public class CameraManager : MonoBehaviour
 		else if (m_camera != GetComponent<Camera>())
 		{
 			Destroy(gameObject);
-			return;												// RETURN TEMP HERE BECAUSE TEST CODE BELOW
 		}
-
-		// [TODO] TEMP HERE! PUT INTO GameStartup or SplashScreen
-		SaveSystem.Init();
 
 		// [TODO][Q][IMPORTANT]
 		// MUST BE A BETTER WAY TO DO THIS? WANT TO DO THIS HERE?
