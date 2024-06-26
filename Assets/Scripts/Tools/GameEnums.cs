@@ -18,10 +18,9 @@ public enum EGameMode
 {
 	Items,
 	Exit,
-	//Travel,						// New game mode idea! Cover every (possible?) square in the time limit.
+	//Travel,						// New game mode idea! Cover every (possible?) square in the time limit. Multiplayer version you have to turn all or as many of the squares to your colour
 	M_Bomb,
-	M_Chase//,
-	// Think of a similar multiplayer to travel where you have to turn all the squares to your colour
+	M_Chase
 }
 
 [System.Serializable]
@@ -34,6 +33,7 @@ public enum ETurnDirection
 public enum EInputMode
 {
 	TapSwipe,
+	SwipeDirectional,
 	Buttons
 }
 
@@ -66,4 +66,15 @@ public enum EMapmetaInfo
 	MapName,
 	Description,				// This is optional!
 	GridDimension
+}
+
+// [TODO] Should really consider separate classes for best practice. And for some of the above, too.
+public enum ECheatType
+{
+	UnlimitedLives,
+	UnlimitedTime,
+	ExitAnyDirection,
+	WallTravel,
+	SecondarySpawn,				// Have this as an option rather than a cheat?
+	PlayerVFX					// Add unnecessary animations/particles upon moving
 }
