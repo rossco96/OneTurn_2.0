@@ -35,15 +35,37 @@ public class SDictionary<k, v> : Dictionary<k, v>, ISerializationCallbackReceive
 		m_values.Clear();
 	}
 
-	/*
-	public v GetValue(k key)
+	public k GetKeyAtIndex(int i)
 	{
-		for (int i = 0; i < m_keys.Count; i++)
+		if (i > Keys.Count)
+			return default;
+
+		int count = 0;
+		var enumerator = Keys.GetEnumerator();
+		while (enumerator.MoveNext())
 		{
-			if (m_keys[i].Item1 == key.Item1 && m_keys[i].Item2 == key.Item2 && m_keys[i].Item3 == key.Item3)
-				return m_values[i];
+			if (count == i)
+				return enumerator.Current;
+			count++;
 		}
+
 		return default;
 	}
-	//*/
+
+	public v GetValueAtIndex(int i)
+	{
+		if (i > Values.Count)
+			return default;
+
+		int count = 0;
+		var enumerator = Values.GetEnumerator();
+		while (enumerator.MoveNext())
+		{
+			if (count == i)
+				return enumerator.Current;
+			count++;
+		}
+
+		return default;
+	}
 }
