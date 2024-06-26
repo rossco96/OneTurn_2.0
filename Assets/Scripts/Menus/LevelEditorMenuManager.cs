@@ -38,6 +38,10 @@ public class LevelEditorMenuManager : MonoBehaviour
 		//m_inputAuthorName.characterLimit =
 
 		InitExistingLevelsOptions();
+
+		// [Q] Keep these here?
+		LevelSelectData.IsInGame = false;
+		LevelEditorData.IsTestingLevel = true;
 	}
 
 

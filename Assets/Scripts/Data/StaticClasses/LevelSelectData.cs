@@ -24,6 +24,7 @@ public static class LevelSelectData
 	public static bool IsMultiplayer = false;
 	// [TODO] This is needed for deciding which end level popups to show and if we're adding to stats and change of buttons etc.
 	public static bool IsCustomMap = false;
+	public static bool IsInGame = false;
 
 	public static int GridDimension = 9;
 	public static float GridSizeMultiplier = 0.0f;

@@ -353,9 +353,6 @@ public class LevelEditor : MonoBehaviour
 	#region Menu Buttons
 	public void ReturnToMenu()
 	{
-		// [TODO][IMPORTANT] Only set this to false on clicking onto LevelSelectMenu!
-		// Then can check for this open loading the scene below and activate the LevelEditorMenu popup, appropriately
-		//LevelEditorData.IsTestingLevel = false;
 		if (m_levelDataDirty)
 			m_unsavedDataPopup.SetActive(true);
 		else
@@ -402,8 +399,6 @@ public class LevelEditor : MonoBehaviour
 	// [TODO] If can't make look more effecient, at least refactor?
 	public void TestLevel()
 	{
-		LevelEditorData.IsTestingLevel = true;
-
 		// [TODO][Q] Must be better way of doing this?
 		MapData map = ScriptableObject.CreateInstance<MapData>();
 		map.ExitFacingDirectionLeft = m_exitDirectionLeft;
