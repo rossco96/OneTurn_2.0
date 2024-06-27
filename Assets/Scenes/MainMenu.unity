@@ -14244,9 +14244,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5469a3648121a644793a3d730160a2a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_mainMenuParent: {fileID: 0}
-  m_levelSelectParent: {fileID: 0}
-  m_levelEditorPopupParent: {fileID: 0}
+  m_mainMenuParent: {fileID: 1564675982}
+  m_levelSelectParent: {fileID: 1779517729}
+  m_levelEditorPopupParent: {fileID: 1010269686}
 --- !u!1 &1577655558
 GameObject:
   m_ObjectHideFlags: 0
