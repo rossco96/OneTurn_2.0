@@ -1,18 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MainMenuManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	// [TODO][IMPORTANT] Delete anything splash related from MainMenu scene -- put into its own scene, along with GameStartup!
+	//[SerializeField] private GameObject m_splashScreenParent;
+	[SerializeField] private GameObject m_mainMenuParent;
+	[SerializeField] private GameObject m_levelSelectParent;
+	[SerializeField] private GameObject m_levelEditorPopupParent;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	private void Awake()
+	{
+		LoadMenu();
+	}
+
+	private void LoadMenu()
+	{
+		if (LevelSelectData.IsInGame)
+		{
+			m_mainMenuParent.SetActive(false);
+			m_levelSelectParent.SetActive(true);
+		}
+		else if (LevelEditorData.IsTestingLevel)
+		{
+			m_levelEditorPopupParent.SetActive(true);
+		}
+	}
 }
