@@ -114,7 +114,8 @@ public class HUDManager : MonoBehaviour
 	public void NextLevel()
 	{
 		Debug.Log("[GameplayManager::NextLevel]");
-		LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex + 1];
+		LevelSelectData.ChosenMapIndex++;
+		LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex];
 		RetryLevel();
 	}
 
