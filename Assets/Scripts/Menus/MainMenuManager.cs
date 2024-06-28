@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class MainMenuManager : MonoBehaviour
 {
-	// [TODO][IMPORTANT] Delete anything splash related from MainMenu scene -- put into its own scene, along with GameStartup!
-	//[SerializeField] private GameObject m_splashScreenParent;
 	[SerializeField] private GameObject m_mainMenuParent;
 	[SerializeField] private GameObject m_levelSelectParent;
 	[SerializeField] private GameObject m_levelEditorPopupParent;

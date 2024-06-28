@@ -21,6 +21,7 @@ public class CameraManager : MonoBehaviour
 		else if (m_camera != GetComponent<Camera>())
 		{
 			Destroy(gameObject);
+			return;
 		}
 
 		// [TODO][Q][IMPORTANT]

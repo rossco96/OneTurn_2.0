@@ -113,7 +113,6 @@ public class HUDManager : MonoBehaviour
 
 	public void NextLevel()
 	{
-		Debug.Log("[GameplayManager::NextLevel]");
 		LevelSelectData.ChosenMapIndex++;
 		LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex];
 		RetryLevel();
@@ -121,8 +120,7 @@ public class HUDManager : MonoBehaviour
 
 	public void RetryLevel()
 	{
-		Debug.Log("[GameplayManager::RetryLevel]");
-		SceneManager.LoadScene("LevelScene");                           // [Q] Is this the best way to do it? Probably
+		SceneManager.LoadScene("LevelScene");
 	}
 
 	// [TODO] Turn into an actual 'exit' button, in the pause menu.
@@ -132,13 +130,11 @@ public class HUDManager : MonoBehaviour
 	// Used by both pause menu and the end screen... Only want to show 'are you sure' popup if we're in the pause menu
 	public void ReturnToMainMenu()
 	{
-		Debug.Log("[GameplayManager::ReturnToMainMenu]");
 		SceneManager.LoadScene("MainMenu");
 	}
 
 	public void ReturnToLevelEditor()
 	{
-		Debug.Log("[GameplayManager::ReturnToMainMenu]");
 		SceneManager.LoadScene("LevelEditor");
 	}
 	#endregion

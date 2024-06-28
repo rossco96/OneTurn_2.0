@@ -78,9 +78,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 		//m_themeIndex = 
 		//m_mapIndex = 
 
-		// 3 is the number of tabs. 80.0f is the pre-defined height
-		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, 80.0f);
-
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
 		else
@@ -95,6 +92,18 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// [Q] Keep these here?
 		LevelSelectData.IsInGame = true;
 		LevelEditorData.IsTestingLevel = false;
+
+		// [NOTE] THIS IS SUPER HACKY BUT IT WORKS
+		StartCoroutine(SetTabsParent());
+	}
+
+
+	// (ensures we're resizing the grid layout group correctly)
+	private System.Collections.IEnumerator SetTabsParent()
+	{
+		yield return null;
+		// 3 is the number of tabs. 80.0f is the pre-defined height
+		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, 80.0f);
 	}
 
 
@@ -197,7 +206,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	private void UpdateStatsMultiplayer()
 	{
-
+		// [TODO]
 	}
 
 
