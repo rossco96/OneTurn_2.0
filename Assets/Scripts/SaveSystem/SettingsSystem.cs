@@ -22,12 +22,6 @@ public static class SettingsSystem
 		if (UpdateRequired(saveDatas) == false)
 			return;
 
-		SDictionary<string, string> gameStartupSettingsData = new SDictionary<string, string>();
-		for (int i = 0; i < saveDatas.Length; ++i)
-		{
-			gameStartupSettingsData.Add(saveDatas[i].Key, saveDatas[i].GetDefaultValueAsString());                          // Are the different classes all pointless if needing to convert to float or int anyways?
-		}
-
 		if (File.Exists(m_settingsFullFilepath))
 		{
 			// Only add the new data which didn't previously exist
@@ -36,35 +30,37 @@ public static class SettingsSystem
 			
 			for (int i = 0; i < saveDatas.Length; ++i)
 			{
+				// [Q] Are the different classes all pointless if needing to convert to float or int anyways?
 				if (jsonSettingsData.ContainsKey(saveDatas[i].Key) == false)
-					jsonSettingsData.Add(saveDatas[i].Key, saveDatas[i].GetDefaultValueAsString());                         // Are the different classes all pointless if needing to convert to float or int anyways?
+					jsonSettingsData.Add(saveDatas[i].Key, saveDatas[i].GetDefaultValueAsString());
 			}
-			// [NOTE] If ever deleting settings, will need to add code here to handle that!
 
+			// [NOTE] If ever deleting settings, will need to add code here to handle that!
+			
 			for (int j = 0; j < jsonSettingsData.Count; ++j)
 			{
 				m_currentSettings.Add(jsonSettingsData.GetKeyAtIndex(j), jsonSettingsData.GetValueAtIndex(j));
 				m_updatedSettings.Add(jsonSettingsData.GetKeyAtIndex(j), jsonSettingsData.GetValueAtIndex(j));
 			}
-			string dataJson = JsonUtility.ToJson(jsonSettingsData);
 
 			File.SetAttributes(m_settingsFullFilepath, FileAttributes.Normal);
-			StreamWriter writer = File.CreateText(m_settingsFullFilepath);
-			writer.Write(dataJson);
-			writer.Close();
-			File.SetAttributes(m_settingsFullFilepath, FileAttributes.ReadOnly);
-			//File.SetAttributes(m_settingsFullFilepath, FileAttributes.Hidden);
 		}
 		else
 		{
-			string dataJson = JsonUtility.ToJson(gameStartupSettingsData);
-			// Create the file!
-			StreamWriter writer = File.CreateText(m_settingsFullFilepath);
-			writer.Write(dataJson);
-			writer.Dispose();
-			File.SetAttributes(m_settingsFullFilepath, FileAttributes.ReadOnly);
-			//File.SetAttributes(m_settingsFullFilepath, FileAttributes.Hidden);
+			for (int i = 0; i < saveDatas.Length; ++i)
+			{
+				m_currentSettings.Add(saveDatas[i].Key, saveDatas[i].GetDefaultValueAsString());
+				m_updatedSettings.Add(saveDatas[i].Key, saveDatas[i].GetDefaultValueAsString());
+			}
 		}
+
+		string dataJson = JsonUtility.ToJson(m_currentSettings);
+		
+		StreamWriter writer = File.CreateText(m_settingsFullFilepath);
+		writer.Write(dataJson);
+		writer.Close();
+		File.SetAttributes(m_settingsFullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(m_settingsFullFilepath, FileAttributes.Hidden);
 	}
 
 	private static bool UpdateRequired(SettingsData_Base[] saveDatas)
