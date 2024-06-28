@@ -94,6 +94,7 @@ public static class SettingsSystem
 		m_settingsDataDirty = true;
 	}
 
+	// [TODO] Implement! Make use of this before SaveSettings() or DiscardSettings() calls
 	public static bool UnsavedData() => m_settingsDataDirty;
 
 	public static void SaveSettings()

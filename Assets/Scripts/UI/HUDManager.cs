@@ -10,40 +10,111 @@ using UnityEngine.UI;
 public class HUDManager : MonoBehaviour
 {
 	#region Vars
+	[Header("Tutorial")]
+	[SerializeField] private GameObject m_tutorialParent;
+	[SerializeField] private SettingsData_Base m_tutorialSettingsData;
+
+	[Space]
 	[Header("Stats (single player)")]
-	[SerializeField] private GameObject m_statsParent;
-	[SerializeField] private GameObject m_statsParentP2;					// [TODO][Q] Is this the best way to do this?
-	[SerializeField] private TextMeshProUGUI m_timerText;
-	[SerializeField] private Slider m_timerSlider;
-	[SerializeField] private TextMeshProUGUI m_livesCount;
-	[SerializeField] private TextMeshProUGUI m_itemsCount;
-	
+	[SerializeField] private GameObject m_statsParentP1;
+	[SerializeField] private TextMeshProUGUI m_timerTextP1;
+	[SerializeField] private Slider m_timerSliderP1;
+	[SerializeField] private TextMeshProUGUI m_livesCountP1;
+	[SerializeField] private TextMeshProUGUI m_itemsCountP1;
+
+	[Space]
+	[Header("Stats (multiplayer)")]
+	[SerializeField] private GameObject m_statsParentP2;                    // [TODO][Q] Is this the best way to do this?
+
+	[Space]
+	[Header("Input Buttons")]
+	[SerializeField] private GameObject m_inputButtonsParentP1;
+	[SerializeField] private GameObject m_inputButtonsParentP2;
+	[SerializeField] private SettingsData_Base m_inputSettingsData;
+
 	[Space]
 	[Header("Pause")]
 	[SerializeField] private Button m_pauseButton;
 	[SerializeField] private Button m_resumeButton;                         // [TODO][Q] Do we want this in its own PauseManager?
+	[SerializeField] private GameObject m_pauseParentGameplay;
+	[SerializeField] private GameObject m_pauseParentEditor;
+
+	[Space]
+	[Header("EndScreen MASTER Parent")]
+	[SerializeField] private GameObject m_allEndScreensParent;
 
 	[Space]
 	[Header("End Game (single player)")]
-	[SerializeField] private GameObject m_endScreenParent;
-	[SerializeField] private TextMeshProUGUI m_levelTitle;
-	[SerializeField] private TextMeshProUGUI m_winLoseTitle;
+	[SerializeField] private GameObject m_endScreenParentSingle;
+	[SerializeField] private TextMeshProUGUI m_endLevelTitle;
+	[SerializeField] private TextMeshProUGUI m_endWinLoseTitle;
 	[SerializeField] private TextMeshProUGUI m_endTimer;
 	[SerializeField] private TextMeshProUGUI m_endMovesCount;
 	[SerializeField] private TextMeshProUGUI m_endLivesCount;
 	[SerializeField] private TextMeshProUGUI m_endItemsCount;
 	[SerializeField] private TextMeshProUGUI m_endTotalScore;
 	[SerializeField] private Button m_nextLevelButton;
+
+	[Space]
+	[Header("End Game (multiplayer)")]
+	[SerializeField] private GameObject m_endScreenParentMulti;
+
+	[Space]
+	[Header("End Game (level editor)")]
+	[SerializeField] private GameObject m_endScreenParentEditor;
 	#endregion
 
 
 	private void Awake()
 	{
-		// [TODO][IMPORTANT] This wiil also change for multiplayer! Calculate!	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+		// [TODO] Implement in editor, so we can turn it off and not always have this popup. Or at least be able to close it!
+		//InitTutorialPopup();
 		
-		// [Q] Is this a correct formula??? Or good enough???
-		m_statsParent.transform.localPosition = new Vector3(0, -(Camera.main.aspect * Camera.main.aspect * Screen.width), 0);
+		InitStats();
+		InitInputButtons();
+		InitPauseMenu();
+		InitEndScreen();
+	}
 
+
+	#region INIT
+	private void InitTutorialPopup()
+	{
+		if (bool.Parse(SettingsSystem.GetValue(m_inputSettingsData.Key)))
+		{
+			m_tutorialParent.SetActive(true);
+		}
+	}
+
+	private void InitStats()
+	{
+		// [TODO][IMPORTANT] This wiil also change for multiplayer! Calculate!	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+		// [Q] Is this a correct formula??? Or good enough???
+		m_statsParentP1.transform.localPosition = new Vector3(0, -(Camera.main.aspect * Camera.main.aspect * Screen.width), 0);
+
+		m_statsParentP2.SetActive(LevelSelectData.IsMultiplayer);
+	}
+
+	private void InitInputButtons()
+	{
+		if (SettingsSystem.GetValue(m_inputSettingsData.Key) != $"{EInputMode.Buttons}")
+			return;
+		// [TODO][IMPORTANT] Must deselect IsMultiplayer if entering the LevelEditor!
+		m_inputButtonsParentP1.SetActive(true);
+		m_inputButtonsParentP2.SetActive(LevelSelectData.IsMultiplayer);
+	}
+
+	private void InitPauseMenu()
+	{
+		// [TODO] Refactor so these bools don't overlap
+		// Only need one of them since both are always(?) referenced together!
+		m_pauseParentGameplay.SetActive(LevelSelectData.IsInGame);
+		m_pauseParentEditor.SetActive(LevelEditorData.IsTestingLevel);
+	}
+
+	private void InitEndScreen()
+	{
 		// [TODO] Move this elsewhere! Will no doubt want to use multiple times?
 		// Pretty sure we already try do something like this when setting end screen stats!
 		int currentLevelIndex = 0;
@@ -55,46 +126,16 @@ public class HUDManager : MonoBehaviour
 				break;
 			}
 		}
-		m_levelTitle.text = $"{LevelSelectData.ThemeData.ThemeName} : {currentLevelIndex}";
+		m_endLevelTitle.text = $"{LevelSelectData.ThemeData.ThemeName} : {currentLevelIndex}";
+
+		if (LevelEditorData.IsTestingLevel)
+			m_endScreenParentEditor.SetActive(true);
+		else if (LevelSelectData.IsMultiplayer)
+			m_endScreenParentMulti.SetActive(true);
+		else
+			m_endScreenParentSingle.SetActive(true);
 	}
-
-
-	public void SetTimerSliderActive(bool active)
-	{
-		m_timerSlider.gameObject.SetActive(active);
-	}
-
-	public void SetItemsCountActive(bool active)
-	{
-		m_itemsCount.gameObject.SetActive(active);
-	}
-
-
-
-	public void UpdateLivesCount(int lives)
-	{
-		m_livesCount.text = $"Lives: {lives}";
-	}
-
-	public void UpdateItemsCount(int items)
-	{
-		m_itemsCount.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
-	}
-
-	public void UpdateTimerTextExit(int timeTaken)
-	{
-		m_timerText.text = $"Time Taken: {timeTaken}s";
-	}
-
-	public void UpdateTimerTextItems(float timeLeft)
-	{
-		m_timerText.text = $"Time Left: {timeLeft}s";
-	}
-
-	public void UpdateTimerSlider(float timeLeft)
-	{
-		m_timerSlider.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit);
-	}
+	#endregion
 
 
 
@@ -141,6 +182,50 @@ public class HUDManager : MonoBehaviour
 
 
 
+	#region GameplayManager Calls (SETs)
+	public void SetTimerSliderActive(bool active)
+	{
+		m_timerSliderP1.gameObject.SetActive(active);
+	}
+
+	public void SetItemsCountActive(bool active)
+	{
+		m_itemsCountP1.gameObject.SetActive(active);
+	}
+	#endregion
+
+
+
+	#region GameplayManager Calls (updates)
+	public void UpdateLivesCount(int lives)
+	{
+		m_livesCountP1.text = $"Lives: {lives}";
+	}
+
+	public void UpdateItemsCount(int items)
+	{
+		m_itemsCountP1.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+	}
+
+	public void UpdateTimerTextExit(int timeTaken)
+	{
+		m_timerTextP1.text = $"Time Taken: {timeTaken}s";
+	}
+
+	public void UpdateTimerTextItems(float timeLeft)
+	{
+		m_timerTextP1.text = $"Time Left: {timeLeft}s";
+	}
+
+	public void UpdateTimerSlider(float timeLeft)
+	{
+		m_timerSliderP1.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit);
+	}
+	#endregion
+
+
+
+	#region GameplayManager Calls (end screen)
 	public void SetEndScreenStats(int totalScore, float timeTaken, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
 	{
 		m_endTotalScore.text = $"Total Score: {totalScore:n0}";
@@ -155,7 +240,7 @@ public class HUDManager : MonoBehaviour
 
 	public void ShowEndScreen(bool isWin)
 	{
-		m_winLoseTitle.text = (isWin) ? "Yay! You Win!" : "Uh-oh! You lost!";
+		m_endWinLoseTitle.text = (isWin) ? "Yay! You Win!" : "Uh-oh! You lost!";
 		if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
 		{
 			m_nextLevelButton.gameObject.SetActive(false);
@@ -166,6 +251,7 @@ public class HUDManager : MonoBehaviour
 			// ... If doing that, will have to switch back upon winning, if we're not reloading the scene... Or do we just reload the scene?
 			m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = (isWin) ? "Next Level" : "Skip Level?";
 		}
-		m_endScreenParent.SetActive(true);
+		m_allEndScreensParent.SetActive(true);
 	}
+	#endregion
 }
