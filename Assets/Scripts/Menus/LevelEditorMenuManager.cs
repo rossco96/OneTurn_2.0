@@ -39,8 +39,9 @@ public class LevelEditorMenuManager : MonoBehaviour
 
 		InitExistingLevelsOptions();
 
-		// [Q] Keep these here?
+		// [Q] Keep these here? Or move to LevelEditor.cs?
 		LevelSelectData.IsInGame = false;
+		LevelSelectData.IsMultiplayer = false;
 		LevelEditorData.IsTestingLevel = true;
 	}
 
