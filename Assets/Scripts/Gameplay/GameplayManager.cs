@@ -170,7 +170,5 @@ public abstract class GameplayManager : MonoBehaviour
 		{
 			m_controllers[i].SetInputDisabled(true);
 		}
-
-		Debug.LogWarning($"END GAME MULTIPLAYER");
 	}
 }
