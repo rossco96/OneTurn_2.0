@@ -20,8 +20,8 @@ public class GameplayManager_LevelEditor : GameplayManager
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActive(false);
-		m_hudManager.SetTimerSliderActive(false);
+		m_hudManager.SetItemsCountActiveP1(false);
+		m_hudManager.SetTimerSliderActiveP1(false);
 	}
 
 	protected override void UpdateTimer()
@@ -30,7 +30,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
 		{
 			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
-			m_hudManager.UpdateTimerTextExit(m_levelDisplayTimeInt);
+			m_hudManager.UpdateTimerTextExitP1(m_levelDisplayTimeInt);
 		}
 	}
 	#endregion
@@ -41,7 +41,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 	{
 		controller.SetInputDisabled(true);
 		controller.DestroyPlayerGameObject();
-		m_hudManager.UpdateLivesCount(controller.Stats.Lives);
+		m_hudManager.UpdateLivesCountP1(controller.Stats.Lives);
 
 		// [NOTE] This should be done after the death animation is complete! Need another callback...
 		// [NOTE] Need also a spawn animation, and THEN can resume control of player
@@ -54,7 +54,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 	private void OnPlayerInteractItem(OTController controller)
 	{
 		controller.Stats.AddItem();
-		m_hudManager.UpdateItemsCount(controller.Stats.Items);
+		m_hudManager.UpdateItemsCountP1(controller.Stats.Items);
 
 		// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when level cleared?
 		m_itemCount++;

@@ -78,3 +78,10 @@ public enum ECheatType
 	SecondarySpawn,				// Have this as an option rather than a cheat?
 	PlayerVFX					// Add unnecessary animations/particles upon moving
 }
+
+public enum EMultiplayerResult
+{
+	P1,
+	P2,
+	Draw
+}

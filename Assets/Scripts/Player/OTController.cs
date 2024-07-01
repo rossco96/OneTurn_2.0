@@ -28,6 +28,8 @@ public class OTController : MonoBehaviour
 	private InGameStats m_stats = new InGameStats();
 	public InGameStats Stats => m_stats;
 
+	public int Index = 0;
+
 
 
 	private void Awake()

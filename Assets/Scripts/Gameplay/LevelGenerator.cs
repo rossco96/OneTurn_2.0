@@ -196,6 +196,7 @@ public class LevelGenerator : MonoBehaviour
 							playerControllerSecondary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[m_multiplayerSpawnIndex]);
 							if (m_isMultiplayer)
 							{
+								playerControllerSecondary.GetComponent<OTController>().Index = m_multiplayerSpawnIndex;
 								playerControllerSecondary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[m_multiplayerSpawnIndex]);
 								m_multiplayerSpawnIndex++;
 							}
@@ -280,15 +281,21 @@ public class LevelGenerator : MonoBehaviour
 		{
 			switch (m_gameMode)
 			{
+				// [TODO][IMPORTANT][Q] Consider making GameplayManager_MItems (child)						<<<<< <<<<< <<<<< <<<<< <<<<<
 				case EGameMode.Items:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_Items>();
 					break;
 				case EGameMode.Exit:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_Exit>();
 					break;
+				/*case EGameMode.Travel:
+					gameplayManager = gmGameObject.AddComponent<GameplayManager_Travel>();
+					break;*/
 				case EGameMode.M_Bomb:
+					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MBomb>();
 					break;
 				case EGameMode.M_Chase:
+					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MChase>();
 					break;
 				default:
 					break;

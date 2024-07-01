@@ -25,6 +25,10 @@ public class HUDManager : MonoBehaviour
 	[Space]
 	[Header("Stats (multiplayer)")]
 	[SerializeField] private GameObject m_statsParentP2;                    // [TODO][Q] Is this the best way to do this?
+	[SerializeField] private TextMeshProUGUI m_timerTextP2;
+	[SerializeField] private Slider m_timerSliderP2;
+	[SerializeField] private TextMeshProUGUI m_livesCountP2;
+	[SerializeField] private TextMeshProUGUI m_itemsCountP2;
 
 	[Space]
 	[Header("Input Buttons")]
@@ -41,27 +45,41 @@ public class HUDManager : MonoBehaviour
 
 	[Space]
 	[Header("EndScreen MASTER Parent")]
-	[SerializeField] private GameObject m_allEndScreensParent;
-
-	[Space]
-	[Header("End Game (single player)")]
-	[SerializeField] private GameObject m_endScreenParentSingle;
+	[SerializeField] private GameObject m_endScreenParent;
 	[SerializeField] private TextMeshProUGUI m_endLevelTitle;
 	[SerializeField] private TextMeshProUGUI m_endWinLoseTitle;
 	[SerializeField] private TextMeshProUGUI m_endTimer;
+	[SerializeField] private Button m_nextLevelButton;
+
+	[Space]
+	[Header("End Game (single player)")]
+	[SerializeField] private GameObject m_endStatsParentSingle;
 	[SerializeField] private TextMeshProUGUI m_endMovesCount;
 	[SerializeField] private TextMeshProUGUI m_endLivesCount;
 	[SerializeField] private TextMeshProUGUI m_endItemsCount;
 	[SerializeField] private TextMeshProUGUI m_endTotalScore;
-	[SerializeField] private Button m_nextLevelButton;
 
 	[Space]
 	[Header("End Game (multiplayer)")]
-	[SerializeField] private GameObject m_endScreenParentMulti;
+	// [TODO] REFACTOR! Try not duplicate two sets of P1 stats. Just move the parent into the correct position!
+	// [TODO] Are we having a different stats section layout for multiplayer? Would make sense, I think. But then would need to duplicate P1 stats... Unless we find a way to do e.g. m_statsString = $"P1 Items: {m_itemsP1} ... P2 Items: {m_itemsP2}"
+	[SerializeField] private GameObject m_endStatsParentMulti;
+	[SerializeField] private TextMeshProUGUI m_endMovesCountP1;
+	[SerializeField] private TextMeshProUGUI m_endLivesCountP1;
+	[SerializeField] private TextMeshProUGUI m_endItemsCountP1;
+	[SerializeField] private TextMeshProUGUI m_endTotalScoreP1;
+	[SerializeField] private TextMeshProUGUI m_endMovesCountP2;
+	[SerializeField] private TextMeshProUGUI m_endLivesCountP2;
+	[SerializeField] private TextMeshProUGUI m_endItemsCountP2;
+	[SerializeField] private TextMeshProUGUI m_endTotalScoreP2;
+	[SerializeField] private TextMeshProUGUI m_headToHeadScoreP1;
+	[SerializeField] private TextMeshProUGUI m_headToHeadScoreP2;
+	[SerializeField] private TextMeshProUGUI m_headToHeadScoreDraw;
 
+	// [TODO][Q] Can we just use single player end game and change text and functionality of return to main menu button?
 	[Space]
 	[Header("End Game (level editor)")]
-	[SerializeField] private GameObject m_endScreenParentEditor;
+	[SerializeField] private GameObject m_endStatsParentEditor;
 	#endregion
 
 
@@ -129,11 +147,11 @@ public class HUDManager : MonoBehaviour
 		m_endLevelTitle.text = $"{LevelSelectData.ThemeData.ThemeName} : {currentLevelIndex}";
 
 		if (LevelEditorData.IsTestingLevel)
-			m_endScreenParentEditor.SetActive(true);
+			m_endStatsParentEditor.SetActive(true);
 		else if (LevelSelectData.IsMultiplayer)
-			m_endScreenParentMulti.SetActive(true);
+			m_endStatsParentMulti.SetActive(true);
 		else
-			m_endScreenParentSingle.SetActive(true);
+			m_endStatsParentSingle.SetActive(true);
 	}
 	#endregion
 
@@ -183,50 +201,38 @@ public class HUDManager : MonoBehaviour
 
 
 	#region GameplayManager Calls (SETs)
-	public void SetTimerSliderActive(bool active)
-	{
-		m_timerSliderP1.gameObject.SetActive(active);
-	}
+	public void SetTimerSliderActiveP1(bool active) { m_timerSliderP1.gameObject.SetActive(active); }
+	public void SetTimerSliderActiveP2(bool active) { m_timerSliderP2.gameObject.SetActive(active); }
 
-	public void SetItemsCountActive(bool active)
-	{
-		m_itemsCountP1.gameObject.SetActive(active);
-	}
+	public void SetItemsCountActiveP1(bool active) { m_itemsCountP1.gameObject.SetActive(active); }
+	public void SetItemsCountActiveP2(bool active) { m_itemsCountP2.gameObject.SetActive(active); }
+
+	public void SetMultiplayerStatsActive() { m_statsParentP2.SetActive(true); }
 	#endregion
 
 
 
 	#region GameplayManager Calls (updates)
-	public void UpdateLivesCount(int lives)
-	{
-		m_livesCountP1.text = $"Lives: {lives}";
-	}
+	public void UpdateLivesCountP1(int lives) { m_livesCountP1.text = $"Lives: {lives}"; }
+	public void UpdateLivesCountP2(int lives) { m_livesCountP2.text = $"Lives: {lives}"; }
 
-	public void UpdateItemsCount(int items)
-	{
-		m_itemsCountP1.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
-	}
+	public void UpdateItemsCountP1(int items) { m_itemsCountP1.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
+	public void UpdateItemsCountP2(int items) { m_itemsCountP2.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
 
-	public void UpdateTimerTextExit(int timeTaken)
-	{
-		m_timerTextP1.text = $"Time Taken: {timeTaken}s";
-	}
+	public void UpdateTimerTextExitP1(int timeTaken) { m_timerTextP1.text = $"Time Taken: {timeTaken}s"; }
+	public void UpdateTimerTextExitP2(int timeTaken) { m_timerTextP2.text = $"Time Taken: {timeTaken}s"; }
 
-	public void UpdateTimerTextItems(float timeLeft)
-	{
-		m_timerTextP1.text = $"Time Left: {timeLeft}s";
-	}
+	public void UpdateTimerTextItemsP1(float timeLeft) { m_timerTextP1.text = $"Time Left: {timeLeft}s"; }
+	public void UpdateTimerTextItemsP2(float timeLeft) { m_timerTextP2.text = $"Time Left: {timeLeft}s"; }
 
-	public void UpdateTimerSlider(float timeLeft)
-	{
-		m_timerSliderP1.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit);
-	}
+	public void UpdateTimerSliderP1(float timeLeft) { m_timerSliderP1.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit); }
+	public void UpdateTimerSliderP2(float timeLeft) { m_timerSliderP2.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit); }
 	#endregion
 
 
 
 	#region GameplayManager Calls (end screen)
-	public void SetEndScreenStats(int totalScore, float timeTaken, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	public void SetEndScreenStatsSingle(int totalScore, float timeTaken, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
 	{
 		m_endTotalScore.text = $"Total Score: {totalScore:n0}";
 		m_endTimer.text = $"Time Taken: {timeTaken}s";
@@ -238,20 +244,57 @@ public class HUDManager : MonoBehaviour
 			m_endItemsCount.gameObject.SetActive(false);
 	}
 
-	public void ShowEndScreen(bool isWin)
+	public void SetWinLoseTitle(bool isWin)
 	{
+		m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = (isWin) ? "Next Level" : "Skip Level?";
 		m_endWinLoseTitle.text = (isWin) ? "Yay! You Win!" : "Uh-oh! You lost!";
-		if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
-		{
-			m_nextLevelButton.gameObject.SetActive(false);
-		}
+	}
+
+
+	public void SetEndScreenStatsMultiP1(int totalScore, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	{
+		m_endTotalScoreP1.text = $"P1: {totalScore:n0}";
+		m_endMovesCountP1.text = $"Moves Taken: {movesTaken}";
+		m_endLivesCountP1.text = $"Lives Left: {livesLeft}";
+		if (isItemsGameMode)
+			m_endItemsCountP1.text = $"Items Found: {itemsCollected}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
 		else
+			m_endItemsCountP1.gameObject.SetActive(false);
+	}
+
+	public void SetEndScreenStatsMultiP2(int totalScore, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	{
+		m_endTotalScoreP2.text = $"P2: {totalScore:n0}";
+		m_endMovesCountP2.text = $"Moves Taken: {movesTaken}";
+		m_endLivesCountP2.text = $"Lives Left: {livesLeft}";
+		if (isItemsGameMode)
+			m_endItemsCountP2.text = $"Items Found: {itemsCollected}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		else
+			m_endItemsCountP2.gameObject.SetActive(false);
+	}
+
+	public void SetWinLoseTitleMulti(EMultiplayerResult result)
+	{
+		switch (result)
 		{
-			// [TODO] If failed, switch the position (function) of the RETRY button and the SKIP button
-			// ... If doing that, will have to switch back upon winning, if we're not reloading the scene... Or do we just reload the scene?
-			m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = (isWin) ? "Next Level" : "Skip Level?";
+			case EMultiplayerResult.P1:		m_endWinLoseTitle.text = "P1 WINS!";	break;
+			case EMultiplayerResult.P2:		m_endWinLoseTitle.text = "P2 WINS!";	break;
+			case EMultiplayerResult.Draw:	m_endWinLoseTitle.text = "DRAW!";		break;
+			default:																break;
 		}
-		m_allEndScreensParent.SetActive(true);
+
+		// [TODO] Animate adding to the score!
+		m_headToHeadScoreP1.text = $"P1\n{PlayerPrefsSystem.MultiplayerGetWinsP1()}";
+		m_headToHeadScoreP2.text = $"P2\n{PlayerPrefsSystem.MultiplayerGetWinsP2()}";
+		m_headToHeadScoreDraw.text = $"Draws\n{PlayerPrefsSystem.MultiplayerGetDraws()}";
+	}
+
+
+	public void ShowEndScreen()
+	{
+		if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
+			m_nextLevelButton.gameObject.SetActive(false);
+		m_endScreenParent.SetActive(true);
 	}
 	#endregion
 }

@@ -14,15 +14,15 @@ public class GameplayManager_Exit : GameplayManager
 		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
 		{
 			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
-			m_hudManager.UpdateTimerTextExit(m_levelDisplayTimeInt);
+			m_hudManager.UpdateTimerTextExitP1(m_levelDisplayTimeInt);
 		}
 	}
 
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActive(false);
-		m_hudManager.SetTimerSliderActive(false);
+		m_hudManager.SetItemsCountActiveP1(false);
+		m_hudManager.SetTimerSliderActiveP1(false);
 	}
 
 	private void OnPlayerInteractExit(OTController controller)
@@ -42,7 +42,7 @@ public class GameplayManager_Exit : GameplayManager
 		base.EndGame(isWin, controller);
 
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
-		m_hudManager.SetEndScreenStats(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
+		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
 
 		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves))
 		{

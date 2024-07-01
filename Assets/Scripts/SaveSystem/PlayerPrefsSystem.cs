@@ -50,7 +50,7 @@ public static class PlayerPrefsSystem
 	#region Multiplayer GET
 	public static int MultiplayerGetWinsP1() => PlayerPrefs.GetInt(MULTIPLAYER_WINS_P1_KEY);
 	public static int MultiplayerGetWinsP2() => PlayerPrefs.GetInt(MULTIPLAYER_WINS_P2_KEY);
-	public static int MultiplayerGetDraws() => PlayerPrefs.GetInt(MULTIPLAYER_WINS_P2_KEY);
+	public static int MultiplayerGetDraws() => PlayerPrefs.GetInt(MULTIPLAYER_DRAWS_KEY);
 	public static int MultiplayerGetScoreP1() => PlayerPrefs.GetInt(MULTIPLAYER_SCORE_P1_KEY);
 	public static int MultiplayerGetScoreP2() => PlayerPrefs.GetInt(MULTIPLAYER_SCORE_P2_KEY);
 	#endregion
@@ -146,7 +146,7 @@ public static class PlayerPrefsSystem
 		return false;
 	}
 
-	public static bool ScoreDisablingCheatEnabled()
+	public static bool ScoreDisablingCheatsEnabled()
 	{
 		for (int i = 0; i < Enum.GetValues(typeof(ECheatType)).Length; ++i)
 		{

@@ -17,7 +17,7 @@ public abstract class GameplayManager : MonoBehaviour
 	// [NOTE] THESE ARE NO LONGER NEEDED HERE -- THEY ARE STORED IN LevelSelectData (static)
 	//private int m_gridDimension;
 	
-	protected OTController[] m_controllers;
+	protected OTController[] m_controllers;								// [TODO] Limit to 2x players max? This is accounting for up to 4x players, and choosing how many...
 	
 	// [TODO] Option to set lives to 1 or 3 or 5 or unlimited?
 	// If unlimited, don't allow recording the score? Same with unlimited time?
@@ -109,14 +109,12 @@ public abstract class GameplayManager : MonoBehaviour
 
 	protected virtual void InitHUD()
 	{
+		// [NOTE] This may also need to be overriden if testing a level editor level! Not essential, though
+		m_hudManager.UpdateLivesCountP1(LevelSelectData.LivesCount);              // [TODO] May want to allow user choosing 1, 3, 5, or unlimited lives
+
 		if (LevelSelectData.IsMultiplayer)
 		{
 			// [TODO] Update both sets of player lives
-		}
-		else
-		{
-			// [NOTE] This may also need to be overriden if testing a level editor level! Not essential, though
-			m_hudManager.UpdateLivesCount(LevelSelectData.LivesCount);              // [TODO] May want to allow user choosing 1, 3, 5, or unlimited lives
 		}
 	}
 
@@ -133,7 +131,13 @@ public abstract class GameplayManager : MonoBehaviour
 
 		if (controller.Stats.RemoveLife() == false)
 		{
-			EndGame(false, controller);
+
+			Debug.Log($"[ccc] {LevelSelectData.IsMultiplayer}");
+
+			if (LevelSelectData.IsMultiplayer)
+				EndGameMultiplayer();														// [Q] Do we want to end the game if the other player dies? Or allow keep playing? TEST!
+			else
+				EndGame(false, controller);
 		}
 		else
 		{
@@ -145,7 +149,7 @@ public abstract class GameplayManager : MonoBehaviour
 			controller.SetInputDisabled(false);
 		}
 
-		m_hudManager.UpdateLivesCount(controller.Stats.Lives);
+		m_hudManager.UpdateLivesCountP1(controller.Stats.Lives);
 	}
 
 
@@ -156,15 +160,14 @@ public abstract class GameplayManager : MonoBehaviour
 	{
 		m_hasEnded = true;
 		m_controllers[0].SetInputDisabled(true);
-		m_hudManager.ShowEndScreen(isWin);
+		m_hudManager.SetWinLoseTitle(isWin);
 	}
 
-	protected void EndGameMultiplayer()
+	protected virtual void EndGameMultiplayer()
 	{
 		m_hasEnded = true;
 		for (int i = 0; i < m_controllers.Length; ++i)
 		{
-			//if (m_controllers[i] != null)								// [TODO][Q] Should no longer need this nullcheck? No longer destroying the controller!
 			m_controllers[i].SetInputDisabled(true);
 		}
 
