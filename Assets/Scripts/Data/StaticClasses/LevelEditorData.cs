@@ -7,6 +7,8 @@ public static class LevelEditorData
 	public static string CustomMapFileName = string.Empty;
 	public static bool LoadExistingLevel = false;
 
+	public static bool IsDirty = false;
+
 	public static bool IsTestingLevel = false;								// [Q] Need this anymore? Rename to LevelEditorOverride?
 	
 	public static bool StartAtSecondSpawnPoint = false;						// [Q] Allow as a 'cheat' for single player as well?

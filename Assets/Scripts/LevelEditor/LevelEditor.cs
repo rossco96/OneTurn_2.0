@@ -44,7 +44,6 @@ public class LevelEditor : MonoBehaviour
 	[SerializeField] private Toggle m_moveThroughWallsToggle;
 
 	private bool m_initComplete = false;
-	private bool m_levelDataDirty = false;
 
 	//private string m_levelFileName;                                                           // [TODO] Implement! ... Or just use LevelEditorData.CustomMapFileName ?
 
@@ -122,8 +121,11 @@ public class LevelEditor : MonoBehaviour
 			}
 		}
 
-		// [Q] Save immediately if LevelEditorData.LoadExistingLevel == false ??
-		
+		// Save a new map immediately
+		if (LevelEditorData.LoadExistingLevel == false && LevelEditorData.IsTestingLevel == false)
+		{
+			Save();
+		}
 		LevelSelectData.IsInGame = false;
 		LevelSelectData.IsMultiplayer = false;
 		LevelEditorData.IsTestingLevel = true;
@@ -257,7 +259,7 @@ public class LevelEditor : MonoBehaviour
 		if (UpdateGridPropertiesCount(property) == false)
 			return;
 		gb.SetPropertyColor(m_mapPropertyData.GetColorByName(m_currentTool));
-		m_levelDataDirty = true;
+		LevelEditorData.IsDirty = true;
 	}
 
 	private bool UpdateGridPropertiesCount(EMapPropertyName property)
@@ -328,7 +330,7 @@ public class LevelEditor : MonoBehaviour
 		SetNewGridSize();
 		m_sliderLabel.text = $"Size: {m_gridDimension}x{m_gridDimension}";
 		if (m_initComplete)
-			m_levelDataDirty = true;
+			LevelEditorData.IsDirty = true;
 	}
 
 	private void SetNewGridSize()
@@ -358,7 +360,7 @@ public class LevelEditor : MonoBehaviour
 	#region Menu Buttons
 	public void ReturnToMenu()
 	{
-		if (m_levelDataDirty)
+		if (LevelEditorData.IsDirty)
 			m_unsavedDataPopup.SetActive(true);
 		else
 			SceneManager.LoadScene("MainMenu");
@@ -372,9 +374,9 @@ public class LevelEditor : MonoBehaviour
 	
 	public void Save()
 	{
-		// [TODO] Just disable the SAVE button until something changed?
-		if (m_levelDataDirty == false)
-			return;
+		// [TODO] Just disable the SAVE button until something changed?						<<< THIS! IMPLEMENT THIS!					[TODO]
+		//if (LevelEditorData.IsDirty == false)
+		//	return;
 
 		// [TODO][IMPORTANT] Must also save the metadata!!!
 		// ... Is that done via any of the SaveSystem._CustomMapFile() methods?
@@ -397,7 +399,7 @@ public class LevelEditor : MonoBehaviour
 		}
 		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.UpdatedTime, $"{System.DateTime.Now.Ticks}");
 
-		m_levelDataDirty = false;
+		LevelEditorData.IsDirty = false;
 		// [TODO] "Saved" popup? Or brief text bubble which doesn't get in the way?
 	}
 
