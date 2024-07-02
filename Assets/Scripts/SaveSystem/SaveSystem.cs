@@ -16,15 +16,18 @@ public static class SaveSystem
 	private static readonly string m_mapExtension = "png";
 	private static readonly string m_mapMetaExtension = "mapmeta";
 	private static readonly string m_mapStatsExtension = "stat";
+	private static readonly string m_mapCustomFacingExtension = "face";
 
-	private static readonly string m_multiplayerGameModePrefix = "M_";					// [TODO] Move as is also used elsewhere... Or make public
+	private static readonly string m_multiplayerGameModePrefix = "M_";					// [TODO] Move as is also used elsewhere... Or make public // Make a file of consts, similar to enums file?
 
 	
 	private static string m_mapFullFilepath = string.Empty;
 	private static string m_mapmetaFullFilepath = string.Empty;
+	private static string m_customFacingFullFilepath = string.Empty;
 	
 	private static Texture2D m_customMapTexture;
-	private static MapmetaData<string, string> m_customMapmetaInfo;
+	private static MapmetaData<string, string> m_customMapmetaInfo;						// [TODO] DELETE MapmetaData class if possible! Investigate!
+	private static MapmetaData<string, string> m_customfacingInfo;						// (same with Stats something or other)
 	#endregion
 
 
@@ -94,16 +97,17 @@ public static class SaveSystem
 	{
 		m_customMapTexture = new Texture2D(gridDimension, gridDimension);
 		m_mapFullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapExtension}";
-		if (File.Exists(m_mapFullFilepath))
-		{
-			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
-			//File.SetAttributes(m_mapFullFilePath, FileAttributes.Normal);
-		}
+		m_customfacingInfo = new MapmetaData<string, string>();
+		m_customFacingFullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapCustomFacingExtension}";
 	}
 
 	public static void AddToCustomMapFile(Color color, int x, int y)
 	{
 		m_customMapTexture.SetPixel(x, y, color);
+	}
+	public static void AddDirectionToCustomMap(EMapPropertyName property, ETurnDirection turnDirection, EFacingDirection facingDirection)
+	{
+		m_customfacingInfo.Add($"{property}{turnDirection}", $"{facingDirection}");
 	}
 
 	public static void SaveCustomMapFile()
@@ -113,12 +117,24 @@ public static class SaveSystem
 			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
 			File.SetAttributes(m_mapFullFilepath, FileAttributes.Normal);
 		}
-		FileStream wrtier = new FileStream(m_mapFullFilepath, FileMode.Create, FileAccess.Write, FileShare.None);
+		FileStream wrtierMapmeta = new FileStream(m_mapFullFilepath, FileMode.Create, FileAccess.Write, FileShare.None);			// [Q] Need all these params?
 		m_customMapTexture.filterMode = FilterMode.Point;
-		wrtier.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
-		wrtier.Dispose();
+		wrtierMapmeta.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
+		wrtierMapmeta.Dispose();
 		File.SetAttributes(m_mapFullFilepath, FileAttributes.ReadOnly);
 		//File.SetAttributes(m_mapFullFilePath, FileAttributes.Hidden);
+
+		if (File.Exists(m_customFacingFullFilepath))
+		{
+			// [TODO][IMPORTANT] Make sure to backup the file first!? Just in case! Can overwrite backups in the same session.
+			File.SetAttributes(m_customFacingFullFilepath, FileAttributes.Normal);
+		}
+		string dataJson = JsonUtility.ToJson(m_customfacingInfo);
+		StreamWriter writerFacing = File.CreateText(m_customFacingFullFilepath);
+		writerFacing.Write(dataJson);
+		writerFacing.Close();
+		File.SetAttributes(m_customFacingFullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(m_customFacingFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -389,6 +405,25 @@ public static class SaveSystem
 		texture.LoadImage(bytes);
 		texture.filterMode = FilterMode.Point;
 		return texture;
+	}
+
+	public static EFacingDirection GetCustomMapFacingInfo(string mapFileName, EMapPropertyName property, ETurnDirection turnDirection)
+	{
+		string facingFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapCustomFacingExtension}";
+		string facingFile = File.ReadAllText(facingFilepath);
+		MapmetaData<string, string> facingInfo = JsonUtility.FromJson<MapmetaData<string, string>>(facingFile);
+
+		if (facingInfo.TryGetValue($"{property}{turnDirection}", out string facingInfoString) == false)
+			return EFacingDirection.Up;
+		
+		for (int i = 0; i < Enum.GetValues(typeof(EFacingDirection)).Length; ++i)
+		{
+			if (facingInfoString == $"{(EFacingDirection)i}")
+				return (EFacingDirection)i;
+		}
+		
+		Debug.LogError("[SaveSystem::GetCustomMapFacingInfo] NO DATA EXISTS");					// [Q] Should never be here due to TryGetValue call above?
+		return EFacingDirection.Up;
 	}
 
 

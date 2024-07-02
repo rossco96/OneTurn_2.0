@@ -60,12 +60,12 @@ public class LevelEditor : MonoBehaviour
 	private int m_placedSpawnPointsSecondary = 0;												// [TODO] Must have one for testing the level with starting at second spawn
 
 	// [TODO][Q] Better way to do this?
-	private EFacingDirection m_exitDirectionRight = EFacingDirection.E_NONE;					// May need facing direction for exit1 and exit2.
-	private EFacingDirection m_exitDirectionLeft = EFacingDirection.E_NONE;						// Need separate colours? For primary exit and secondary exit? Or nah?
-	private EFacingDirection m_spawnPrimaryDirectionRight = EFacingDirection.E_NONE;
-	private EFacingDirection m_spawnPrimaryDirectionLeft = EFacingDirection.E_NONE;
-	private EFacingDirection m_spawnSecondaryDirectionRight = EFacingDirection.E_NONE;
-	private EFacingDirection m_spawnSecondaryDirectionLeft = EFacingDirection.E_NONE;
+	private EFacingDirection m_exitDirectionRight = EFacingDirection.Up;					// May need facing direction for exit1 and exit2.
+	private EFacingDirection m_exitDirectionLeft = EFacingDirection.Up;						// Need separate colours? For primary exit and secondary exit? Or nah?
+	private EFacingDirection m_spawnPrimaryDirectionRight = EFacingDirection.Up;
+	private EFacingDirection m_spawnPrimaryDirectionLeft = EFacingDirection.Up;
+	private EFacingDirection m_spawnSecondaryDirectionRight = EFacingDirection.Up;
+	private EFacingDirection m_spawnSecondaryDirectionLeft = EFacingDirection.Up;
 
 
 	private void Awake()
@@ -105,13 +105,56 @@ public class LevelEditor : MonoBehaviour
 					Color color = LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1);
 					gb.SetPropertyColor(color);
 					EMapPropertyName property = m_mapPropertyData.GetNameByColor(color);
+					
 					switch (property)
 					{
-						case EMapPropertyName.Item:					m_placedItems++;				break;
-						case EMapPropertyName.Exit:					m_placedExits++;				break;
-						case EMapPropertyName.SpawnPointPrimary:	m_placedSpawnPointsPrimary++;	break;
-						case EMapPropertyName.SpawnPointSecondary:	m_placedSpawnPointsSecondary++;	break;
-						default:																	break;
+						case EMapPropertyName.Item:
+							m_placedItems++;
+							break;
+
+						case EMapPropertyName.Exit:
+							m_placedExits++;
+							if (LevelEditorData.IsTestingLevel)
+							{
+								m_exitDirectionRight = LevelSelectData.MapData.ExitFacingDirectionRight;
+								m_exitDirectionLeft = LevelSelectData.MapData.ExitFacingDirectionLeft;
+							}
+							else if (LevelEditorData.LoadExistingLevel)
+							{
+								m_exitDirectionRight = SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, property, ETurnDirection.Right);
+								m_exitDirectionLeft = SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, property, ETurnDirection.Left);
+							}
+							break;
+
+						case EMapPropertyName.SpawnPointPrimary:
+							m_placedSpawnPointsPrimary++;
+							if (LevelEditorData.IsTestingLevel)
+							{
+								m_spawnPrimaryDirectionRight = LevelSelectData.MapData.PlayerSpawnDirectionRight[0];
+								m_spawnPrimaryDirectionLeft = LevelSelectData.MapData.PlayerSpawnDirectionLeft[0];
+							}
+							else if (LevelEditorData.LoadExistingLevel)
+							{
+								m_spawnPrimaryDirectionRight = SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, property, ETurnDirection.Right);
+								m_spawnPrimaryDirectionLeft = SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, property, ETurnDirection.Left);
+							}
+							break;
+
+						case EMapPropertyName.SpawnPointSecondary:
+							m_placedSpawnPointsSecondary++;
+							if (LevelEditorData.IsTestingLevel)
+							{
+								m_spawnSecondaryDirectionRight = LevelSelectData.MapData.PlayerSpawnDirectionRight[1];
+								m_spawnSecondaryDirectionLeft = LevelSelectData.MapData.PlayerSpawnDirectionLeft[1];
+							}
+							else if (LevelEditorData.LoadExistingLevel)
+							{
+								m_spawnSecondaryDirectionRight = SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, property, ETurnDirection.Right);
+								m_spawnSecondaryDirectionLeft = SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, property, ETurnDirection.Left);
+							}
+							break;
+						default:
+							break;
 					}
 				}
 				else
@@ -128,7 +171,7 @@ public class LevelEditor : MonoBehaviour
 		}
 		LevelSelectData.IsInGame = false;
 		LevelSelectData.IsMultiplayer = false;
-		LevelEditorData.IsTestingLevel = true;
+		//LevelEditorData.IsTestingLevel = false;							// Don't have this here. Need to check where all these types of calls are being referenced. Figure out actual system!
 	}
 
 	private void InitToolsDropdown()
@@ -169,6 +212,7 @@ public class LevelEditor : MonoBehaviour
 		{
 			rotations.Add($"{(EFacingDirection)i}");
 		}
+		
 		m_extraInfoRotationRight_Dropdown.AddOptions(rotations);
 		m_extraInfoRotationRight_Dropdown.value = 0;
 		m_extraInfoRotationLeft_Dropdown.AddOptions(rotations);
@@ -198,7 +242,7 @@ public class LevelEditor : MonoBehaviour
 	#endregion
 
 
-	#region Tools Dropdown
+	#region Dropdown OnChange
 	public void OnToolChanged(TMP_Dropdown dropdown)
 	{
 		m_currentTool = (EMapPropertyName)dropdown.value;
@@ -212,6 +256,7 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(false);
 				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(false);
 				break;
+
 			case EMapPropertyName.Exit:
 				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
 				m_extraInfoToolItemsUsed.text = $"Exits placed: {m_placedExits}/{m_maxExits}";
@@ -219,7 +264,18 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoRotationLeft_Label.gameObject.SetActive(true);
 				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(true);
 				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(true);
+				if (LevelEditorData.IsTestingLevel)
+				{
+					m_extraInfoRotationRight_Dropdown.value = (int)LevelSelectData.MapData.ExitFacingDirectionRight;
+					m_extraInfoRotationLeft_Dropdown.value = (int)LevelSelectData.MapData.ExitFacingDirectionLeft;
+				}
+				else if (LevelEditorData.LoadExistingLevel)
+				{
+					m_extraInfoRotationRight_Dropdown.value = (int)SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, m_currentTool, ETurnDirection.Right);
+					m_extraInfoRotationLeft_Dropdown.value = (int)SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, m_currentTool, ETurnDirection.Left);
+				}
 				break;
+
 			case EMapPropertyName.SpawnPointPrimary:
 				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
 				m_extraInfoToolItemsUsed.text = $"Primary spawns placed: {m_placedSpawnPointsPrimary}/{m_maxSpawnPoints}";
@@ -227,7 +283,18 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoRotationLeft_Label.gameObject.SetActive(true);
 				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(true);
 				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(true);
+				if (LevelEditorData.IsTestingLevel)
+				{
+					m_extraInfoRotationRight_Dropdown.value = (int)LevelSelectData.MapData.PlayerSpawnDirectionRight[0];
+					m_extraInfoRotationLeft_Dropdown.value = (int)LevelSelectData.MapData.PlayerSpawnDirectionLeft[0];
+				}
+				else if (LevelEditorData.LoadExistingLevel)
+				{
+					m_extraInfoRotationRight_Dropdown.value = (int)SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, m_currentTool, ETurnDirection.Right);
+					m_extraInfoRotationLeft_Dropdown.value = (int)SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, m_currentTool, ETurnDirection.Left);
+				}
 				break;
+
 			case EMapPropertyName.SpawnPointSecondary:
 				m_extraInfoToolItemsUsed.gameObject.SetActive(true);
 				m_extraInfoToolItemsUsed.text = $"Secondary spawns placed: {m_placedSpawnPointsSecondary}/{m_maxSpawnPoints}";
@@ -235,7 +302,18 @@ public class LevelEditor : MonoBehaviour
 				m_extraInfoRotationLeft_Label.gameObject.SetActive(true);
 				m_extraInfoRotationRight_Dropdown.gameObject.SetActive(true);
 				m_extraInfoRotationLeft_Dropdown.gameObject.SetActive(true);
+				if (LevelEditorData.IsTestingLevel)
+				{
+					m_extraInfoRotationRight_Dropdown.value = (int)LevelSelectData.MapData.PlayerSpawnDirectionRight[1];
+					m_extraInfoRotationLeft_Dropdown.value = (int)LevelSelectData.MapData.PlayerSpawnDirectionLeft[1];
+				}
+				else if (LevelEditorData.LoadExistingLevel)
+				{
+					m_extraInfoRotationRight_Dropdown.value = (int)SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, m_currentTool, ETurnDirection.Right);
+					m_extraInfoRotationLeft_Dropdown.value = (int)SaveSystem.GetCustomMapFacingInfo(LevelEditorData.CustomMapFileName, m_currentTool, ETurnDirection.Left);
+				}
 				break;
+
 			default:
 				m_extraInfoToolItemsUsed.gameObject.SetActive(false);
 				m_extraInfoRotationRight_Label.gameObject.SetActive(false);
@@ -249,6 +327,44 @@ public class LevelEditor : MonoBehaviour
 		// m_toolsDropdown.captionImage currently NULL!
 		//m_toolsDropdown.captionImage.sprite = m_mapPropertyData.GetDropdownSpriteByName(m_currentTool);
 	}
+
+	public void OnRotationChangedRight(TMP_Dropdown dropdown)
+	{
+		EFacingDirection facingDirection = (EFacingDirection)dropdown.value;
+		switch (m_currentTool)
+		{
+			case EMapPropertyName.Exit:
+				m_exitDirectionRight = facingDirection;
+				break;
+			case EMapPropertyName.SpawnPointPrimary:
+				m_spawnPrimaryDirectionRight = facingDirection;
+				break;
+			case EMapPropertyName.SpawnPointSecondary:
+				m_spawnSecondaryDirectionRight = facingDirection;
+				break;
+			default:
+				break;
+		}
+	}
+
+	public void OnRotationChangedLeft(TMP_Dropdown dropdown)
+	{
+		EFacingDirection facingDirection = (EFacingDirection)dropdown.value;
+		switch (m_currentTool)
+		{
+			case EMapPropertyName.Exit:
+				m_exitDirectionLeft = facingDirection;
+				break;
+			case EMapPropertyName.SpawnPointPrimary:
+				m_spawnPrimaryDirectionLeft = facingDirection;
+				break;
+			case EMapPropertyName.SpawnPointSecondary:
+				m_spawnSecondaryDirectionLeft = facingDirection;
+				break;
+			default:
+				break;
+		}
+	}
 	#endregion
 
 
@@ -256,9 +372,33 @@ public class LevelEditor : MonoBehaviour
 	public void OnGridButtonClicked(GridButton gb)
 	{
 		EMapPropertyName property = m_mapPropertyData.GetNameByColor(gb.PropertyColor);
-		if (UpdateGridPropertiesCount(property) == false)
+		if (UpdateGridPropertiesCount(property) == false)									// [TODO] Should be allowed to click on one with updated rotations if applicable!
 			return;
 		gb.SetPropertyColor(m_mapPropertyData.GetColorByName(m_currentTool));
+
+		if (m_currentTool == EMapPropertyName.Exit || m_currentTool == EMapPropertyName.SpawnPointPrimary || m_currentTool == EMapPropertyName.SpawnPointSecondary)
+		{
+			EFacingDirection facingDirectionRight = (EFacingDirection)m_extraInfoRotationRight_Dropdown.value;
+			EFacingDirection facingDirectionLeft = (EFacingDirection)m_extraInfoRotationLeft_Dropdown.value;
+			switch (m_currentTool)
+			{
+				case EMapPropertyName.Exit:
+					m_exitDirectionRight = facingDirectionRight;
+					m_exitDirectionLeft = facingDirectionLeft;
+					break;
+				case EMapPropertyName.SpawnPointPrimary:
+					m_spawnPrimaryDirectionRight = facingDirectionRight;
+					m_spawnPrimaryDirectionLeft = facingDirectionLeft;
+					break;
+				case EMapPropertyName.SpawnPointSecondary:
+					m_spawnSecondaryDirectionRight = facingDirectionRight;
+					m_spawnSecondaryDirectionLeft = facingDirectionLeft;
+					break;
+				default:
+					break;
+			}
+		}
+
 		LevelEditorData.IsDirty = true;
 	}
 
@@ -388,6 +528,24 @@ public class LevelEditor : MonoBehaviour
 			{
 				Color color = gridButtons[j].PropertyColor;
 				SaveSystem.AddToCustomMapFile(color, j, m_gridDimension - i - 1);
+				EMapPropertyName property = m_mapPropertyData.GetNameByColor(color);
+				switch (property)
+				{
+					case EMapPropertyName.Exit:
+						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Right, m_exitDirectionRight);
+						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Left, m_exitDirectionLeft);
+						break;
+					case EMapPropertyName.SpawnPointPrimary:
+						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Right, m_spawnPrimaryDirectionRight);
+						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Left, m_spawnPrimaryDirectionLeft);
+						break;
+					case EMapPropertyName.SpawnPointSecondary:
+						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Right, m_spawnSecondaryDirectionRight);
+						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Left, m_spawnSecondaryDirectionLeft);
+						break;
+					default:
+						break;
+				}
 			}
 		}
 		SaveSystem.SaveCustomMapFile();
@@ -436,6 +594,7 @@ public class LevelEditor : MonoBehaviour
 
 		// Must set this to true so we go back to the grid upon coming back?
 		LevelEditorData.LoadExistingLevel = true;
+		LevelEditorData.IsTestingLevel = true;
 
 		SceneManager.LoadScene("LevelScene");
 	}

@@ -257,8 +257,6 @@ public class LevelGenerator : MonoBehaviour
 			case EFacingDirection.Left:
 				zRotation = 90;		break;
 			default:
-				// 'Up' is the default direction.
-				// 'E_NONE' defaults to 'Up' anyway.
 				break;
 		}
 		placedObject.transform.Rotate(0, 0, zRotation);
