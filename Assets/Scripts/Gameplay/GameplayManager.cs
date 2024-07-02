@@ -115,6 +115,7 @@ public abstract class GameplayManager : MonoBehaviour
 		if (LevelSelectData.IsMultiplayer)
 		{
 			// [TODO] Update both sets of player lives
+			m_hudManager.UpdateLivesCountP2(LevelSelectData.LivesCount);
 		}
 	}
 

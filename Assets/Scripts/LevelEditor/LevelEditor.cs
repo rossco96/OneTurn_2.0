@@ -52,21 +52,21 @@ public class LevelEditor : MonoBehaviour
 	private EMapPropertyName m_currentTool = EMapPropertyName.BlankSquare;
 
 	private int m_maxItems = 8;
-	private int m_maxExits = 1;
+	private int m_maxExits = 1;																	// [TODO] Include "m_minExits = 1" and "m_maxExits = 2" ?
 	private int m_maxSpawnPoints = 1;
 
 	private int m_placedExits = 0;
 	private int m_placedItems = 0;
-	private int m_placedSpawnPointsPrimary = 0;
-	private int m_placedSpawnPointsSecondary = 0;
+	private int m_placedSpawnPointsPrimary = 0;													// [TODO] Must have one for testing the level!
+	private int m_placedSpawnPointsSecondary = 0;												// [TODO] Must have one for testing the level with starting at second spawn
 
 	// [TODO][Q] Better way to do this?
-	private EFacingDirection m_exitDirectionRight = EFacingDirection.Up;
-	private EFacingDirection m_exitDirectionLeft = EFacingDirection.Up;
-	private EFacingDirection m_spawnPrimaryDirectionRight = EFacingDirection.Up;
-	private EFacingDirection m_spawnPrimaryDirectionLeft = EFacingDirection.Up;
-	private EFacingDirection m_spawnSecondaryDirectionRight = EFacingDirection.Up;
-	private EFacingDirection m_spawnSecondaryDirectionLeft = EFacingDirection.Up;
+	private EFacingDirection m_exitDirectionRight = EFacingDirection.E_NONE;					// May need facing direction for exit1 and exit2.
+	private EFacingDirection m_exitDirectionLeft = EFacingDirection.E_NONE;						// Need separate colours? For primary exit and secondary exit? Or nah?
+	private EFacingDirection m_spawnPrimaryDirectionRight = EFacingDirection.E_NONE;
+	private EFacingDirection m_spawnPrimaryDirectionLeft = EFacingDirection.E_NONE;
+	private EFacingDirection m_spawnSecondaryDirectionRight = EFacingDirection.E_NONE;
+	private EFacingDirection m_spawnSecondaryDirectionLeft = EFacingDirection.E_NONE;
 
 
 	private void Awake()

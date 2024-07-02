@@ -30,7 +30,6 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private GameObject m_exitPrefab;
 	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
 
-	private bool m_levelEditorOverride = false;
 	private ThemeData m_themeData;
 	private MapData m_mapData;
 	private EGameMode m_gameMode;
@@ -47,15 +46,12 @@ public class LevelGenerator : MonoBehaviour
 
 	private void Awake()
 	{
-		//m_levelEditorOverride = LevelEditorData.IsTestingLevel;								// [TODO] Uncomment!
-		m_levelEditorOverride = false;															// This is for testing only!
-
 		m_themeData = LevelSelectData.ThemeData;
 		m_mapData = LevelSelectData.MapData;
 		m_gameMode = LevelSelectData.GameMode;
 		m_turnDirection = LevelSelectData.TurnDirection;
 
-		m_isMultiplayer = (m_levelEditorOverride == false && LevelSelectData.IsMultiplayer);
+		m_isMultiplayer = (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer);
 
 		if (m_isMultiplayer)
 		{
@@ -169,7 +165,7 @@ public class LevelGenerator : MonoBehaviour
 						break;
 
 					case EMapPropertyName.SpawnPointPrimary:
-						if (m_levelEditorOverride && LevelEditorData.StartAtSecondSpawnPoint)
+						if (LevelEditorData.IsTestingLevel && LevelEditorData.StartAtSecondSpawnPoint)
 							break;
 						GameObject playerControllerPrimary = PlaceOnGrid
 						(
@@ -184,7 +180,7 @@ public class LevelGenerator : MonoBehaviour
 						break;
 
 					case EMapPropertyName.SpawnPointSecondary:
-						if ((m_levelEditorOverride && LevelEditorData.StartAtSecondSpawnPoint) || m_isMultiplayer)
+						if ((LevelEditorData.IsTestingLevel && LevelEditorData.StartAtSecondSpawnPoint) || m_isMultiplayer)
 						{
 							GameObject playerControllerSecondary = PlaceOnGrid
 							(
@@ -261,6 +257,8 @@ public class LevelGenerator : MonoBehaviour
 			case EFacingDirection.Left:
 				zRotation = 90;		break;
 			default:
+				// 'Up' is the default direction.
+				// 'E_NONE' defaults to 'Up' anyway.
 				break;
 		}
 		placedObject.transform.Rotate(0, 0, zRotation);
