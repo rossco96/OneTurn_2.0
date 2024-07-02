@@ -38,11 +38,6 @@ public class LevelEditorMenuManager : MonoBehaviour
 		//m_inputAuthorName.characterLimit =
 
 		InitExistingLevelsOptions();
-
-		// [Q] Keep these here? Or move to LevelEditor.cs?
-		LevelSelectData.IsInGame = false;
-		LevelSelectData.IsMultiplayer = false;
-		LevelEditorData.IsTestingLevel = true;
 	}
 
 

@@ -91,6 +91,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		// [Q] Keep these here?
 		LevelSelectData.IsInGame = true;
+		LevelSelectData.IsMultiplayer = false;
 		LevelEditorData.IsTestingLevel = false;
 
 		// [NOTE] THIS IS SUPER HACKY BUT IT WORKS

@@ -9,6 +9,12 @@ public class MainMenuManager : MonoBehaviour
 	private void Awake()
 	{
 		LoadMenu();
+
+		// [NOTE] The below is repeated in a coupe of places! Figure out where and how actually needed!
+		// Here, LevelSelectMenuManager, and LevelEditor (prev. LevelEditorMenuManager)
+		LevelSelectData.IsInGame = false;
+		LevelSelectData.IsMultiplayer = false;
+		LevelEditorData.IsTestingLevel = false;
 	}
 
 	private void LoadMenu()

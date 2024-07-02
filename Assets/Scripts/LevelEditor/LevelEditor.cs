@@ -100,7 +100,8 @@ public class LevelEditor : MonoBehaviour
 				GridButton gb = gridButtons[j];
 				gb.gameObject.SetActive(j < gridDimension);
 				gb.RegisterOnButtonSelected(OnGridButtonClicked);
-				if (i < gridDimension && j < gridDimension && LevelEditorData.LoadExistingLevel)
+				
+				if (i < gridDimension && j < gridDimension && (LevelEditorData.LoadExistingLevel || LevelEditorData.IsTestingLevel))
 				{
 					Color color = LevelEditorData.GridTexture.GetPixel(j, gridDimension - i - 1);
 					gb.SetPropertyColor(color);
@@ -122,6 +123,10 @@ public class LevelEditor : MonoBehaviour
 		}
 
 		// [Q] Save immediately if LevelEditorData.LoadExistingLevel == false ??
+		
+		LevelSelectData.IsInGame = false;
+		LevelSelectData.IsMultiplayer = false;
+		LevelEditorData.IsTestingLevel = true;
 	}
 
 	private void InitToolsDropdown()
@@ -426,6 +431,9 @@ public class LevelEditor : MonoBehaviour
 		LevelSelectData.TurnDirection = (ETurnDirection)m_turnDirectionDropdown.value;
 		LevelEditorData.StartAtSecondSpawnPoint = m_startAtSecondSpawnToggle.isOn;
 		LevelEditorData.AllowMoveThroughWalls = m_moveThroughWallsToggle.isOn;
+
+		// Must set this to true so we go back to the grid upon coming back?
+		LevelEditorData.LoadExistingLevel = true;
 
 		SceneManager.LoadScene("LevelScene");
 	}
