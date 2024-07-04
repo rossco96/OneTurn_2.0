@@ -10,21 +10,15 @@ public class OTController : MonoBehaviour
 	private EInputMode m_inputMode = EInputMode.TapSwipe;
 	private Input_Base m_input = null;
 
-	public void SetInputBounds(Bounds bounds)
-	{
-		if (m_input == null)
-		{
-			Debug.LogError("[OTController::SetInputBounds] m_input is null!");
-			return;
-		}
-		m_input.SetInputBounds(bounds);
-	}
+	public bool IsButtonsGameMode => m_inputMode == EInputMode.Buttons;
+	public void GetOnMoveForward(out UnityEngine.Events.UnityAction onMoveForward) { onMoveForward = ButtonMoveForward; }
+	public void GetOnTurn(out UnityEngine.Events.UnityAction onTurn) { onTurn = ButtonTurn; }
+
+	public void SetInputBounds(Bounds bounds) { m_input.SetInputBounds(bounds); }
 	
 	private float m_gridSizeMultiplier = 1.0f;
 
 	private ETurnDirection m_turnDirection = ETurnDirection.Right;
-
-	private bool m_isMultiplayer = false;
 
 	private GameObject m_playerPrefab = null;
 	private GameObject m_player = null;
@@ -38,12 +32,9 @@ public class OTController : MonoBehaviour
 
 	private void Awake()
 	{
-		Vector2 screenDimensions = new Vector2(Screen.width, Screen.height);
 		m_gridSizeMultiplier = LevelSelectData.GridSizeMultiplier;
-		m_isMultiplayer = (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer);
 		m_turnDirection = LevelSelectData.TurnDirection;
 		m_stats.SetLives(LevelSelectData.LivesCount);                   // [TODO][NOTE] Make sure we do NOT remove the life in GameplayManager_LevelEditor
-
 		InitInput();
 	}
 
@@ -94,17 +85,17 @@ public class OTController : MonoBehaviour
 	}
 
 
-	// UI 'buttons' input style
-	public void TurnButton()
+	private void ButtonMoveForward()
 	{
-		Turn();
-	}
-	// UI 'buttons' input style
-	public void MoveForwardButton()
-	{
+		if (m_inputDisabled) return;
 		MoveForward();
 	}
 
+	private void ButtonTurn()
+	{
+		if (m_inputDisabled) return;
+		Turn();
+	}
 
 	private void Turn()
 	{

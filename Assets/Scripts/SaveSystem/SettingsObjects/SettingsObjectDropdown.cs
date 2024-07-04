@@ -20,6 +20,8 @@ public class SettingsObjectDropdown : SettingsObject_Base
 
 	public override void SetNewValue()
 	{
-		SettingsSystem.UpdateSettings(m_data.Key, m_dropdown.itemText.text);
+		// [TODO] Will we ever NOT want this? Regardless, pls rename these two camel case extensions
+		string optionNoSpaces = m_dropdown.options[m_dropdown.value].text.FromCamelCase();
+		SettingsSystem.UpdateSettings(m_data.Key, optionNoSpaces);
 	}
 }

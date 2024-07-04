@@ -32,7 +32,8 @@ public class InputSwipeDirectional : Input_Base
 		if (m_inputDisabled || Input.touchCount == 0)
 			return false;
 
-		if (LevelSelectData.IsMultiplayer)
+		// [TODO][Q] Do we need the IsTestingLevel check anymore? Think I can delete.
+		if (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer)
 		{
 			if (GetValidMultiplayerTouch(out m_touch) == false)     // If multiplayer, touch must be within specific bounds
 				return false;

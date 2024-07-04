@@ -30,6 +30,14 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private GameObject m_exitPrefab;
 	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
 
+	[Space]
+	[SerializeField] private GameObject m_inputButtonsP1;
+	[SerializeField] private GameObject m_inputButtonsP2;
+	[SerializeField] private UnityEngine.UI.Button m_buttonMoveForwardP1;
+	[SerializeField] private UnityEngine.UI.Button m_buttonTurnP1;
+	[SerializeField] private UnityEngine.UI.Button m_buttonMoveForwardP2;
+	[SerializeField] private UnityEngine.UI.Button m_buttonTurnP2;
+
 	private ThemeData m_themeData;
 	private MapData m_mapData;
 	private EGameMode m_gameMode;
@@ -175,8 +183,18 @@ public class LevelGenerator : MonoBehaviour
 								: m_mapData.PlayerSpawnDirectionLeft[0]
 						);
 						playerControllerPrimary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[0]);
+						if (playerControllerPrimary.GetComponent<OTController>().IsButtonsGameMode)
+						{
+							m_inputButtonsP1.SetActive(true);
+							playerControllerPrimary.GetComponent<OTController>().GetOnMoveForward(out UnityEngine.Events.UnityAction onMoveForward);
+							m_buttonMoveForwardP1.onClick.AddListener(onMoveForward);
+							playerControllerPrimary.GetComponent<OTController>().GetOnTurn(out UnityEngine.Events.UnityAction onTurn);
+							m_buttonTurnP1.onClick.AddListener(onTurn);
+						}
 						if (m_isMultiplayer)
+						{
 							playerControllerPrimary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[0]);
+						}
 						break;
 
 					case EMapPropertyName.SpawnPointSecondary:
@@ -195,6 +213,26 @@ public class LevelGenerator : MonoBehaviour
 								playerControllerSecondary.GetComponent<OTController>().Index = m_multiplayerSpawnIndex;
 								playerControllerSecondary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[m_multiplayerSpawnIndex]);
 								m_multiplayerSpawnIndex++;
+								if (playerControllerSecondary.GetComponent<OTController>().IsButtonsGameMode)
+								{
+									m_inputButtonsP2.SetActive(true);
+									playerControllerSecondary.GetComponent<OTController>().GetOnMoveForward(out UnityEngine.Events.UnityAction onMoveForward);
+									m_buttonMoveForwardP2.onClick.AddListener(onMoveForward);
+									playerControllerSecondary.GetComponent<OTController>().GetOnTurn(out UnityEngine.Events.UnityAction onTurn);
+									m_buttonTurnP2.onClick.AddListener(onTurn);
+								}
+							}
+							else
+							{
+								// We are testing in the level editor so only need the first set of buttons
+								if (playerControllerSecondary.GetComponent<OTController>().IsButtonsGameMode)
+								{
+									m_inputButtonsP1.SetActive(true);
+									playerControllerSecondary.GetComponent<OTController>().GetOnMoveForward(out UnityEngine.Events.UnityAction onMoveForward);
+									m_buttonMoveForwardP1.onClick.AddListener(onMoveForward);
+									playerControllerSecondary.GetComponent<OTController>().GetOnTurn(out UnityEngine.Events.UnityAction onTurn);
+									m_buttonTurnP1.onClick.AddListener(onTurn);
+								}
 							}
 						}
 						break;

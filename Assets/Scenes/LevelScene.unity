@@ -566,7 +566,7 @@ GameObject:
   - component: {fileID: 63935254}
   - component: {fileID: 63935253}
   m_Layer: 5
-  m_Name: ButtonForward
+  m_Name: ButtonForwardP1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9461,7 +9461,7 @@ GameObject:
   - component: {fileID: 1457757539}
   - component: {fileID: 1457757538}
   m_Layer: 5
-  m_Name: ButtonForward
+  m_Name: ButtonForwardP2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10685,7 +10685,7 @@ GameObject:
   - component: {fileID: 1641600068}
   - component: {fileID: 1641600067}
   m_Layer: 5
-  m_Name: ButtonTurn
+  m_Name: ButtonTurnP2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11486,7 +11486,7 @@ GameObject:
   - component: {fileID: 1768720370}
   - component: {fileID: 1768720369}
   m_Layer: 5
-  m_Name: ButtonTurn
+  m_Name: ButtonTurnP1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12798,7 +12798,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2004133646}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -12806,10 +12806,10 @@ RectTransform:
   - {fileID: 1641600066}
   m_Father: {fileID: 1953451559}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 320}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -240}
   m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2012001537
@@ -13374,6 +13374,12 @@ MonoBehaviour:
   m_wallPrefab: {fileID: 8207327220536189564, guid: d1fe2fdf44cf1a142840ee300e6868bb, type: 3}
   m_itemPrefab: {fileID: 5627526918740645347, guid: 120192b01dc96c24b902f8565a79c9ff, type: 3}
   m_exitPrefab: {fileID: 8887468549016088395, guid: 606b92b3173cb1b469e4176f1b66d466, type: 3}
+  m_inputButtonsP1: {fileID: 118489443}
+  m_inputButtonsP2: {fileID: 2004133646}
+  m_buttonMoveForwardP1: {fileID: 63935253}
+  m_buttonTurnP1: {fileID: 1768720369}
+  m_buttonMoveForwardP2: {fileID: 1457757538}
+  m_buttonTurnP2: {fileID: 1641600067}
 --- !u!4 &2037785593
 Transform:
   m_ObjectHideFlags: 0

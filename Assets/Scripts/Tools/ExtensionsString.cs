@@ -23,6 +23,11 @@ public static class ExtensionsString
 		return capitalsCount > 0;
 	}
 
+	public static string FromCamelCase(this string s)
+	{
+		return s.Replace(" ", "");
+	}
+
 	public static long ToLong(this string s)
 	{
 		long returnValue = 0;
