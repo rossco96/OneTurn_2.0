@@ -3887,7 +3887,7 @@ GameObject:
   m_Component:
   - component: {fileID: 544537743}
   m_Layer: 0
-  m_Name: BorderParent (not ideal - collider sitting away from actual border?)
+  m_Name: BorderParent (not ideal - colliders sitting away from actual borders?)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

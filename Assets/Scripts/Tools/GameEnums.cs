@@ -1,5 +1,6 @@
 public enum EFacingDirection
 {
+	// IMPORTANT - keep this as a 'clockface' (going clockwise, starting from 'up'
 	Up,
 	Right,
 	Down,
@@ -35,6 +36,12 @@ public enum EInputMode
 	TapSwipe,
 	SwipeDirectional,
 	Buttons
+}
+
+public enum EMovement
+{
+	Forward,
+	Turn
 }
 
 [System.Serializable]

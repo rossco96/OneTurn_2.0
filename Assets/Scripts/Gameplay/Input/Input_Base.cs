@@ -1,18 +1,28 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Input_Base : MonoBehaviour
+public abstract class Input_Base
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	protected Bounds m_inputBounds;
+	public void SetInputBounds(Bounds bounds) { m_inputBounds = bounds; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	protected bool m_inputDisabled = true;
+	public void SetInputDisabled(bool disabled) { m_inputDisabled = disabled; }
+
+	public abstract bool Check(out EMovement movement);
+
+	protected bool GetValidMultiplayerTouch(out Touch touch)
+	{
+		touch = default;
+		bool validTouch = false;
+		for (int i = 0; i < Input.touchCount; ++i)
+		{
+			if (m_inputBounds.Contains(Input.GetTouch(i).position))
+			{
+				touch = Input.GetTouch(i);
+				validTouch = true;
+				break;
+			}
+		}
+		return validTouch;
+	}
 }

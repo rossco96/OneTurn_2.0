@@ -43,4 +43,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1680ea9280ee6d40987492ac46e366d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_screenPercentSwipe: 0.05
+  m_inputSettingsKey: {fileID: 11400000, guid: e8daeab57452dbf41830aa2559fe03c9, type: 2}
+  Index: 0

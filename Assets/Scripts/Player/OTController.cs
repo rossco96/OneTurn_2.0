@@ -2,19 +2,23 @@ using UnityEngine;
 
 public class OTController : MonoBehaviour
 {
-	const float k_screenPercentSwipe = 0.05f;
-	
-	private float m_minSwipeDistance = 0.0f;
-
 	private bool m_inputDisabled = true;
 	private bool m_inputDisabledIsDirty = false;
 	private bool m_inputDisabledPendingValue = false;
-	
-	private Touch m_touch;
-	private Vector2 m_touchStartPosition = Vector2.zero;
 
-	private Bounds m_inputBounds;
-	public void SetInputBounds(Bounds bounds) { m_inputBounds = bounds; }
+	[SerializeField] private SettingsDataString m_inputSettingsKey;
+	private EInputMode m_inputMode = EInputMode.TapSwipe;
+	private Input_Base m_input = null;
+
+	public void SetInputBounds(Bounds bounds)
+	{
+		if (m_input == null)
+		{
+			Debug.LogError("[OTController::SetInputBounds] m_input is null!");
+			return;
+		}
+		m_input.SetInputBounds(bounds);
+	}
 	
 	private float m_gridSizeMultiplier = 1.0f;
 
@@ -35,16 +39,47 @@ public class OTController : MonoBehaviour
 	private void Awake()
 	{
 		Vector2 screenDimensions = new Vector2(Screen.width, Screen.height);
-		m_minSwipeDistance = k_screenPercentSwipe * screenDimensions.magnitude;
 		m_gridSizeMultiplier = LevelSelectData.GridSizeMultiplier;
 		m_isMultiplayer = (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer);
 		m_turnDirection = LevelSelectData.TurnDirection;
-		m_stats.SetLives(LevelSelectData.LivesCount);					// [TODO][NOTE] Make sure we do NOT remove the life in GameplayManager_LevelEditor
+		m_stats.SetLives(LevelSelectData.LivesCount);                   // [TODO][NOTE] Make sure we do NOT remove the life in GameplayManager_LevelEditor
+
+		InitInput();
 	}
+
+	private void InitInput()
+	{
+		string inputSettings = SettingsSystem.GetValue(m_inputSettingsKey.Key);
+		for (int i = 0; i < System.Enum.GetValues(typeof(EInputMode)).Length; ++i)
+		{
+			if ($"{(EInputMode)i}" == inputSettings)
+			{
+				m_inputMode = (EInputMode)i;
+				break;
+			}
+		}
+
+		switch (m_inputMode)
+		{
+			case EInputMode.TapSwipe:			m_input = new InputTapSwipe();			break;
+			case EInputMode.SwipeDirectional:	m_input = new InputSwipeDirectional();	break;
+			case EInputMode.Buttons:			m_input = new InputButtons();			break;
+			default:																	break;
+		}
+	}
+
 
 	private void Update()
     {
-		CheckInput();
+		if (m_input.Check(out EMovement movement))
+		{
+			switch (movement)
+			{
+				case EMovement.Forward:	MoveForward();	break;
+				case EMovement.Turn:	Turn();			break;
+				default:								break;
+			}
+		}
     }
 
 	// [TODO] Do not like that I'm using LateUpdate for this!?
@@ -54,54 +89,22 @@ public class OTController : MonoBehaviour
 		{
 			m_inputDisabledIsDirty = false;
 			m_inputDisabled = m_inputDisabledPendingValue;
+			m_input.SetInputDisabled(m_inputDisabled);
 		}
 	}
 
 
-
-	private void CheckInput()
+	// UI 'buttons' input style
+	public void TurnButton()
 	{
-		if (m_inputDisabled || Input.touchCount == 0)
-			return;
-
-		if (m_isMultiplayer)
-		{
-			if (GetValidMultiplayerTouch(out m_touch) == false)		// If multiplayer, touch must be within specific bounds
-				return;
-		}
-		else
-		{
-			m_touch = Input.GetTouch(0);							// Single player allows touching the screen anywhere
-		}
-
-		if (m_touch.phase == TouchPhase.Began)
-		{
-			m_touchStartPosition = m_touch.position;
-		}
-		else if (m_touch.phase == TouchPhase.Ended)					// [TODO] Do we ever need to consider TouchPhase.Canceled?
-		{
-			if ((m_touch.position - m_touchStartPosition).sqrMagnitude > Mathf.Pow(m_minSwipeDistance, 2))
-				Turn();
-			else
-				MoveForward();
-		}
+		Turn();
 	}
-
-	private bool GetValidMultiplayerTouch(out Touch touch)
+	// UI 'buttons' input style
+	public void MoveForwardButton()
 	{
-		touch = default;
-		bool validTouch = false;
-		for (int i = 0; i < Input.touchCount; ++i)
-		{
-			if (m_inputBounds.Contains(Input.GetTouch(i).position))
-			{
-				touch = Input.GetTouch(i);
-				validTouch = true;
-				break;
-			}
-		}
-		return validTouch;
+		MoveForward();
 	}
+
 
 	private void Turn()
 	{
@@ -133,6 +136,7 @@ public class OTController : MonoBehaviour
 		else
 		{
 			m_inputDisabled = disabled;
+			m_input.SetInputDisabled(disabled);
 		}
 	}
 
@@ -146,6 +150,10 @@ public class OTController : MonoBehaviour
 	public void RespawnPlayer()
 	{
 		m_player = Instantiate(m_playerPrefab, transform);
+		if (m_inputMode == EInputMode.SwipeDirectional)
+		{
+			((InputSwipeDirectional)m_input).ResetCurrentDirection();
+		}
 	}
 
 	public void DestroyPlayerGameObject()
