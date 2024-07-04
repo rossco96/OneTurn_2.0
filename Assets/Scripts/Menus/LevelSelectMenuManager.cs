@@ -104,7 +104,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	{
 		yield return null;
 		// 3 is the number of tabs. 80.0f is the pre-defined height
-		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, 80.0f);
+		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, m_mapTabsParentGridLayoutGroup.cellSize.y);
 	}
 
 
