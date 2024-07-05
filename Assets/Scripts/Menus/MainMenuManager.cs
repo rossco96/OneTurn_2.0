@@ -12,6 +12,8 @@ public class MainMenuManager : MonoBehaviour
 
 		// [NOTE] The below is repeated in a coupe of places! Figure out where and how actually needed!
 		// Here, LevelSelectMenuManager, and LevelEditor (prev. LevelEditorMenuManager)
+
+		return;
 		LevelSelectData.IsInGame = false;
 		LevelSelectData.IsMultiplayer = false;
 		LevelEditorData.IsTestingLevel = false;

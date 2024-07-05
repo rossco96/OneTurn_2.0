@@ -7,7 +7,10 @@ public class SettingsObjectDropdown : SettingsObject_Base
 
 	public override void ApplyExistingValue()
 	{
-		string valueString = SettingsSystem.GetValue(m_data.Key);
+		// Also not ideal here! Again, are we always populating dropdowns with camelcase? and want it going back to no-spaces
+		string valueString = (SettingsSystem.GetValue(m_data.Key).CanFormatCamelCase(out string camelCaseString))
+			? camelCaseString
+			: SettingsSystem.GetValue(m_data.Key);
 		for (int i = 0; i < m_dropdown.options.Count; ++i)
 		{
 			if (m_dropdown.options[i].text == valueString)

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour
 {
+	private const float k_multiplayerGamespaceScreenPercentage = 0.4f;
+	private const float k_multiplayerStatsScreenPercentage = 0.2f;
+
 	// [TODO]
 	// Too hacky? What if we want to change this?
 	// Same concern with if we ever want height and width to be different (i.e. rectangular and not square)
@@ -16,6 +19,7 @@ public class LevelGenerator : MonoBehaviour
 
 	[Space]
 	[SerializeField] private HUDManager m_hudManager;
+	[SerializeField] private Transform m_statsParentP1;					// This is also referenced in HUDManager! What do? ... Would also need to change buttons parent too, right? Maybe not. Test!
 	[SerializeField] private Transform m_gameSpaceParent;
 	[SerializeField] private Transform m_borderParent;
 
@@ -132,9 +136,15 @@ public class LevelGenerator : MonoBehaviour
 		m_gridSizeMultiplier = (Camera.main.aspect * Camera.main.orthographicSize * 2.0f) / (m_gridDimension + 0.2f);
 
 		m_gameSpaceParent.localScale = m_gridSizeMultiplier * Vector3.one;
-		float yOffset = -10.0f * ((Screen.currentResolution.height - Screen.safeArea.height) / Screen.currentResolution.height);	// [Q][IMPORTANT] Is this a correct and safe formula for all devices???
-		m_gameSpaceParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
-		m_borderParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
+
+		// We have already positioned the gamespace and border if multiplayer mode
+		// ... Don't want repeated code in other places! How best do this?
+		if (m_isMultiplayer == false)
+		{
+			float yOffset = -10.0f * ((Screen.currentResolution.height - Screen.safeArea.height) / Screen.currentResolution.height);    // [Q][IMPORTANT] Is this a correct and safe formula for all devices???
+			m_gameSpaceParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
+			m_borderParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
+		}
 
 		return true;
 	}
@@ -351,9 +361,19 @@ public class LevelGenerator : MonoBehaviour
 	
 	private void PositionGameSpaceLocalMultiplayer()
 	{
+		/*
 		// [TODO] If this works, rename the vars... Why does it work like this?
 		Vector3 screenCentreY = new Vector3(0.0f, Screen.height * 0.5f, 0.0f);
-		Vector3 worldPointCentreY = Camera.main.ScreenToWorldPoint(screenCentreY) / (Camera.main.aspect * 0.5f);
+		Vector3 worldPointCentreY = Camera.main.ScreenToWorldPoint(screenCentreY) * (Camera.main.aspect * 0.5f);
+		Vector3 worldPointCentreY2 = Camera.main.ViewportToWorldPoint(screenCentreY) * (Camera.main.aspect * 0.5f);
 		m_gameSpaceParent.position = new Vector3(0.0f, -worldPointCentreY.y, 0.0f);
+		m_borderParent.position = new Vector3(0.0f, -worldPointCentreY.y, 0.0f);
+		//*/
+
+		// [TODO] Figure out how to get '5' from Camera or Screen etc.
+		m_gameSpaceParent.localPosition = new Vector3(0.05f, -5 * k_multiplayerGamespaceScreenPercentage, 0.0f);
+		m_borderParent.localPosition = new Vector3(0.05f, -5 * k_multiplayerGamespaceScreenPercentage, 0.0f);
+
+		m_statsParentP1.localPosition = new Vector3(0.05f, -1080 * k_multiplayerStatsScreenPercentage, 0.0f);		// IMPORTANT! Note this is UI! Will want something different!
 	}
 }

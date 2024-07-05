@@ -9,6 +9,7 @@ public abstract class Interactable_Base : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D col)
 	{
+		//return;														// For the love of everything good, please uncomment and absolutely do NOT commit this
 		if (col.CompareTag("Player"))
 		{
 			m_playerController = col.GetComponentInParent<OTController>();		// [NOTE] Don't like using GetComponentInParent... But think this is an okay instance to do it.
