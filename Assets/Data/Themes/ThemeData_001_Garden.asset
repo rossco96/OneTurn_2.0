@@ -23,7 +23,7 @@ MonoBehaviour:
   LevelPlayInfo: {fileID: 11400000, guid: 5c9304feb5f5eda47b3c4bd722db51a4, type: 2}
   IsNew: 0
   IsComplete: 0
-  LevelSelectIcon: {fileID: 0}
+  LevelSelectIcon: {fileID: 21300000, guid: c9570c6d3faa17c41a66f22314df8e05, type: 3}
   BackgroundSprite: {fileID: 0}
   PlayerSprite: {fileID: 21300000, guid: 8b45a4bddca66c940b161336744f411f, type: 3}
   WallSprite: {fileID: 21300000, guid: 0c1b08d9289b6a247bb0012048c2a02e, type: 3}
