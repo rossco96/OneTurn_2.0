@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class LevelSelectMenuManager : MonoBehaviour
 {
 	[SerializeField] private ThemesList m_themesList;
+	[SerializeField] private SettingsDataString m_themeSettingsData;
+	[SerializeField] private SettingsDataInt m_mapIndexSettingsData;
 
 	[Space]
 	[SerializeField] private GridLayoutGroup m_mapTabsParentGridLayoutGroup;
@@ -18,6 +20,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	[Space]
 	[SerializeField] private Image m_themeIconImage;
+	[SerializeField] private TextMeshProUGUI m_mapIndexText;
 	
 	[SerializeField] private Button m_buttonThemeUp;
 	[SerializeField] private Button m_buttonThemeDown;
@@ -43,10 +46,10 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	private ThemeData m_currentTheme;
 
-	private int m_numberOfThemes;
-	private int m_themeIndex;
-	private int m_numberOfMaps;
-	private int m_mapIndex;
+	private int m_numberOfThemes = 0;
+	private int m_themeIndex = 0;
+	private int m_numberOfMaps = 0;
+	private int m_mapIndex = 0;
 
 
 	
@@ -59,24 +62,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// If no level exists (i.e. a new download) then default to first level -- Same with m_mapIndex
 		// --> Make sure to also show tutorial hints if that is the case!
 
-		// [TODO] Temp here!!!
-		m_themeIndex = 0;
-		m_mapIndex = 0;
-		m_currentTheme = m_themesList.ThemesData[0];
-		m_numberOfMaps = m_currentTheme.Maps.Length;
-		LevelSelectData.ThemeData = m_currentTheme;
-		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-		LevelSelectData.ChosenMapIndex = 0;
-		LevelSelectData.FileName = $"{Hash128.Compute(m_currentTheme.Maps[0].GridLayout.EncodeToPNG())}";
-		LevelSelectData.MapType = EMapType.Game;
-
-		m_buttonThemeUp.interactable = false;
-		m_buttonMapUp.interactable = false;
-		// ^^^^^ ^^^^^ ^^^^^
-
-		//m_currentTheme = 
-		//m_themeIndex = 
-		//m_mapIndex = 
+		SetThemeMapIndexes();
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
@@ -134,6 +120,38 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 
 
+	private void SetThemeMapIndexes()
+	{
+		string themeName = SettingsSystem.GetValue(m_themeSettingsData.Key);
+		for (int i = 0; i < m_numberOfThemes; ++i)
+		{
+			if ($"{m_themesList.ThemesData[i].ThemeName}" == themeName)
+			{
+				m_themeIndex = i;
+				break;
+			}
+		}
+		m_mapIndex = int.Parse(SettingsSystem.GetValue(m_mapIndexSettingsData.Key));
+
+		m_currentTheme = m_themesList.ThemesData[m_themeIndex];
+		m_numberOfMaps = m_currentTheme.Maps.Length;
+
+		LevelSelectData.ThemeData = m_currentTheme;
+		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
+		LevelSelectData.ChosenMapIndex = m_mapIndex;
+
+		LevelSelectData.FileName = $"{Hash128.Compute(m_currentTheme.Maps[m_mapIndex].GridLayout.EncodeToPNG())}";	// [TODO] THIS IS ONLY FOR 'GAME' MAPS. Not for custom maps.
+		LevelSelectData.MapType = EMapType.Game;																	// [TODO] NEED TO IMPLEMENT THIS TOO! Need setting of last played EMapType too..
+
+		m_buttonThemeUp.interactable = (m_themeIndex > 0);
+		m_buttonMapUp.interactable = (m_mapIndex > 0);
+		m_buttonThemeDown.interactable = (m_themeIndex < m_numberOfThemes);
+		m_buttonMapDown.interactable = (m_mapIndex < m_currentTheme.Maps.Length);
+
+		m_themeIconImage.sprite = m_currentTheme.LevelSelectIcon;
+		m_mapIndexText.text = $"{m_mapIndex}";
+	}
+
 	public void UpdateThemeIndex(int indexDirection)
 	{
 		m_themeIndex += indexDirection;
@@ -143,6 +161,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_numberOfMaps = m_currentTheme.Maps.Length;
 		
 		m_mapIndex = 0;
+		m_mapIndexText.text = $"{m_mapIndex}";
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		m_buttonMapUp.interactable = false;
 		m_buttonMapDown.interactable = true;
@@ -174,6 +193,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 			return;
 		}
 		m_mapIndex += indexDirection;
+		m_mapIndexText.text = $"{m_mapIndex}";
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
 		LevelSelectData.ChosenMapIndex = m_mapIndex;
@@ -278,11 +298,10 @@ public class LevelSelectMenuManager : MonoBehaviour
 		//	o Using GameplayManager, within the level itself, retrieve the data
 		//	o Generate the level
 
-		// [NOTE] No longer implementing as below!
+		SettingsSystem.UpdateSettings(m_themeSettingsData.Key, m_currentTheme.ThemeName);
+		SettingsSystem.UpdateSettings(m_mapIndexSettingsData.Key, $"{m_mapIndex}");
+		SettingsSystem.SaveSettings();
 
-		//if (m_isMultiplayer)
-		//	SceneManager.LoadScene("LevelScene_Multiplayer");
-		//else
-			SceneManager.LoadScene("LevelScene");
+		SceneManager.LoadScene("LevelScene");
 	}
 }
