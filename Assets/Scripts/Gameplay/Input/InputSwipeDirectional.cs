@@ -5,8 +5,6 @@ public class InputSwipeDirectional : Input_Base
 	private const float k_screenPercentSwipe = 0.05f;
 	private float m_minSwipeDistance = 0.0f;
 
-	private EFacingDirection m_currentDirection = EFacingDirection.Up;
-
 	private Touch m_touch;
 	private Vector2 m_touchStartPosition = Vector2.zero;
 
@@ -14,15 +12,6 @@ public class InputSwipeDirectional : Input_Base
 	{
 		Vector2 screenDimensions = new Vector2(Screen.width, Screen.height);
 		m_minSwipeDistance = k_screenPercentSwipe * screenDimensions.magnitude;
-		ResetCurrentDirection();
-	}
-
-	public void ResetCurrentDirection()
-	{
-		// [TODO][IMPORTANT] THINK MULTIPLAYER! Don't just want to select [0], must look at player index.
-		m_currentDirection = (LevelSelectData.TurnDirection == ETurnDirection.Right)
-			? LevelSelectData.MapData.PlayerSpawnDirectionRight[0]
-			: LevelSelectData.MapData.PlayerSpawnDirectionLeft[0];
 	}
 
 	public override bool Check(out EMovement movement)

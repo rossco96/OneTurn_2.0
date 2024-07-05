@@ -15,6 +15,7 @@ public class OTController : MonoBehaviour
 	public void GetOnTurn(out UnityEngine.Events.UnityAction onTurn) { onTurn = ButtonTurn; }
 
 	public void SetInputBounds(Bounds bounds) { m_input.SetInputBounds(bounds); }
+	public void SetFacingDirection(EFacingDirection direction) { m_input.ResetCurrentDirection(direction); }
 	
 	private float m_gridSizeMultiplier = 1.0f;
 
@@ -52,10 +53,10 @@ public class OTController : MonoBehaviour
 
 		switch (m_inputMode)
 		{
-			case EInputMode.TapSwipe:			m_input = new InputTapSwipe();			break;
-			case EInputMode.SwipeDirectional:	m_input = new InputSwipeDirectional();	break;
-			case EInputMode.Buttons:			m_input = new InputButtons();			break;
-			default:																	break;
+			case EInputMode.TapSwipe:			m_input = new InputTapSwipe();				break;
+			case EInputMode.SwipeDirectional:	m_input = new InputSwipeDirectional();		break;
+			case EInputMode.Buttons:			m_input = new InputButtons();				break;
+			default:																		break;
 		}
 	}
 
@@ -143,7 +144,8 @@ public class OTController : MonoBehaviour
 		m_player = Instantiate(m_playerPrefab, transform);
 		if (m_inputMode == EInputMode.SwipeDirectional)
 		{
-			((InputSwipeDirectional)m_input).ResetCurrentDirection();
+			EFacingDirection spawnDirection = (LevelSelectData.TurnDirection == ETurnDirection.Right) ? LevelSelectData.MapData.PlayerSpawnDirectionRight[Index] : LevelSelectData.MapData.PlayerSpawnDirectionLeft[Index];
+			((InputSwipeDirectional)m_input).ResetCurrentDirection(spawnDirection);
 		}
 	}
 

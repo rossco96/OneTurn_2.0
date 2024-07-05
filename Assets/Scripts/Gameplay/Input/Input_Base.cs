@@ -8,6 +8,10 @@ public abstract class Input_Base
 	protected bool m_inputDisabled = true;
 	public void SetInputDisabled(bool disabled) { m_inputDisabled = disabled; }
 
+	protected EFacingDirection m_currentDirection = EFacingDirection.Up;
+	public void ResetCurrentDirection(EFacingDirection direction){ m_currentDirection = direction; }
+
+
 	public abstract bool Check(out EMovement movement);
 
 	protected bool GetValidMultiplayerTouch(out Touch touch)
