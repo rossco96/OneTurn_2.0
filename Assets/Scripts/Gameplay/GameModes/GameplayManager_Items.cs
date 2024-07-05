@@ -38,7 +38,7 @@ public class GameplayManager_Items : GameplayManager
 				if (LevelSelectData.IsMultiplayer)
 					EndGameMultiplayer();
 				else
-					EndGame(false, null);											// [TODO] Ideally don't want to be passing null to this???
+					EndGame(false);
 				return;
 			}
 			m_hudManager.UpdateTimerTextItemsP1(m_itemTimeRemainingFloat.RoundDP(2));
@@ -89,6 +89,7 @@ public class GameplayManager_Items : GameplayManager
 	{
 		controller.Stats.AddItem();
 
+		// [TODO] THIS IS NOT NECESSARILY EQUAL TO P1-P2 RESPECTIVELY??? MUST DO SIMILAR TO IN EndGameMultiplayer() ???
 		if (controller == m_controllers[0])
 			m_hudManager.UpdateItemsCountP1(controller.Stats.Items);
 		else
@@ -104,15 +105,15 @@ public class GameplayManager_Items : GameplayManager
 			if (LevelSelectData.IsMultiplayer)
 				EndGameMultiplayer();
 			else
-				EndGame(true, controller);										// (END GAME -- win)
+				EndGame(true);										// (END GAME -- win)
 		}
 	}
 
 
 
-	protected override void EndGame(bool isWin, OTController controller)
+	protected override void EndGame(bool isWin)
 	{
-		base.EndGame(isWin, controller);
+		base.EndGame(isWin);
 
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, true, m_controllers[0].Stats.Items);

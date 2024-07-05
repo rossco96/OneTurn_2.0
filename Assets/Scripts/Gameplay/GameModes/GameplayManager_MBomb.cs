@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class GameplayManager_MBomb : GameplayManager
 {
-	private OTController m_winningMultiplayerController = null;
-
 	protected override void Start()
 	{
 		base.Start();
@@ -52,9 +50,9 @@ public class GameplayManager_MBomb : GameplayManager
 	//*/
 
 
-	protected override void EndGame(bool isWin, OTController controller)
+	protected override void EndGame(bool isWin)
 	{
-		base.EndGame(isWin, controller);
+		base.EndGame(isWin);
 		/*
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);

@@ -1,9 +1,12 @@
 using UnityEngine;
 
+// [TODO] Ensure we're playing through this twice. Once as P1 being the chaser, then as P2 being the chaser.
+// Then can base winner off least number of chaser moves (or most number of the one being chased... Same thing)
+// --> Allow timer as well (optional?) so can be timed out and not caught
+// (how to score that? would we also need to make sure the turn based moves has a limit as well, otherwise can just not move and other player can't have their go!)
+
 public class GameplayManager_MChase : GameplayManager
 {
-	private OTController m_winningMultiplayerController = null;
-
 	protected override void Start()
 	{
 		base.Start();
@@ -53,9 +56,9 @@ public class GameplayManager_MChase : GameplayManager
 	//*/
 
 
-	protected override void EndGame(bool isWin, OTController controller)
+	protected override void EndGame(bool isWin)
 	{
-		base.EndGame(isWin, controller);
+		base.EndGame(isWin);
 		/*
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);

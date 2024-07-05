@@ -138,7 +138,7 @@ public abstract class GameplayManager : MonoBehaviour
 			if (LevelSelectData.IsMultiplayer)
 				EndGameMultiplayer();														// [Q] Do we want to end the game if the other player dies? Or allow keep playing? TEST!
 			else
-				EndGame(false, controller);
+				EndGame(false);
 		}
 		else
 		{
@@ -157,7 +157,7 @@ public abstract class GameplayManager : MonoBehaviour
 
 	// [TODO][Q] Can we delete OTController?
 	// Also can we please sort out whatever is going on with m_controllers indexing - this looks terrible
-	protected virtual void EndGame(bool isWin, OTController controller)
+	protected virtual void EndGame(bool isWin)
 	{
 		m_hasEnded = true;
 		m_controllers[0].SetInputDisabled(true);

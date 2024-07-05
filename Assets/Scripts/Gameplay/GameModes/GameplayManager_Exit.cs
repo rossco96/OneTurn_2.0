@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class GameplayManager_Exit : GameplayManager
 {
-	private OTController m_winningMultiplayerController = null;
-
 	protected override void Start()
 	{
 		base.Start();
@@ -17,6 +15,10 @@ public class GameplayManager_Exit : GameplayManager
 		{
 			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
 			m_hudManager.UpdateTimerTextExitP1(m_levelDisplayTimeInt);
+			if (LevelSelectData.IsMultiplayer)
+			{
+				m_hudManager.UpdateTimerTextItemsP2(m_levelDisplayTimeInt);
+			}
 		}
 	}
 
@@ -25,6 +27,12 @@ public class GameplayManager_Exit : GameplayManager
 		base.InitHUD();
 		m_hudManager.SetItemsCountActiveP1(false);
 		m_hudManager.SetTimerSliderActiveP1(false);
+		if (LevelSelectData.IsMultiplayer)
+		{
+			m_hudManager.SetMultiplayerStatsActive();
+			m_hudManager.SetItemsCountActiveP2(false);
+			m_hudManager.SetTimerSliderActiveP2(false);
+		}
 	}
 
 
@@ -37,19 +45,19 @@ public class GameplayManager_Exit : GameplayManager
 		// END GAME -- win
 		if (LevelSelectData.IsMultiplayer)
 		{
-			m_winningMultiplayerController = controller;
+			controller.Stats.SetAtExit();
 			EndGameMultiplayer();
 		}
 		else
 		{
-			EndGame(true, controller);
+			EndGame(true);
 		}
 	}
 
 
-	protected override void EndGame(bool isWin, OTController controller)
+	protected override void EndGame(bool isWin)
 	{
-		base.EndGame(isWin, controller);
+		base.EndGame(isWin);
 
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
@@ -75,7 +83,7 @@ public class GameplayManager_Exit : GameplayManager
 		}
 
 		EMultiplayerResult result = EMultiplayerResult.Draw;
-		if (m_winningMultiplayerController == controllerP1)
+		if (controllerP1.Stats.IsAtExit)
 		{
 			result = EMultiplayerResult.P1;
 			PlayerPrefsSystem.MultiplayerAddWinP1();
@@ -85,6 +93,7 @@ public class GameplayManager_Exit : GameplayManager
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
 		}
+		// NOTE not currently any drawing in exit mode as no time-out
 
 		m_hudManager.SetWinLoseTitleMulti(result);
 		m_hudManager.ShowEndScreen();
