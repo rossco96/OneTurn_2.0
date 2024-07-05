@@ -130,7 +130,8 @@ public abstract class GameplayManager : MonoBehaviour
 		controller.SetInputDisabled(true);
 		controller.DestroyPlayerGameObject();
 
-		if (controller.Stats.RemoveLife() == false)
+		controller.Stats.Lives--;
+		if (controller.Stats.Lives == 0)
 		{
 
 			Debug.Log($"[ccc] {LevelSelectData.IsMultiplayer}");

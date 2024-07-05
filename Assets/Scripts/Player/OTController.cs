@@ -35,7 +35,7 @@ public class OTController : MonoBehaviour
 	{
 		m_gridSizeMultiplier = LevelSelectData.GridSizeMultiplier;
 		m_turnDirection = LevelSelectData.TurnDirection;
-		m_stats.SetLives(LevelSelectData.LivesCount);                   // [TODO][NOTE] Make sure we do NOT remove the life in GameplayManager_LevelEditor
+		m_stats.Lives = LevelSelectData.LivesCount;                   // [TODO][NOTE] Make sure we do NOT remove the life in GameplayManager_LevelEditor
 		InitInput();
 	}
 
@@ -110,7 +110,7 @@ public class OTController : MonoBehaviour
 	private void MoveForward()
 	{
 		m_player.transform.position += m_gridSizeMultiplier * m_player.transform.up;
-		Stats.AddMove();
+		Stats.Moves++;
 	}
 
 

@@ -53,7 +53,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 
 	private void OnPlayerInteractItem(OTController controller)
 	{
-		controller.Stats.AddItem();
+		controller.Stats.Items++;
 		m_hudManager.UpdateItemsCountP1(controller.Stats.Items);
 
 		// [TODO][IMPORTANT] Use InGameStats to increase the individual count... But still keep track here for when level cleared?

@@ -87,7 +87,7 @@ public class GameplayManager_Items : GameplayManager
 
 	private void OnPlayerInteractItem(OTController controller)
 	{
-		controller.Stats.AddItem();
+		controller.Stats.Items++;
 
 		// [TODO] THIS IS NOT NECESSARILY EQUAL TO P1-P2 RESPECTIVELY??? MUST DO SIMILAR TO IN EndGameMultiplayer() ???
 		if (controller == m_controllers[0])

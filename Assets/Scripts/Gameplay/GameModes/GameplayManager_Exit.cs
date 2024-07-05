@@ -45,7 +45,7 @@ public class GameplayManager_Exit : GameplayManager
 		// END GAME -- win
 		if (LevelSelectData.IsMultiplayer)
 		{
-			controller.Stats.SetAtExit();
+			controller.Stats.IsAtExit = true;
 			EndGameMultiplayer();
 		}
 		else
