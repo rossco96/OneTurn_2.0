@@ -251,7 +251,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
 		{
 			string gameMode = $"{(EGameMode)i}";
-			if (gameMode.StartsWith("M_"))
+			if (gameMode.StartsWith("M_"))								// NOTE "M_" is stored as const, somewhere, as something like k_multiplayerModePrefix
 			{
 				if (isMultiplayerToggle.isOn == false)
 					continue;
@@ -292,16 +292,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	public void LoadLevel()
 	{
-		// [TODO]
-		//	o Get ThemeData and then the specific MapData from the index chosen
-		//	o Pass ThemeData and MapData to *STATIC* LevelGenerator
-		//	o Using GameplayManager, within the level itself, retrieve the data
-		//	o Generate the level
-
 		SettingsSystem.UpdateSettings(m_themeSettingsData.Key, m_currentTheme.ThemeName);
 		SettingsSystem.UpdateSettings(m_mapIndexSettingsData.Key, $"{m_mapIndex}");
 		SettingsSystem.SaveSettings();
-
 		SceneManager.LoadScene("LevelScene");
 	}
 }
