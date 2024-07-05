@@ -171,7 +171,6 @@ public class LevelEditor : MonoBehaviour
 		}
 		LevelSelectData.IsInGame = false;
 		LevelSelectData.IsMultiplayer = false;
-		//LevelEditorData.IsTestingLevel = false;							// Don't have this here. Need to check where all these types of calls are being referenced. Figure out actual system!
 	}
 
 	private void InitToolsDropdown()
