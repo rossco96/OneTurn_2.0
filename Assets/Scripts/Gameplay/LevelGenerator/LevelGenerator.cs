@@ -185,13 +185,9 @@ public class LevelGenerator : MonoBehaviour
 					case EMapPropertyName.SpawnPointPrimary:
 						if (LevelEditorData.IsTestingLevel && LevelEditorData.StartAtSecondSpawnPoint)
 							break;
-						GameObject playerControllerPrimary = PlaceOnGrid
-						(
-							m_playerControllerPrefab, x, y,
-							(m_turnDirection == ETurnDirection.Right)
-								? m_mapData.PlayerSpawnDirectionRight[0]
-								: m_mapData.PlayerSpawnDirectionLeft[0]
-						);
+						EFacingDirection spawnDirectionPrimary = (m_turnDirection == ETurnDirection.Right) ? m_mapData.PlayerSpawnDirectionRight[0] : m_mapData.PlayerSpawnDirectionLeft[0];
+						GameObject playerControllerPrimary = PlaceOnGrid(m_playerControllerPrefab, x, y, spawnDirectionPrimary);
+						playerControllerPrimary.GetComponent<OTController>().SetFacingDirection(spawnDirectionPrimary);
 						playerControllerPrimary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[0]);
 						if (playerControllerPrimary.GetComponent<OTController>().IsButtonsGameMode)
 						{
@@ -210,13 +206,9 @@ public class LevelGenerator : MonoBehaviour
 					case EMapPropertyName.SpawnPointSecondary:
 						if ((LevelEditorData.IsTestingLevel && LevelEditorData.StartAtSecondSpawnPoint) || m_isMultiplayer)
 						{
-							GameObject playerControllerSecondary = PlaceOnGrid
-							(
-								m_playerControllerPrefab, x, y,
-								(m_turnDirection == ETurnDirection.Right)
-									? m_mapData.PlayerSpawnDirectionRight[m_multiplayerSpawnIndex]
-									: m_mapData.PlayerSpawnDirectionLeft[m_multiplayerSpawnIndex]
-							);
+							EFacingDirection spawnDirectionSecondary = (m_turnDirection == ETurnDirection.Right) ? m_mapData.PlayerSpawnDirectionRight[m_multiplayerSpawnIndex] : m_mapData.PlayerSpawnDirectionLeft[m_multiplayerSpawnIndex];
+							GameObject playerControllerSecondary = PlaceOnGrid(m_playerControllerPrefab, x, y, spawnDirectionSecondary);
+							playerControllerSecondary.GetComponent<OTController>().SetFacingDirection(spawnDirectionSecondary);
 							playerControllerSecondary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[m_multiplayerSpawnIndex]);
 							if (m_isMultiplayer)
 							{
@@ -332,14 +324,14 @@ public class LevelGenerator : MonoBehaviour
 				case EGameMode.Exit:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_Exit>();
 					break;
-				/*case EGameMode.Travel:
-					gameplayManager = gmGameObject.AddComponent<GameplayManager_Travel>();
-					break;*/
+				//case EGameMode.Travel:
+				//	gameplayManager = gmGameObject.AddComponent<GameplayManager_Travel>();
+				//	break;
 				case EGameMode.M_Bomb:
-					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MBomb>();
+					gameplayManager = gmGameObject.AddComponent<GameplayManager_MBomb>();
 					break;
 				case EGameMode.M_Chase:
-					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MChase>();
+					gameplayManager = gmGameObject.AddComponent<GameplayManager_MChase>();
 					break;
 				default:
 					break;
