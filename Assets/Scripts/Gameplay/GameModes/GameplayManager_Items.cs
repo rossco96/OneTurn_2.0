@@ -18,17 +18,17 @@ public class GameplayManager_Items : GameplayManager
 		// Still want m_levelTimeElapsed for calculating score at the end
 		// ... Or could just reverse engineer rather than have the extra calculation per frame?
 		m_levelTimeElapsedFloat = Time.time - m_levelStartTime - m_totalTimePaused;
-		m_itemTimeRemainingFloat = m_timeLimit - m_levelTimeElapsedFloat;
+		m_countdownTimeRemainingFloat = m_timeLimit - m_levelTimeElapsedFloat;
 		
-		if (m_itemTimeRemainingFloat < 10.0f)
+		if (m_countdownTimeRemainingFloat < 10.0f)
 		{
-			if (m_itemTimeRemainingFloat <= 0.0f)
+			if (m_countdownTimeRemainingFloat <= 0.0f)
 			{
-				m_hudManager.UpdateTimerTextItemsP1(0.0f);
+				m_hudManager.UpdateTimerTextCountDownP1(0.0f);
 				m_hudManager.UpdateTimerSliderP1(0.0f);
 				if (LevelSelectData.IsMultiplayer)
 				{
-					m_hudManager.UpdateTimerTextItemsP2(0.0f);
+					m_hudManager.UpdateTimerTextCountDownP2(0.0f);
 					m_hudManager.UpdateTimerSliderP2(0.0f);
 				}
 				// END GAME -- lose
@@ -41,26 +41,26 @@ public class GameplayManager_Items : GameplayManager
 					EndGame(false);
 				return;
 			}
-			m_hudManager.UpdateTimerTextItemsP1(m_itemTimeRemainingFloat.RoundDP(2));
+			m_hudManager.UpdateTimerTextCountDownP1(m_countdownTimeRemainingFloat.RoundDP(2));
 			if (LevelSelectData.IsMultiplayer)
 			{
-				m_hudManager.UpdateTimerTextItemsP2(m_itemTimeRemainingFloat.RoundDP(2));
+				m_hudManager.UpdateTimerTextCountDownP2(m_countdownTimeRemainingFloat.RoundDP(2));
 			}
 		}
-		else if (Mathf.FloorToInt(m_itemTimeRemainingFloat) != m_levelDisplayTimeInt)
+		else if (Mathf.FloorToInt(m_countdownTimeRemainingFloat) != m_levelDisplayTimeInt)
 		{
-			m_levelDisplayTimeInt = Mathf.FloorToInt(m_itemTimeRemainingFloat);
-			m_hudManager.UpdateTimerTextItemsP1(m_levelDisplayTimeInt);
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_countdownTimeRemainingFloat);
+			m_hudManager.UpdateTimerTextCountDownP1(m_levelDisplayTimeInt);
 			if (LevelSelectData.IsMultiplayer)
 			{
-				m_hudManager.UpdateTimerTextItemsP2(m_levelDisplayTimeInt);
+				m_hudManager.UpdateTimerTextCountDownP2(m_levelDisplayTimeInt);
 			}
 		}
 
-		m_hudManager.UpdateTimerSliderP1(m_itemTimeRemainingFloat);
+		m_hudManager.UpdateTimerSliderP1(m_countdownTimeRemainingFloat);
 		if (LevelSelectData.IsMultiplayer)
 		{
-			m_hudManager.UpdateTimerSliderP2(m_itemTimeRemainingFloat);
+			m_hudManager.UpdateTimerSliderP2(m_countdownTimeRemainingFloat);
 		}
 	}
 
@@ -73,7 +73,7 @@ public class GameplayManager_Items : GameplayManager
 		m_hudManager.SetItemsCountActiveP1(true);
 		m_hudManager.UpdateItemsCountP1(0);
 		m_hudManager.SetTimerSliderActiveP1(true);
-		m_hudManager.UpdateTimerTextItemsP1(m_timeLimit);
+		m_hudManager.UpdateTimerTextCountDownP1(m_timeLimit);
 
 		if (LevelSelectData.IsMultiplayer)
 		{
@@ -81,7 +81,7 @@ public class GameplayManager_Items : GameplayManager
 			m_hudManager.SetItemsCountActiveP2(true);
 			m_hudManager.UpdateItemsCountP2(0);
 			m_hudManager.SetTimerSliderActiveP2(true);
-			m_hudManager.UpdateTimerTextItemsP2(m_timeLimit);
+			m_hudManager.UpdateTimerTextCountDownP2(m_timeLimit);
 		}
 	}
 
@@ -182,7 +182,7 @@ public class GameplayManager_Items : GameplayManager
 	// [TODO] Make abstract in base?
 	private int GetTotalScore(float time, int lives, int moves, int items)
 	{
-		if (m_itemTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
+		if (m_countdownTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
 		float itemsRatio = (float)items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems;
@@ -201,7 +201,7 @@ public class GameplayManager_Items : GameplayManager
 
 	private int GetTotalScoreMultiplayer(int lives, int moves, int items)
 	{
-		if (m_itemTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
+		if (m_countdownTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
 		float itemsRatio = (float)items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems;

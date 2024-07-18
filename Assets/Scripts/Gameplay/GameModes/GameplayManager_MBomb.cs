@@ -4,8 +4,8 @@ public class GameplayManager_MBomb : GameplayManager
 {
 	protected override void Start()
 	{
-		base.Start();
 		InitInteractableBehaviour<Bomb>(OnPlayerInteractBomb);							// Create Bonb type Interactable_Base!
+		base.Start();
 	}
 
 	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
@@ -17,7 +17,7 @@ public class GameplayManager_MBomb : GameplayManager
 		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
 		{
 			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
-			m_hudManager.UpdateTimerTextExitP1(m_levelDisplayTimeInt);
+			m_hudManager.UpdateTimerTextCountUpP1(m_levelDisplayTimeInt);
 		}
 	}
 

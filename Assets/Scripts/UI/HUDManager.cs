@@ -219,11 +219,11 @@ public class HUDManager : MonoBehaviour
 	public void UpdateItemsCountP1(int items) { m_itemsCountP1.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
 	public void UpdateItemsCountP2(int items) { m_itemsCountP2.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
 
-	public void UpdateTimerTextExitP1(int timeTaken) { m_timerTextP1.text = $"Time Taken: {timeTaken}s"; }
-	public void UpdateTimerTextExitP2(int timeTaken) { m_timerTextP2.text = $"Time Taken: {timeTaken}s"; }
+	public void UpdateTimerTextCountUpP1(int timeTaken) { m_timerTextP1.text = $"Time Taken: {timeTaken}s"; }
+	public void UpdateTimerTextCountUpP2(int timeTaken) { m_timerTextP2.text = $"Time Taken: {timeTaken}s"; }
 
-	public void UpdateTimerTextItemsP1(float timeLeft) { m_timerTextP1.text = $"Time Left: {timeLeft}s"; }
-	public void UpdateTimerTextItemsP2(float timeLeft) { m_timerTextP2.text = $"Time Left: {timeLeft}s"; }
+	public void UpdateTimerTextCountDownP1(float timeLeft) { m_timerTextP1.text = $"Time Left: {timeLeft}s"; }
+	public void UpdateTimerTextCountDownP2(float timeLeft) { m_timerTextP2.text = $"Time Left: {timeLeft}s"; }
 
 	public void UpdateTimerSliderP1(float timeLeft) { m_timerSliderP1.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit); }
 	public void UpdateTimerSliderP2(float timeLeft) { m_timerSliderP2.value = 1 - (timeLeft / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit); }

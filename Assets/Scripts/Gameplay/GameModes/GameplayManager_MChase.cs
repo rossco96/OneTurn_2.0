@@ -9,8 +9,8 @@ public class GameplayManager_MChase : GameplayManager
 {
 	protected override void Start()
 	{
-		base.Start();
 		InitInteractableBehaviour<Chaser>(OnPlayerInteractChaser);
+		base.Start();
 	}
 
 	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
@@ -21,7 +21,7 @@ public class GameplayManager_MChase : GameplayManager
 		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
 		{
 			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
-			m_hudManager.UpdateTimerTextExitP1(m_levelDisplayTimeInt);
+			m_hudManager.UpdateTimerTextCountUpP1(m_levelDisplayTimeInt);
 		}
 	}
 
