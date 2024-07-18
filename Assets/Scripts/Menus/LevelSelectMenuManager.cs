@@ -150,6 +150,26 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		m_themeIconImage.sprite = m_currentTheme.LevelSelectIcon;
 		m_mapIndexText.text = $"{m_mapIndex}";
+
+		// Init game mode dropdown choices:
+
+		int gameModeValue = (int)LevelSelectData.GameMode;
+		m_gameModeDropdown.ClearOptions();
+		System.Collections.Generic.List<string> gameModes = new System.Collections.Generic.List<string>();
+		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
+		{
+			string gameMode = $"{(EGameMode)i}";
+			if (gameMode.StartsWith("M_"))                              // NOTE "M_" is stored as const, somewhere, as something like k_multiplayerModePrefix
+			{
+				if (LevelSelectData.IsMultiplayer == false)
+					continue;
+				else
+					gameMode = gameMode.Substring(2);
+			}
+			gameModes.Add(gameMode);
+		}
+		m_gameModeDropdown.AddOptions(gameModes);
+		m_gameModeDropdown.value = gameModeValue;
 	}
 
 	public void UpdateThemeIndex(int indexDirection)
@@ -239,10 +259,10 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// want to retain that data if switching between single player and multiplayer (and if ITEMS selected then no updating is required)
 
 		int gameModeValue = -1;
-		if (m_gameModeDropdown.value > 1)
+		if (m_gameModeDropdown.value > 2)												// NOT IDEAL - this will need changing if we add any new game modes to the enum. already changed from 1 to 2
 			m_gameModeDropdown.value = 0;
-		else if (m_gameModeDropdown.value == 1)
-			gameModeValue = 1;
+		else if (m_gameModeDropdown.value > 0)
+			gameModeValue = m_gameModeDropdown.value;
 
 		LevelSelectData.IsMultiplayer = isMultiplayerToggle.isOn;
 
@@ -262,8 +282,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		}
 		m_gameModeDropdown.AddOptions(gameModes);
 		
-		if (gameModeValue == 1)
-			m_gameModeDropdown.value = 1;
+		if (gameModeValue == 1 || gameModeValue == 2)									// Same note as NOT IDEAL above
+			m_gameModeDropdown.value = gameModeValue;
 
 		m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
 		m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
