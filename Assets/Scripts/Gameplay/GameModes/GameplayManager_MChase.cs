@@ -10,7 +10,7 @@ public class GameplayManager_MChase : GameplayManager
 	protected override void Start()
 	{
 		base.Start();
-		//InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
+		InitInteractableBehaviour<Chaser>(OnPlayerInteractChaser);
 	}
 
 	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
@@ -25,35 +25,34 @@ public class GameplayManager_MChase : GameplayManager
 		}
 	}
 
-	/*
+
+	// [TODO][IMPORTANT] Turn 'MovesText' into 'ExtraInfoText' and also use for counting number of remaining moves in this game mode
 	protected override void InitHUD()
 	{
 		base.InitHUD();
 		m_hudManager.SetItemsCountActiveP1(false);
 		m_hudManager.SetTimerSliderActiveP1(false);
+		if (LevelSelectData.IsMultiplayer)
+		{
+			m_hudManager.SetMultiplayerStatsActive();
+			m_hudManager.SetItemsCountActiveP2(false);
+			m_hudManager.SetTimerSliderActiveP2(false);
+		}
 	}
-	//*/
 
 
-	/*
-	private void OnPlayerInteractExit(OTController controller)
+	private void OnPlayerInteractChaser(OTController controller)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)
 		// Otherwise then yeah, obviously win condition
 
-		// END GAME -- win
+		// END GAME -- win (switch who is the chaser if it's the first round, otherwise END and compare number of moves!
 		if (LevelSelectData.IsMultiplayer)
 		{
-			m_winningMultiplayerController = controller;
 			EndGameMultiplayer();
 		}
-		else
-		{
-			EndGame(true, controller);
-		}
 	}
-	//*/
 
 
 	protected override void EndGame(bool isWin)

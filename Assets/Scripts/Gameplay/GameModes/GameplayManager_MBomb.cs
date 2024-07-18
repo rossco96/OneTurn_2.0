@@ -5,10 +5,11 @@ public class GameplayManager_MBomb : GameplayManager
 	protected override void Start()
 	{
 		base.Start();
-		//InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
+		InitInteractableBehaviour<Bomb>(OnPlayerInteractBomb);							// Create Bonb type Interactable_Base!
 	}
 
 	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
+	// ... note each timer is updated differently in this game mode
 
 	protected override void UpdateTimer()
 	{
@@ -29,25 +30,14 @@ public class GameplayManager_MBomb : GameplayManager
 	}
 	//*/
 
-	/*
-	private void OnPlayerInteractExit(OTController controller)
+	private void OnPlayerInteractBomb(OTController controller)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)
 		// Otherwise then yeah, obviously win condition
 
-		// END GAME -- win
-		if (LevelSelectData.IsMultiplayer)
-		{
-			m_winningMultiplayerController = controller;
-			EndGameMultiplayer();
-		}
-		else
-		{
-			EndGame(true, controller);
-		}
+		EndGameMultiplayer();
 	}
-	//*/
 
 
 	protected override void EndGame(bool isWin)

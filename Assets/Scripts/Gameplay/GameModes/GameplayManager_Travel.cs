@@ -5,33 +5,81 @@ public class GameplayManager_Travel : GameplayManager
 	protected override void Start()
 	{
 		base.Start();
-		//InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
+		InitInteractableBehaviour<TravelSquare>(OnPlayerInteractTravelSquare);
 	}
 
-
-	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
 
 	protected override void UpdateTimer()
 	{
+		// Still want m_levelTimeElapsed for calculating score at the end
+		// ... Or could just reverse engineer rather than have the extra calculation per frame?
 		m_levelTimeElapsedFloat = Time.time - m_levelStartTime - m_totalTimePaused;
-		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
+		m_itemTimeRemainingFloat = m_timeLimit - m_levelTimeElapsedFloat;
+
+		if (m_itemTimeRemainingFloat < 10.0f)
 		{
-			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
-			m_hudManager.UpdateTimerTextExitP1(m_levelDisplayTimeInt);
+			if (m_itemTimeRemainingFloat <= 0.0f)
+			{
+				m_hudManager.UpdateTimerTextItemsP1(0.0f);
+				m_hudManager.UpdateTimerSliderP1(0.0f);
+				if (LevelSelectData.IsMultiplayer)
+				{
+					m_hudManager.UpdateTimerTextItemsP2(0.0f);
+					m_hudManager.UpdateTimerSliderP2(0.0f);
+				}
+				// END GAME -- lose
+
+				Debug.Log($"[a] {LevelSelectData.IsMultiplayer}");
+
+				if (LevelSelectData.IsMultiplayer)
+					EndGameMultiplayer();
+				else
+					EndGame(false);
+				return;
+			}
+			m_hudManager.UpdateTimerTextItemsP1(m_itemTimeRemainingFloat.RoundDP(2));
+			if (LevelSelectData.IsMultiplayer)
+			{
+				m_hudManager.UpdateTimerTextItemsP2(m_itemTimeRemainingFloat.RoundDP(2));
+			}
+		}
+		else if (Mathf.FloorToInt(m_itemTimeRemainingFloat) != m_levelDisplayTimeInt)
+		{
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_itemTimeRemainingFloat);
+			m_hudManager.UpdateTimerTextItemsP1(m_levelDisplayTimeInt);
+			if (LevelSelectData.IsMultiplayer)
+			{
+				m_hudManager.UpdateTimerTextItemsP2(m_levelDisplayTimeInt);
+			}
+		}
+
+		m_hudManager.UpdateTimerSliderP1(m_itemTimeRemainingFloat);
+		if (LevelSelectData.IsMultiplayer)
+		{
+			m_hudManager.UpdateTimerSliderP2(m_itemTimeRemainingFloat);
 		}
 	}
 
-	/*
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActiveP1(false);
-		m_hudManager.SetTimerSliderActiveP1(false);
-	}
-	//*/
 
-	/*
-	private void OnPlayerInteractExit(OTController controller)
+		m_hudManager.SetItemsCountActiveP1(true);
+		m_hudManager.UpdateItemsCountP1(0);
+		m_hudManager.SetTimerSliderActiveP1(true);
+		m_hudManager.UpdateTimerTextItemsP1(m_timeLimit);
+
+		if (LevelSelectData.IsMultiplayer)
+		{
+			m_hudManager.SetMultiplayerStatsActive();
+			m_hudManager.SetItemsCountActiveP2(true);
+			m_hudManager.UpdateItemsCountP2(0);
+			m_hudManager.SetTimerSliderActiveP2(true);
+			m_hudManager.UpdateTimerTextItemsP2(m_timeLimit);
+		}
+	}
+
+	private void OnPlayerInteractTravelSquare(OTController controller)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)
@@ -40,15 +88,13 @@ public class GameplayManager_Travel : GameplayManager
 		// END GAME -- win
 		if (LevelSelectData.IsMultiplayer)
 		{
-			m_winningMultiplayerController = controller;
 			EndGameMultiplayer();
 		}
 		else
 		{
-			EndGame(true, controller);
+			EndGame(true);
 		}
 	}
-	//*/
 
 
 	protected override void EndGame(bool isWin)
