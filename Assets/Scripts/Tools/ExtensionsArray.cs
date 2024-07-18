@@ -28,6 +28,21 @@ public static class ExtensionsArray
 		return newArray;
 	}
 
+	public static T[] TryAdd<T>(this T[] array, T item)
+	{
+		if (array.Contains(item))
+			return array;
+
+		T[] newArray = new T[array.Length + 1];
+		for (int i = 0; i < array.Length; ++i)
+		{
+			newArray[i] = array[i];
+		}
+		newArray[array.Length] = item;
+
+		return newArray;
+	}
+
 	public static T[] RemoveAt<T>(this T[] array, int index)
 	{
 		T[] newArray = new T[array.Length - 1];
