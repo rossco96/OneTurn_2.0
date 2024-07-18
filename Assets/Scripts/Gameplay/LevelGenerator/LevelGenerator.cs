@@ -32,6 +32,7 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private GameObject m_wallPrefab;
 	[SerializeField] private GameObject m_itemPrefab;
 	[SerializeField] private GameObject m_exitPrefab;
+	[SerializeField] private GameObject m_travelSquarePrefab;			// [TODO] IMPLEMENT!					<<<<<
 	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
 
 	[Space]
@@ -105,9 +106,13 @@ public class LevelGenerator : MonoBehaviour
 			case EGameMode.Exit:
 				m_exitPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.ExitSprite;
 				break;
+			case EGameMode.Travel:
+				break;
 			case EGameMode.M_Bomb:
 				break;
 			case EGameMode.M_Chase:
+				break;
+			case EGameMode.M_Tanks:
 				break;
 			default:
 				break;
@@ -162,6 +167,8 @@ public class LevelGenerator : MonoBehaviour
 				{
 					case EMapPropertyName.BlankSquare:
 						// Do nothing
+						if (m_gameMode == EGameMode.Travel)
+							PlaceOnGrid(m_travelSquarePrefab, x, y);
 						break;
 
 					case EMapPropertyName.Wall:
@@ -171,6 +178,8 @@ public class LevelGenerator : MonoBehaviour
 					case EMapPropertyName.Item:
 						if (m_gameMode == EGameMode.Items)
 							PlaceOnGrid(m_itemPrefab, x, y);
+						else if (m_gameMode == EGameMode.Travel)
+							PlaceOnGrid(m_travelSquarePrefab, x, y);
 						break;
 
 					case EMapPropertyName.Exit:
@@ -183,10 +192,12 @@ public class LevelGenerator : MonoBehaviour
 						break;
 
 					case EMapPropertyName.SpawnPointPrimary:
+						if (m_gameMode == EGameMode.Travel)
+							PlaceOnGrid(m_travelSquarePrefab, x, y);
 						if (LevelEditorData.IsTestingLevel && LevelEditorData.StartAtSecondSpawnPoint)
 							break;
 						EFacingDirection spawnDirectionPrimary = (m_turnDirection == ETurnDirection.Right) ? m_mapData.PlayerSpawnDirectionRight[0] : m_mapData.PlayerSpawnDirectionLeft[0];
-						GameObject playerControllerPrimary = PlaceOnGrid(m_playerControllerPrefab, x, y, spawnDirectionPrimary);
+						GameObject playerControllerPrimary = PlaceOnGrid(m_playerControllerPrefab, x, y, -5, spawnDirectionPrimary);
 						playerControllerPrimary.GetComponent<OTController>().SetFacingDirection(spawnDirectionPrimary);
 						playerControllerPrimary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[0]);
 						if (playerControllerPrimary.GetComponent<OTController>().IsButtonsGameMode)
@@ -204,10 +215,12 @@ public class LevelGenerator : MonoBehaviour
 						break;
 
 					case EMapPropertyName.SpawnPointSecondary:
+						if (m_gameMode == EGameMode.Travel)
+							PlaceOnGrid(m_travelSquarePrefab, x, y);
 						if ((LevelEditorData.IsTestingLevel && LevelEditorData.StartAtSecondSpawnPoint) || m_isMultiplayer)
 						{
 							EFacingDirection spawnDirectionSecondary = (m_turnDirection == ETurnDirection.Right) ? m_mapData.PlayerSpawnDirectionRight[m_multiplayerSpawnIndex] : m_mapData.PlayerSpawnDirectionLeft[m_multiplayerSpawnIndex];
-							GameObject playerControllerSecondary = PlaceOnGrid(m_playerControllerPrefab, x, y, spawnDirectionSecondary);
+							GameObject playerControllerSecondary = PlaceOnGrid(m_playerControllerPrefab, x, y, -5, spawnDirectionSecondary);
 							playerControllerSecondary.GetComponent<OTController>().SetFacingDirection(spawnDirectionSecondary);
 							playerControllerSecondary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[m_multiplayerSpawnIndex]);
 							if (m_isMultiplayer)
@@ -303,6 +316,29 @@ public class LevelGenerator : MonoBehaviour
 		return placedObject;
 	}
 
+	private GameObject PlaceOnGrid(GameObject objectToPlace, int posX, int posY, int posZ, EFacingDirection direction)
+	{
+		// 0.6f below because of 0.5f * of our wall width plus our border width 0.1f
+		GameObject placedObject = Instantiate(objectToPlace, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
+		Vector3 position = new Vector3(posX + 0.6f, posY + 0.6f, posZ);
+		placedObject.transform.localPosition = position;
+
+		int zRotation = 0;
+		switch (direction)
+		{
+			case EFacingDirection.Right:
+				zRotation = -90; break;
+			case EFacingDirection.Down:
+				zRotation = 180; break;
+			case EFacingDirection.Left:
+				zRotation = 90; break;
+			default:
+				break;
+		}
+		placedObject.transform.Rotate(0, 0, zRotation);
+		return placedObject;
+	}
+
 
 
 	private void InitGameplayManager()
@@ -324,14 +360,17 @@ public class LevelGenerator : MonoBehaviour
 				case EGameMode.Exit:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_Exit>();
 					break;
-				//case EGameMode.Travel:
-				//	gameplayManager = gmGameObject.AddComponent<GameplayManager_Travel>();
-				//	break;
+				case EGameMode.Travel:
+					gameplayManager = gmGameObject.AddComponent<GameplayManager_Travel>();
+					break;
 				case EGameMode.M_Bomb:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_MBomb>();
 					break;
 				case EGameMode.M_Chase:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_MChase>();
+					break;
+				case EGameMode.M_Tanks:
+					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MTanks>();				// Create GameMode_MTanks
 					break;
 				default:
 					break;
