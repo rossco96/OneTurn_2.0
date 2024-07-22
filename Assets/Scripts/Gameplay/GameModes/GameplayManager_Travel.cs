@@ -179,31 +179,40 @@ public class GameplayManager_Travel : GameplayManager
 
 		base.EndGameMultiplayer();
 
-		/*
 		OTController controllerP1 = null;
 		OTController controllerP2 = null;
 		for (int i = 0; i < m_controllers.Length; ++i)
 		{
 			if (m_controllers[i].Index == 0)
 				controllerP1 = m_controllers[i];
-			else
+			else //if (m_controllers[i].Index == 1)
 				controllerP2 = m_controllers[i];
 		}
 
+		float percentCoveredP1 = ((100.0f * controllerP1.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+		float percentCoveredP2 = ((100.0f * controllerP2.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+		int totalScoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, percentCoveredP1);
+		int totalScoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, percentCoveredP2);
+		m_hudManager.SetEndScreenStatsMultiP1(totalScoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, percentCoveredP1);
+		m_hudManager.SetEndScreenStatsMultiP2(totalScoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, percentCoveredP2);
+
 		EMultiplayerResult result = EMultiplayerResult.Draw;
-		if (m_winningMultiplayerController == controllerP1)
+		if (percentCoveredP1 > percentCoveredP2)
 		{
 			result = EMultiplayerResult.P1;
 			PlayerPrefsSystem.MultiplayerAddWinP1();
 		}
-		else //if (m_winningMultiplayerController == controllerP2)			// [NOTE] else-if here in case we're adding P3 and P4
+		else if (percentCoveredP1 < percentCoveredP2)
 		{
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
 		}
+		else
+		{
+			PlayerPrefsSystem.MultiplayerAddDraw();
+		}
 
 		m_hudManager.SetWinLoseTitleMulti(result);
-		//*/
 	}
 
 
@@ -216,7 +225,7 @@ public class GameplayManager_Travel : GameplayManager
 	private int GetTotalScore(float time, int lives, int moves, float covered)
 	{
 		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
-		if (lives == 0 || time > maxTime) return 0;
+		if (lives == 0 || time >= maxTime) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
 		float timeRatio = (maxTime - time) / maxTime;
@@ -227,6 +236,21 @@ public class GameplayManager_Travel : GameplayManager
 
 		int score = Mathf.RoundToInt((gridRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
 		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		return Mathf.Max(0, score);
+	}
+
+	private int GetTotalScoreMultiplayer(int lives, int moves, float covered)
+	{
+		if (lives == 0) return 0;
+
+		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
+		const int scoreMultiplier = 10000;
+		const int livesMultiplier = 1000;
+
+		// [TODO] How to involve #moves? If at all?
+
+		int score = Mathf.RoundToInt((gridRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
+		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
 		return Mathf.Max(0, score);
 	}
 }

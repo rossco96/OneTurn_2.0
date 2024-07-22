@@ -10,8 +10,11 @@ using UnityEngine.UI;
 public class HUDManager : MonoBehaviour
 {
 	#region Vars
+	[Space]
+	[Header("Global Settings")]
 	[SerializeField] private SettingsDataInt m_mapIndexSettingsData;
 
+	[Space]
 	[Header("Tutorial")]
 	[SerializeField] private GameObject m_tutorialParent;
 	[SerializeField] private SettingsData_Base m_tutorialSettingsData;
@@ -69,11 +72,11 @@ public class HUDManager : MonoBehaviour
 	[SerializeField] private GameObject m_endStatsParentMulti;
 	[SerializeField] private TextMeshProUGUI m_endMovesCountP1;
 	[SerializeField] private TextMeshProUGUI m_endLivesCountP1;
-	[SerializeField] private TextMeshProUGUI m_endItemsCountP1;
+	[SerializeField] private TextMeshProUGUI m_endExtraInfoStatP1;
 	[SerializeField] private TextMeshProUGUI m_endTotalScoreP1;
 	[SerializeField] private TextMeshProUGUI m_endMovesCountP2;
 	[SerializeField] private TextMeshProUGUI m_endLivesCountP2;
-	[SerializeField] private TextMeshProUGUI m_endItemsCountP2;
+	[SerializeField] private TextMeshProUGUI m_endExtraInfoStatP2;
 	[SerializeField] private TextMeshProUGUI m_endTotalScoreP2;
 	[SerializeField] private TextMeshProUGUI m_headToHeadScoreP1;
 	[SerializeField] private TextMeshProUGUI m_headToHeadScoreP2;
@@ -272,26 +275,30 @@ public class HUDManager : MonoBehaviour
 	}
 
 
-	public void SetEndScreenStatsMultiP1(int totalScore, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	public void SetEndScreenStatsMultiP1(int totalScore, int movesTaken, int livesLeft, float extraInfo = 0)
 	{
 		m_endTotalScoreP1.text = $"P1: {totalScore:n0}";
 		m_endMovesCountP1.text = $"Moves Taken: {movesTaken}";
 		m_endLivesCountP1.text = $"Lives Left: {livesLeft}";
-		if (isItemsGameMode)
-			m_endItemsCountP1.text = $"Items Found: {itemsCollected}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		if (LevelSelectData.GameMode == EGameMode.Items)
+			m_endExtraInfoStatP1.text = $"Items Collected: {extraInfo}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
+			m_endExtraInfoStatP1.text = $"Area Covered: {extraInfo}%";
 		else
-			m_endItemsCountP1.gameObject.SetActive(false);
+			m_endExtraInfoStatP1.gameObject.SetActive(false);
 	}
 
-	public void SetEndScreenStatsMultiP2(int totalScore, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	public void SetEndScreenStatsMultiP2(int totalScore, int movesTaken, int livesLeft, float extraInfo = 0)
 	{
 		m_endTotalScoreP2.text = $"P2: {totalScore:n0}";
 		m_endMovesCountP2.text = $"Moves Taken: {movesTaken}";
 		m_endLivesCountP2.text = $"Lives Left: {livesLeft}";
-		if (isItemsGameMode)
-			m_endItemsCountP2.text = $"Items Found: {itemsCollected}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		if (LevelSelectData.GameMode == EGameMode.Items)
+			m_endExtraInfoStatP2.text = $"Items Collected: {extraInfo}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
+			m_endExtraInfoStatP2.text = $"Area Covered: {extraInfo}%";
 		else
-			m_endItemsCountP2.gameObject.SetActive(false);
+			m_endExtraInfoStatP2.gameObject.SetActive(false);
 	}
 
 	public void SetWinLoseTitleMulti(EMultiplayerResult result)
@@ -313,6 +320,14 @@ public class HUDManager : MonoBehaviour
 
 	public void ShowEndScreen()
 	{
+		if (LevelEditorData.IsTestingLevel)
+		{
+			// [TODO] SET STATS HERE!
+			m_endStatsParentEditor.SetActive(true);
+			m_nextLevelButton.gameObject.SetActive(false);
+			return;
+		}
+
 		if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
 			m_nextLevelButton.gameObject.SetActive(false);
 		m_endScreenParent.SetActive(true);

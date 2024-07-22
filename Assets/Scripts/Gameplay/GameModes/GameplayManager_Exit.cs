@@ -86,15 +86,21 @@ public class GameplayManager_Exit : GameplayManager
 		}
 
 		EMultiplayerResult result = EMultiplayerResult.Draw;
-		if (controllerP1.Stats.IsAtExit)
+		if (controllerP1.Stats.IsAtExit || controllerP2.Stats.Lives == 0)
 		{
 			result = EMultiplayerResult.P1;
 			PlayerPrefsSystem.MultiplayerAddWinP1();
+			int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves);
+			m_hudManager.SetEndScreenStatsMultiP1((controllerP1.Stats.IsAtExit) ? scoreP1 : 1000, controllerP1.Stats.Moves, controllerP1.Stats.Lives);
+			m_hudManager.SetEndScreenStatsMultiP2(0, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
 		}
-		else //if (m_winningMultiplayerController == controllerP2)			// [NOTE] else-if here in case we're adding P3 and P4
+		else //if (controllerP2.Stats.IsAtExit || controllerP1.Stats.Lives == 0)			// [NOTE] else-if here in case we're adding P3 and P4
 		{
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
+			int scoreP2 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves);
+			m_hudManager.SetEndScreenStatsMultiP1(0, controllerP1.Stats.Moves, controllerP1.Stats.Lives);
+			m_hudManager.SetEndScreenStatsMultiP2((controllerP2.Stats.IsAtExit) ? scoreP2 : 1000, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
 		}
 		// NOTE not currently any drawing in exit mode as no time-out
 
@@ -111,7 +117,7 @@ public class GameplayManager_Exit : GameplayManager
 	private int GetTotalScore(float time, int lives, int moves)
 	{
 		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
-		if (lives == 0 || time > maxTime) return 0;
+		if (lives == 0 || time >= maxTime) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
 		float timeRatio = (maxTime - time) / maxTime;
@@ -122,6 +128,21 @@ public class GameplayManager_Exit : GameplayManager
 
 		int score = Mathf.RoundToInt((gridRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
 		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		return Mathf.Max(0, score);
+	}
+
+	private int GetTotalScoreMultiplayer(int lives, int moves)
+	{
+		if (lives == 0) return 0;
+
+		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
+		const int scoreMultiplier = 10000;
+		const int livesMultiplier = 1000;
+
+		// [TODO] How to involve #moves? If at all?
+
+		int score = Mathf.RoundToInt((gridRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
+		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
 		return Mathf.Max(0, score);
 	}
 }

@@ -4413,7 +4413,7 @@ GameObject:
   - component: {fileID: 680210871}
   - component: {fileID: 680210870}
   m_Layer: 5
-  m_Name: EndStatsItemsP1
+  m_Name: EndStatsExtraInfoP1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4868,11 +4868,11 @@ MonoBehaviour:
   m_endStatsParentMulti: {fileID: 1915132513}
   m_endMovesCountP1: {fileID: 727277868}
   m_endLivesCountP1: {fileID: 1316681439}
-  m_endItemsCountP1: {fileID: 680210870}
+  m_endExtraInfoStatP1: {fileID: 680210870}
   m_endTotalScoreP1: {fileID: 1018357628}
   m_endMovesCountP2: {fileID: 502059812}
   m_endLivesCountP2: {fileID: 1096293765}
-  m_endItemsCountP2: {fileID: 2141979925}
+  m_endExtraInfoStatP2: {fileID: 2141979925}
   m_endTotalScoreP2: {fileID: 200992174}
   m_headToHeadScoreP1: {fileID: 1130864832}
   m_headToHeadScoreP2: {fileID: 683481162}
@@ -14189,7 +14189,7 @@ GameObject:
   - component: {fileID: 2141979926}
   - component: {fileID: 2141979925}
   m_Layer: 5
-  m_Name: EndStatsItemsP2
+  m_Name: EndStatsExtraInfoP2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
