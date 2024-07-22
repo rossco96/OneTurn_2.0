@@ -98,7 +98,7 @@ public abstract class GameplayManager : MonoBehaviour
 
 
 
-	protected void InitInteractableBehaviour<T>(UnityAction<OTController> action) where T : Interactable_Base
+	protected void InitInteractableBehaviour<T>(UnityAction<OTController, Interactable_Base> action) where T : Interactable_Base
 	{
 		T[] interactables = FindObjectsOfType<T>();
 		for (int i = 0; i < interactables.Length; ++i)
@@ -106,6 +106,7 @@ public abstract class GameplayManager : MonoBehaviour
 			interactables[i].PlayerEnterEvent += action;
 		}
 	}
+
 
 	protected virtual void InitHUD()
 	{
@@ -125,7 +126,7 @@ public abstract class GameplayManager : MonoBehaviour
 
 
 
-	private void OnPlayerInteractWall(OTController controller)
+	private void OnPlayerInteractWall(OTController controller, Interactable_Base interactable)
 	{
 		controller.SetInputDisabled(true);
 		controller.DestroyPlayerGameObject();
@@ -163,6 +164,7 @@ public abstract class GameplayManager : MonoBehaviour
 		m_hasEnded = true;
 		m_controllers[0].SetInputDisabled(true);
 		m_hudManager.SetWinLoseTitle(isWin);
+		m_hudManager.ShowEndScreen();
 	}
 
 	protected virtual void EndGameMultiplayer()
@@ -172,5 +174,6 @@ public abstract class GameplayManager : MonoBehaviour
 		{
 			m_controllers[i].SetInputDisabled(true);
 		}
+		m_hudManager.ShowEndScreen();
 	}
 }

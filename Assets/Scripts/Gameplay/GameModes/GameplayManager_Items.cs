@@ -85,7 +85,7 @@ public class GameplayManager_Items : GameplayManager
 		}
 	}
 
-	private void OnPlayerInteractItem(OTController controller)
+	private void OnPlayerInteractItem(OTController controller, Interactable_Base interactable)
 	{
 		controller.Stats.Items++;
 
@@ -116,9 +116,8 @@ public class GameplayManager_Items : GameplayManager
 		base.EndGame(isWin);
 
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
-		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, true, m_controllers[0].Stats.Items);
-		m_hudManager.ShowEndScreen();
-
+		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Items);
+		
 		if (PlayerPrefsSystem.ScoreDisablingCheatsEnabled())
 			return;
 
@@ -168,7 +167,6 @@ public class GameplayManager_Items : GameplayManager
 		}
 
 		m_hudManager.SetWinLoseTitleMulti(result);
-		m_hudManager.ShowEndScreen();
 	}
 
 	// [TODO]

@@ -17,11 +17,13 @@ public enum EMapType
 [System.Serializable]
 public enum EGameMode
 {
+	// [TODO][IMPORTANT] Need to create new save data -- cannot load for Travel as it didn't exist when creating the save system!
 	Items,
 	Exit,
-	//Travel,						// New game mode idea! Cover every (possible?) square in the time limit. Multiplayer version you have to turn all or as many of the squares to your colour
+	Travel,						// New game mode idea! Cover every (possible?) square in the time limit. Multiplayer version you have to turn all or as many of the squares to your colour
 	M_Bomb,
-	M_Chase
+	M_Chase,
+	M_Tanks						// New game mode idea! Like the classic Tank game. Could do 1 shot per move, 3 or 5 lives, either reset or not upon being hit
 }
 
 [System.Serializable]
@@ -62,7 +64,8 @@ public enum EStatsSection
 	Lives,
 	Time,
 	Moves,
-	Items
+	Items,
+	Area
 }
 
 public enum EMapmetaInfo
@@ -91,4 +94,13 @@ public enum EMultiplayerResult
 	P1,
 	P2,
 	Draw
+}
+
+// If implementing a "3x max travel" feature, then can include here too?
+// Idea: could be worth more points if travelled to multiple times, but on the fourth time it'll turn into a wall (removed from total score and makes level more difficult)
+public enum ETravelSquareState
+{
+	NONE,
+	P1,
+	P2
 }

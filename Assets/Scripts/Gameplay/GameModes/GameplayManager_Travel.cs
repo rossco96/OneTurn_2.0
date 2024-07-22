@@ -2,10 +2,19 @@ using UnityEngine;
 
 public class GameplayManager_Travel : GameplayManager
 {
+	private TravelSquare[] m_travelSquares;
+	private int m_squaresCovered = 0;
+
 	protected override void Start()
 	{
 		InitInteractableBehaviour<TravelSquare>(OnPlayerInteractTravelSquare);
 		m_timeLimit = LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
+		
+		if (LevelSelectData.IsMultiplayer == false)
+			m_hudManager.AssignTravelButtonP1(OnTravelModeStoppedP1);
+		
+		m_travelSquares = FindObjectsOfType<TravelSquare>();
+
 		base.Start();
 	}
 
@@ -80,23 +89,69 @@ public class GameplayManager_Travel : GameplayManager
 		}
 	}
 
-	private void OnPlayerInteractTravelSquare(OTController controller)
+	private void OnPlayerInteractTravelSquare(OTController controller, Interactable_Base interactable)
 	{
-		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
-		// If not, respawn (losing condition for lives == 0 in there)
-		// Otherwise then yeah, obviously win condition
+		TravelSquare travelSquare = (TravelSquare)interactable;
 
-		return;
+		switch (travelSquare.CurrentState)
+		{
+			case ETravelSquareState.NONE:
+				controller.Stats.TravelSquares++;
+				float newTravelPercent = ((100.0f * controller.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+				if (controller == m_controllers[0])
+					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercent);
+				else
+					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercent);
+				m_squaresCovered++;
+				break;
 
-		// END GAME -- win
-		if (LevelSelectData.IsMultiplayer)
-		{
-			EndGameMultiplayer();
+			case ETravelSquareState.P1:
+				if (LevelSelectData.IsMultiplayer && controller.Index == 1)
+				{
+					m_controllers[0].Stats.TravelSquares--;
+					controller.Stats.TravelSquares++;
+					float newTravelPercentP1 = ((100.0f * m_controllers[0].Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+					float newTravelPercentP2 = ((100.0f * controller.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercentP1);
+					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercentP2);
+				}
+				break;
+
+			case ETravelSquareState.P2:
+				if (controller.Index == 0)
+				{
+					controller.Stats.TravelSquares++;
+					m_controllers[1].Stats.TravelSquares--;
+					float newTravelPercentP1 = ((100.0f * controller.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+					float newTravelPercentP2 = ((100.0f * m_controllers[1].Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercentP1);
+					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercentP2);
+				}
+				break;
+
+			default:
+				break;
 		}
-		else
+
+		if (m_squaresCovered == m_travelSquares.Length)
 		{
-			EndGame(true);
+			// END GAME -- win
+			if (LevelSelectData.IsMultiplayer)
+			{
+				EndGameMultiplayer();
+			}
+			else
+			{
+				EndGame(true);
+			}
 		}
+	}
+
+
+	// [TODO][Q] Implement more properly than this?? Regardless, need to implement EndGame methods
+	private void OnTravelModeStoppedP1()
+	{
+		EndGame(true);
 	}
 
 
@@ -104,19 +159,24 @@ public class GameplayManager_Travel : GameplayManager
 	{
 		base.EndGame(isWin);
 
-		/*
-		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
-		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
+		float percentCovered = ((100.0f * m_squaresCovered) / m_travelSquares.Length).RoundDP(2);
+		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, percentCovered);
+		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, percentCovered);
 
-		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves))
+		if (PlayerPrefsSystem.ScoreDisablingCheatsEnabled())
+			return;
+
+		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, percentCovered))
 		{
-			SaveSystem.SaveStatFileInfo(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
+			SaveSystem.SaveStatFileInfo(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, percentCovered);
 		}
-		//*/
 	}
 
 	protected override void EndGameMultiplayer()
 	{
+		// [NOTE] Since we can (and have to) end the game using buttons, both players must press it to end the game
+		// ... Or just disable the stop button for multiplayer, and play until timer runs out. Yeah. Let's do that!
+
 		base.EndGameMultiplayer();
 
 		/*
@@ -143,7 +203,6 @@ public class GameplayManager_Travel : GameplayManager
 		}
 
 		m_hudManager.SetWinLoseTitleMulti(result);
-		m_hudManager.ShowEndScreen();
 		//*/
 	}
 
@@ -154,7 +213,7 @@ public class GameplayManager_Travel : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int lives, int moves)
+	private int GetTotalScore(float time, int lives, int moves, float covered)
 	{
 		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
 		if (lives == 0 || time > maxTime) return 0;

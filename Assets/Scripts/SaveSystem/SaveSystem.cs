@@ -226,7 +226,9 @@ public static class SaveSystem
 				string direction = turnDirection[turnDirectionIndex];
 				for (int statsSectionIndex = 0; statsSectionIndex < statsSection.Length; ++statsSectionIndex)
 				{
-					if ((EGameMode)gameModeIndex == EGameMode.Exit && (EStatsSection)statsSectionIndex == EStatsSection.Items) continue;
+					if ((EGameMode)gameModeIndex == EGameMode.Exit && ((EStatsSection)statsSectionIndex == EStatsSection.Items || (EStatsSection)statsSectionIndex == EStatsSection.Area)) continue;
+					if ((EGameMode)gameModeIndex == EGameMode.Items && (EStatsSection)statsSectionIndex == EStatsSection.Area) continue;
+					if ((EGameMode)gameModeIndex == EGameMode.Travel && (EStatsSection)statsSectionIndex == EStatsSection.Items) continue;
 					string stat = statsSection[statsSectionIndex];
 					statsData.Add($"{mode}{direction}{stat}", 0);
 				}
@@ -243,7 +245,7 @@ public static class SaveSystem
 		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 
-	public static bool StatFileSaveRequired(float time, int lives, int moves, int items = -1)
+	public static bool StatFileSaveRequired(float time, int lives, int moves, float extraInfo = -1)
 	{
 		string statFullFilepath = string.Empty;
 		switch (LevelSelectData.MapType)
@@ -268,37 +270,28 @@ public static class SaveSystem
 
 		// [Q] Is this the order of priorities for what classes as a more successful level? Figure out in testing!
 		// (changed to putting TIME last since very rarely will come down to the exact same time, so all other comparisons would be pointless)
-		if (items >= 0)
+
+		if (LevelSelectData.GameMode == EGameMode.Items)
 		{
-			// ITEMS game mode
-			if (items > statsData[$"{statBase}{EStatsSection.Items}"])		return true;
-			else if (items < statsData[$"{statBase}{EStatsSection.Items}"])	return false;
-			
-			else if (lives > statsData[$"{statBase}{EStatsSection.Lives}"])	return true;
-			else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"])	return false;
-			
-			else if (statsData[$"{statBase}{EStatsSection.Moves}"] == 0 ||
-				moves < statsData[$"{statBase}{EStatsSection.Moves}"])		return true;
-			else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
-			
-			else if (statsData[$"{statBase}{EStatsSection.Time}"] == 0 ||
-				time < statsData[$"{statBase}{EStatsSection.Time}"])		return true;
-			else if (time > statsData[$"{statBase}{EStatsSection.Time}"])	return false;
+			if (extraInfo > statsData[$"{statBase}{EStatsSection.Items}"]) return true;
+			else if (extraInfo < statsData[$"{statBase}{EStatsSection.Items}"]) return false;
 		}
-		else
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
 		{
-			// EXIT game mode
-			if (lives > statsData[$"{statBase}{EStatsSection.Lives}"])		return true;
-			else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"])	return false;
-			
-			else if (statsData[$"{statBase}{EStatsSection.Moves}"] == 0 ||
-				moves < statsData[$"{statBase}{EStatsSection.Moves}"])		return true;
-			else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"])	return false;
-			
-			else if (statsData[$"{statBase}{EStatsSection.Time}"] == 0 ||
-				time < statsData[$"{statBase}{EStatsSection.Time}"])		return true;
-			else if (time > statsData[$"{statBase}{EStatsSection.Time}"])	return false;
+			if (extraInfo > statsData[$"{statBase}{EStatsSection.Area}"]) return true;
+			else if (extraInfo < statsData[$"{statBase}{EStatsSection.Area}"]) return false;
 		}
+
+		if (lives > statsData[$"{statBase}{EStatsSection.Lives}"]) return true;
+		else if (lives < statsData[$"{statBase}{EStatsSection.Lives}"]) return false;
+
+		else if (statsData[$"{statBase}{EStatsSection.Moves}"] == 0 ||
+			moves < statsData[$"{statBase}{EStatsSection.Moves}"]) return true;
+		else if (moves > statsData[$"{statBase}{EStatsSection.Moves}"]) return false;
+
+		else if (statsData[$"{statBase}{EStatsSection.Time}"] == 0 ||
+			time < statsData[$"{statBase}{EStatsSection.Time}"]) return true;
+		else if (time > statsData[$"{statBase}{EStatsSection.Time}"]) return false;
 
 		// [TODO] IMPLEMENT CHECKING, PRIORITY OF DIFFERENT THINGS
 		// e.g. for exit mode: first number of lives, then amount of time, then number of moves
@@ -306,7 +299,7 @@ public static class SaveSystem
 		return true;
 	}
 
-	public static void SaveStatFileInfo(int score, float time, int lives, int moves, int items = -1)
+	public static void SaveStatFileInfo(int score, float time, int lives, int moves, float extraInfo = -1)
 	{
 		string statFullFilepath = string.Empty;
 		switch (LevelSelectData.MapType)
@@ -334,8 +327,10 @@ public static class SaveSystem
 		statsData[$"{statBase}{EStatsSection.Lives}"] = lives;
 		statsData[$"{statBase}{EStatsSection.Moves}"] = moves;
 
-		if (items >= 0)
-			statsData[$"{statBase}{EStatsSection.Items}"] = items;
+		if (LevelSelectData.GameMode == EGameMode.Items)
+			statsData[$"{statBase}{EStatsSection.Items}"] = extraInfo;
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
+			statsData[$"{statBase}{EStatsSection.Area}"] = extraInfo;
 
 		string jsonData = JsonUtility.ToJson(statsData);
 		File.SetAttributes(statFullFilepath, FileAttributes.Normal);

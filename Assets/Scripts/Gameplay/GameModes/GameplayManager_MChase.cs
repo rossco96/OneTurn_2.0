@@ -41,7 +41,7 @@ public class GameplayManager_MChase : GameplayManager
 	}
 
 
-	private void OnPlayerInteractChaser(OTController controller)
+	private void OnPlayerInteractChaser(OTController controller, Interactable_Base interactable)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)

@@ -13,8 +13,10 @@ public class GameplayManager_LevelEditor : GameplayManager
 
 		if (LevelSelectData.GameMode == EGameMode.Items)
 			InitInteractableBehaviour<Item>(OnPlayerInteractItem);
-		else if (LevelSelectData.GameMode == EGameMode.Items)
+		else if (LevelSelectData.GameMode == EGameMode.Exit)
 			InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
+			InitInteractableBehaviour<Exit>(OnPlayerInteractTravelSquare);
 	}
 
 	protected override void InitHUD()
@@ -37,7 +39,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 
 
 	#region OnPlayerInteracts
-	private void OnPlayerInteractWallLevelEditor(OTController controller)
+	private void OnPlayerInteractWallLevelEditor(OTController controller, Interactable_Base interactable)
 	{
 		controller.SetInputDisabled(true);
 		controller.DestroyPlayerGameObject();
@@ -51,7 +53,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 		controller.SetInputDisabled(false);
 	}
 
-	private void OnPlayerInteractItem(OTController controller)
+	private void OnPlayerInteractItem(OTController controller, Interactable_Base interactable)
 	{
 		controller.Stats.Items++;
 		m_hudManager.UpdateItemsCountP1(controller.Stats.Items);
@@ -65,7 +67,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 		}
 	}
 
-	private void OnPlayerInteractExit(OTController controller)
+	private void OnPlayerInteractExit(OTController controller, Interactable_Base interactable)
 	{
 		// [TODO]
 		// SHOW A LEVEL_EDITOR POPUP
@@ -77,6 +79,43 @@ public class GameplayManager_LevelEditor : GameplayManager
 
 		// END GAME -- win
 		//EndGame(true, controller);
+	}
+
+	private void OnPlayerInteractTravelSquare(OTController controller, Interactable_Base interactable)
+	{
+		TravelSquare travelSquare = (TravelSquare)interactable;
+
+		switch (travelSquare.CurrentState)
+		{
+			case ETravelSquareState.NONE:
+				controller.Stats.TravelSquares++;
+				float newTravelPercent = ((100.0f * controller.Stats.TravelSquares) / FindObjectsOfType<TravelSquare>().Length).RoundDP(2);
+				if (controller == m_controllers[0])
+					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercent);
+				else
+					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercent);
+				break;
+
+			default:
+				break;
+		}
+
+		// [TODO] Implement LevelEditor version of 'EndGame' here
+
+		/*
+		if (controller.Stats.TravelSquares == FindObjectsOfType<TravelSquare>().Length)
+		{
+			// END GAME -- win
+			if (LevelSelectData.IsMultiplayer)
+			{
+				EndGameMultiplayer();
+			}
+			else
+			{
+				EndGame(true);
+			}
+		}
+		//*/
 	}
 	#endregion
 }

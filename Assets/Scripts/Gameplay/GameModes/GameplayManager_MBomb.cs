@@ -30,7 +30,7 @@ public class GameplayManager_MBomb : GameplayManager
 	}
 	//*/
 
-	private void OnPlayerInteractBomb(OTController controller)
+	private void OnPlayerInteractBomb(OTController controller, Interactable_Base interactable)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)

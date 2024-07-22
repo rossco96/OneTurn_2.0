@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class HUDManager : MonoBehaviour
 {
 	#region Vars
+	[SerializeField] private SettingsDataInt m_mapIndexSettingsData;
+
 	[Header("Tutorial")]
 	[SerializeField] private GameObject m_tutorialParent;
 	[SerializeField] private SettingsData_Base m_tutorialSettingsData;
@@ -20,7 +22,7 @@ public class HUDManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI m_timerTextP1;
 	[SerializeField] private Slider m_timerSliderP1;
 	[SerializeField] private TextMeshProUGUI m_livesCountP1;
-	[SerializeField] private TextMeshProUGUI m_itemsCountP1;
+	[SerializeField] private TextMeshProUGUI m_countStatP1;
 
 	[Space]
 	[Header("Stats (multiplayer)")]
@@ -28,13 +30,14 @@ public class HUDManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI m_timerTextP2;
 	[SerializeField] private Slider m_timerSliderP2;
 	[SerializeField] private TextMeshProUGUI m_livesCountP2;
-	[SerializeField] private TextMeshProUGUI m_itemsCountP2;
+	[SerializeField] private TextMeshProUGUI m_countStatP2;
 
 	[Space]
 	[Header("Input Buttons")]
 	[SerializeField] private GameObject m_inputButtonsParentP1;
 	[SerializeField] private GameObject m_inputButtonsParentP2;
 	[SerializeField] private SettingsData_Base m_inputSettingsData;
+	[SerializeField] private Button m_buttonStopTravelP1;
 
 	[Space]
 	[Header("Pause")]
@@ -56,7 +59,7 @@ public class HUDManager : MonoBehaviour
 	[SerializeField] private GameObject m_endStatsParentSingle;
 	[SerializeField] private TextMeshProUGUI m_endMovesCount;
 	[SerializeField] private TextMeshProUGUI m_endLivesCount;
-	[SerializeField] private TextMeshProUGUI m_endItemsCount;
+	[SerializeField] private TextMeshProUGUI m_endExtraInfoStat;
 	[SerializeField] private TextMeshProUGUI m_endTotalScore;
 
 	[Space]
@@ -116,6 +119,10 @@ public class HUDManager : MonoBehaviour
 
 	private void InitInputButtons()
 	{
+		if (LevelSelectData.GameMode == EGameMode.Travel && LevelSelectData.IsMultiplayer == false)
+		{
+			m_buttonStopTravelP1.gameObject.SetActive(true);
+		}
 		if (SettingsSystem.GetValue(m_inputSettingsData.Key) != $"{EInputMode.Buttons}")
 			return;
 		// [TODO][IMPORTANT] Must deselect IsMultiplayer if entering the LevelEditor!
@@ -170,10 +177,19 @@ public class HUDManager : MonoBehaviour
 	}
 
 
+	public void AssignTravelButtonP1(UnityAction onTravelStopped)
+	{
+		m_buttonStopTravelP1.onClick.AddListener(onTravelStopped);
+	}
+
+
 	public void NextLevel()
 	{
 		LevelSelectData.ChosenMapIndex++;
 		LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex];
+		SettingsSystem.UpdateSettings(m_mapIndexSettingsData.Key, $"{LevelSelectData.ChosenMapIndex}");
+		// NOTE we want to autosave the map index
+		SettingsSystem.SaveSettings();
 		RetryLevel();
 	}
 
@@ -204,8 +220,8 @@ public class HUDManager : MonoBehaviour
 	public void SetTimerSliderActiveP1(bool active) { m_timerSliderP1.gameObject.SetActive(active); }
 	public void SetTimerSliderActiveP2(bool active) { m_timerSliderP2.gameObject.SetActive(active); }
 
-	public void SetItemsCountActiveP1(bool active) { m_itemsCountP1.gameObject.SetActive(active); }
-	public void SetItemsCountActiveP2(bool active) { m_itemsCountP2.gameObject.SetActive(active); }
+	public void SetItemsCountActiveP1(bool active) { m_countStatP1.gameObject.SetActive(active); }
+	public void SetItemsCountActiveP2(bool active) { m_countStatP2.gameObject.SetActive(active); }
 
 	public void SetMultiplayerStatsActive() { m_statsParentP2.SetActive(true); }
 	#endregion
@@ -216,8 +232,11 @@ public class HUDManager : MonoBehaviour
 	public void UpdateLivesCountP1(int lives) { m_livesCountP1.text = $"Lives: {lives}"; }
 	public void UpdateLivesCountP2(int lives) { m_livesCountP2.text = $"Lives: {lives}"; }
 
-	public void UpdateItemsCountP1(int items) { m_itemsCountP1.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
-	public void UpdateItemsCountP2(int items) { m_itemsCountP2.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
+	public void UpdateItemsCountP1(int items) { m_countStatP1.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
+	public void UpdateItemsCountP2(int items) { m_countStatP2.text = $"Items: {items}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}"; }
+
+	public void UpdateTravelSquaresPercentP1(float squaresPercent) { m_countStatP1.text = $"Squares: {squaresPercent}%"; }
+	public void UpdateTravelSquaresPercentP2(float squaresPercent) { m_countStatP2.text = $"Squares: {squaresPercent}%"; }
 
 	public void UpdateTimerTextCountUpP1(int timeTaken) { m_timerTextP1.text = $"Time Taken: {timeTaken}s"; }
 	public void UpdateTimerTextCountUpP2(int timeTaken) { m_timerTextP2.text = $"Time Taken: {timeTaken}s"; }
@@ -232,16 +251,18 @@ public class HUDManager : MonoBehaviour
 
 
 	#region GameplayManager Calls (end screen)
-	public void SetEndScreenStatsSingle(int totalScore, float timeTaken, int movesTaken, int livesLeft, bool isItemsGameMode = false, int itemsCollected = 0)
+	public void SetEndScreenStatsSingle(int totalScore, float timeTaken, int movesTaken, int livesLeft, float extraInfo = 0)
 	{
 		m_endTotalScore.text = $"Total Score: {totalScore:n0}";
 		m_endTimer.text = $"Time Taken: {timeTaken}s";
 		m_endMovesCount.text = $"Moves Taken: {movesTaken}";
 		m_endLivesCount.text = $"Lives Left: {livesLeft}";
-		if (isItemsGameMode)
-			m_endItemsCount.text = $"Items Found: {itemsCollected}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		if (LevelSelectData.GameMode == EGameMode.Items)
+			m_endExtraInfoStat.text = $"Items Collected: {extraInfo}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
+			m_endExtraInfoStat.text = $"Area Covered: {extraInfo}%";
 		else
-			m_endItemsCount.gameObject.SetActive(false);
+			m_endExtraInfoStat.gameObject.SetActive(false);
 	}
 
 	public void SetWinLoseTitle(bool isWin)

@@ -4,6 +4,8 @@ public class InGameStats
 	public int Moves = 0;
 	
 	public int Items = 0;
+
+	public int TravelSquares = 0;
 	
 	public bool IsAtExit = false;
 	

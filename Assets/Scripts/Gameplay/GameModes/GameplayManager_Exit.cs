@@ -36,7 +36,7 @@ public class GameplayManager_Exit : GameplayManager
 	}
 
 
-	private void OnPlayerInteractExit(OTController controller)
+	private void OnPlayerInteractExit(OTController controller, Interactable_Base interactable)
 	{
 		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
 		// If not, respawn (losing condition for lives == 0 in there)
@@ -61,6 +61,9 @@ public class GameplayManager_Exit : GameplayManager
 
 		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
+
+		if (PlayerPrefsSystem.ScoreDisablingCheatsEnabled())
+			return;
 
 		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves))
 		{
@@ -96,7 +99,6 @@ public class GameplayManager_Exit : GameplayManager
 		// NOTE not currently any drawing in exit mode as no time-out
 
 		m_hudManager.SetWinLoseTitleMulti(result);
-		m_hudManager.ShowEndScreen();
 	}
 
 
