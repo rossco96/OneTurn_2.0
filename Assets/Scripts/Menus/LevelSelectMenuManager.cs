@@ -10,6 +10,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private ThemesList m_themesList;
 	[SerializeField] private SettingsDataString m_themeSettingsData;
 	[SerializeField] private SettingsDataInt m_mapIndexSettingsData;
+	[SerializeField] private SettingsDataString m_gameModeSettingsData;
+	[SerializeField] private SettingsDataString m_levelDirectionSettingsData;
 
 	[Space]
 	[SerializeField] private GridLayoutGroup m_mapTabsParentGridLayoutGroup;
@@ -36,7 +38,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI m_statTime;
 	[SerializeField] private TextMeshProUGUI m_statMoves;
 	[SerializeField] private TextMeshProUGUI m_statLives;
-	[SerializeField] private TextMeshProUGUI m_statItems;
+	[SerializeField] private TextMeshProUGUI m_statExtraInfo;
 	[SerializeField] private TextMeshProUGUI m_statScore;
 	[SerializeField] private TextMeshProUGUI m_statTotalPoints;
 
@@ -141,7 +143,25 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.ChosenMapIndex = m_mapIndex;
 
 		LevelSelectData.FileName = $"{Hash128.Compute(m_currentTheme.Maps[m_mapIndex].GridLayout.EncodeToPNG())}";	// [TODO] THIS IS ONLY FOR 'GAME' MAPS. Not for custom maps.
-		LevelSelectData.MapType = EMapType.Game;																	// [TODO] NEED TO IMPLEMENT THIS TOO! Need setting of last played EMapType too..
+		LevelSelectData.MapType = EMapType.Game;                                                                    // [TODO] NEED TO IMPLEMENT THIS TOO! Need setting of last played EMapType too..
+
+		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
+		{
+			if ($"{(EGameMode)i}" == SettingsSystem.GetValue(m_gameModeSettingsData.Key))
+			{
+				LevelSelectData.GameMode = (EGameMode)i;
+				break;
+			}
+		}
+		
+		for (int i = 0; i < System.Enum.GetValues(typeof(ETurnDirection)).Length; ++i)
+		{
+			if ($"{(ETurnDirection)i}" == SettingsSystem.GetValue(m_levelDirectionSettingsData.Key))
+			{
+				LevelSelectData.TurnDirection = (ETurnDirection)i;
+				break;
+			}
+		}
 
 		m_buttonThemeUp.interactable = (m_themeIndex > 0);
 		m_buttonMapUp.interactable = (m_mapIndex > 0);
@@ -239,7 +259,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_statMoves.text = $"Moves Taken: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Moves)}";
 		m_statLives.text = $"Lives Left: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Lives)}";	// [TODO][Q] Do we want time left, quickest time, or different depending on items or exit mode?
 		if (LevelSelectData.GameMode == EGameMode.Items)
-			m_statItems.text = $"Items Collected: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Items)}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+			m_statExtraInfo.text = $"Items Collected: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Items)}/{LevelSelectData.ThemeData.LevelPlayInfo.TotalItems}";
+		else if (LevelSelectData.GameMode == EGameMode.Travel)
+			m_statExtraInfo.text = $"Area Covered: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Area)}%";
 		m_statScore.text = $"Level Score: {SaveSystem.GetStatsInfo(LevelSelectData.FileName, EStatsSection.Score):n0}";
 	}
 
@@ -295,7 +317,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.GameMode = gameMode;
 		if (LevelSelectData.IsMultiplayer == false)
 		{
-			m_statItems.gameObject.SetActive(gameMode == EGameMode.Items);
+			m_statExtraInfo.gameObject.SetActive(gameMode == EGameMode.Items || gameMode == EGameMode.Travel);
 			UpdateLevelStatsSinglePlayer();
 		}
 	}
@@ -314,6 +336,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 	{
 		SettingsSystem.UpdateSettings(m_themeSettingsData.Key, m_currentTheme.ThemeName);
 		SettingsSystem.UpdateSettings(m_mapIndexSettingsData.Key, $"{m_mapIndex}");
+		SettingsSystem.UpdateSettings(m_gameModeSettingsData.Key, $"{LevelSelectData.GameMode}");
+		SettingsSystem.UpdateSettings(m_levelDirectionSettingsData.Key, $"{LevelSelectData.TurnDirection}");
 		SettingsSystem.SaveSettings();
 		SceneManager.LoadScene("LevelScene");
 	}
