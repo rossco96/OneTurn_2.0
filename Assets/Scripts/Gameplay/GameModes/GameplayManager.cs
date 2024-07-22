@@ -26,7 +26,7 @@ public abstract class GameplayManager : MonoBehaviour
 
 	private float m_introStartTime = 0.0f;
 	private bool m_hasStarted = false;
-	private bool m_hasEnded = false;									// [TODO] Won't need this eventually?
+	protected bool m_hasEnded = false;									// [TODO] Won't need this eventually? [NOTE] Made protected for GameplayManager_LevelEditor ONLY.
 	private bool m_isPaused = false;
 	private void SetPause() { m_isPaused = true; OnPauseChanged(true); }
 	private void SetResume() { m_isPaused = false; OnPauseChanged(false); }

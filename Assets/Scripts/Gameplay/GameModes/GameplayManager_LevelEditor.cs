@@ -17,6 +17,8 @@ public class GameplayManager_LevelEditor : GameplayManager
 			InitInteractableBehaviour<Exit>(OnPlayerInteractExit);
 		else if (LevelSelectData.GameMode == EGameMode.Travel)
 			InitInteractableBehaviour<Exit>(OnPlayerInteractTravelSquare);
+
+		m_hudManager.AssignLevelEditorResumeEndLevel(ResumePostGameplay);
 	}
 
 	protected override void InitHUD()
@@ -118,4 +120,10 @@ public class GameplayManager_LevelEditor : GameplayManager
 		//*/
 	}
 	#endregion
+
+	private void ResumePostGameplay()
+	{
+		m_hasEnded = false;
+		m_controllers[0].SetInputDisabled(false);
+	}
 }

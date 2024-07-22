@@ -186,6 +186,15 @@ public class HUDManager : MonoBehaviour
 	}
 
 
+	public void AssignLevelEditorResumeEndLevel(UnityAction onResume)
+	{
+		m_nextLevelButton.onClick.RemoveListener(NextLevel);
+		m_nextLevelButton.onClick.AddListener(LevelEditorContinue);
+		m_nextLevelButton.onClick.AddListener(onResume);
+		m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = "Continue?";
+	}
+
+
 	public void NextLevel()
 	{
 		LevelSelectData.ChosenMapIndex++;
@@ -199,6 +208,11 @@ public class HUDManager : MonoBehaviour
 	public void RetryLevel()
 	{
 		SceneManager.LoadScene("LevelScene");
+	}
+
+	private void LevelEditorContinue()
+	{
+		m_endScreenParent.SetActive(false);
 	}
 
 	// [TODO] Turn into an actual 'exit' button, in the pause menu.
@@ -320,15 +334,7 @@ public class HUDManager : MonoBehaviour
 
 	public void ShowEndScreen()
 	{
-		if (LevelEditorData.IsTestingLevel)
-		{
-			// [TODO] SET STATS HERE!
-			m_endStatsParentEditor.SetActive(true);
-			m_nextLevelButton.gameObject.SetActive(false);
-			return;
-		}
-
-		if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
+		if (LevelEditorData.IsTestingLevel == false && LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
 			m_nextLevelButton.gameObject.SetActive(false);
 		m_endScreenParent.SetActive(true);
 	}
