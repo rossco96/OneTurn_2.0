@@ -30,6 +30,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private Button m_buttonMapDown;
 
 	[Space]
+	[SerializeField] private Toggle m_multiplayerToggle;
 	[SerializeField] private TMP_Dropdown m_gameModeDropdown;
 
 	[Space]
@@ -124,6 +125,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	private void SetThemeMapIndexes()
 	{
+		m_multiplayerToggle.isOn = LevelSelectData.IsMultiplayer;
+
 		string themeName = SettingsSystem.GetValue(m_themeSettingsData.Key);
 		for (int i = 0; i < m_numberOfThemes; ++i)
 		{
@@ -267,6 +270,10 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	private void UpdateStatsMultiplayer()
 	{
+		// [Q] Best place to call this?
+		if (LevelSelectData.GameMode == EGameMode.M_Chase)
+			LevelSelectData.ChaseIsRoundTwo = false;
+		
 		// [TODO]
 	}
 
