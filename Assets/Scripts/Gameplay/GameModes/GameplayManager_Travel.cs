@@ -93,12 +93,23 @@ public class GameplayManager_Travel : GameplayManager
 	{
 		TravelSquare travelSquare = (TravelSquare)interactable;
 
+		// [TODO][Q] Cache this?
+		OTController controllerP1 = null;
+		OTController controllerP2 = null;
+		for (int i = 0; i < m_controllers.Length; ++i)
+		{
+			if (m_controllers[i].Index == 0)
+				controllerP1 = m_controllers[i];
+			else //if (m_controllers[i].Index == 1)
+				controllerP2 = m_controllers[i];
+		}
+
 		switch (travelSquare.CurrentState)
 		{
 			case ETravelSquareState.NONE:
 				controller.Stats.TravelSquares++;
 				float newTravelPercent = ((100.0f * controller.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
-				if (controller == m_controllers[0])
+				if (controller == controllerP1)
 					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercent);
 				else
 					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercent);
@@ -106,11 +117,11 @@ public class GameplayManager_Travel : GameplayManager
 				break;
 
 			case ETravelSquareState.P1:
-				if (LevelSelectData.IsMultiplayer && controller.Index == 1)
+				if (LevelSelectData.IsMultiplayer && controller == controllerP2)
 				{
-					m_controllers[0].Stats.TravelSquares--;
+					controllerP1.Stats.TravelSquares--;
 					controller.Stats.TravelSquares++;
-					float newTravelPercentP1 = ((100.0f * m_controllers[0].Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+					float newTravelPercentP1 = ((100.0f * controllerP1.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
 					float newTravelPercentP2 = ((100.0f * controller.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
 					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercentP1);
 					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercentP2);
@@ -118,12 +129,12 @@ public class GameplayManager_Travel : GameplayManager
 				break;
 
 			case ETravelSquareState.P2:
-				if (controller.Index == 0)
+				if (controller == controllerP1)
 				{
 					controller.Stats.TravelSquares++;
-					m_controllers[1].Stats.TravelSquares--;
+					controllerP2.Stats.TravelSquares--;
 					float newTravelPercentP1 = ((100.0f * controller.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
-					float newTravelPercentP2 = ((100.0f * m_controllers[1].Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
+					float newTravelPercentP2 = ((100.0f * controllerP2.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
 					m_hudManager.UpdateTravelSquaresPercentP1(newTravelPercentP1);
 					m_hudManager.UpdateTravelSquaresPercentP2(newTravelPercentP2);
 				}
