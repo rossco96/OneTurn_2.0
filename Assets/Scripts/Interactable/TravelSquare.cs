@@ -18,7 +18,7 @@ public class TravelSquare : Interactable_Base
 		else
 		{
 			CurrentState = ETravelSquareState.P2;
-			m_renderer.color = m_colorP1;
+			m_renderer.color = m_colorP2;
 		}
 	}
 }
