@@ -74,7 +74,7 @@ public class GameplayManager_Travel : GameplayManager
 	{
 		base.InitHUD();
 
-		m_hudManager.SetItemsCountActiveP1(true);
+		m_hudManager.SetCountStatActiveP1(true);
 		m_hudManager.UpdateItemsCountP1(0);
 		m_hudManager.SetTimerSliderActiveP1(true);
 		m_hudManager.UpdateTimerTextCountDownP1(m_timeLimit);
@@ -82,7 +82,7 @@ public class GameplayManager_Travel : GameplayManager
 		if (LevelSelectData.IsMultiplayer)
 		{
 			m_hudManager.SetMultiplayerStatsActive();
-			m_hudManager.SetItemsCountActiveP2(true);
+			m_hudManager.SetCountStatActiveP2(true);
 			m_hudManager.UpdateItemsCountP2(0);
 			m_hudManager.SetTimerSliderActiveP2(true);
 			m_hudManager.UpdateTimerTextCountDownP2(m_timeLimit);
