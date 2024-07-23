@@ -92,7 +92,9 @@ public class GameplayManager_MBomb : GameplayManager
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		
+
+		m_hudManager.SetMultiplayerStatsActive();
+
 		m_hudManager.SetCountStatActiveP1(false);
 		m_hudManager.SetTimerSliderActiveP1(true);
 		m_hudManager.UpdateTimerSliderP1(m_timeLimit * 2.0f);
