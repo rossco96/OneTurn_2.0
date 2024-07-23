@@ -4878,6 +4878,8 @@ MonoBehaviour:
   m_headToHeadScoreP2: {fileID: 683481162}
   m_headToHeadScoreDraw: {fileID: 1242928337}
   m_endStatsParentEditor: {fileID: 1064362596}
+  MovesChaser: 0
+  MovesTarget: 0
 --- !u!4 &700921783
 Transform:
   m_ObjectHideFlags: 0
@@ -13622,6 +13624,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_mapPropertyData: {fileID: 11400000, guid: 5c143bb75e5de014280b5d7d0eff8228, type: 2}
+  m_movesChaserSettingsData: {fileID: 11400000, guid: e889980957693394ea8ec3e51a9d247e, type: 2}
+  m_movesTargetSettingsData: {fileID: 11400000, guid: c4232c3410388a542a1d04a20b4f762d, type: 2}
   m_hudManager: {fileID: 700921782}
   m_statsParentP1: {fileID: 1164585420}
   m_gameSpaceParent: {fileID: 607657834}
@@ -13635,6 +13639,7 @@ MonoBehaviour:
   m_exitPrefab: {fileID: 8887468549016088395, guid: 606b92b3173cb1b469e4176f1b66d466, type: 3}
   m_travelSquarePrefab: {fileID: 8887468549016088395, guid: 502c26f21cf859d4d96e8470d5098736, type: 3}
   m_bombPrefab: {fileID: 5627526918740645347, guid: 96f1e0e70e5c68f48b38f771c13cd818, type: 3}
+  m_chaserPrefab: {fileID: 5627526918740645347, guid: 2712ca24bc043ee44a50c6c00dd14b28, type: 3}
   m_inputButtonsP1: {fileID: 118489443}
   m_inputButtonsP2: {fileID: 2004133646}
   m_buttonMoveForwardP1: {fileID: 63935253}

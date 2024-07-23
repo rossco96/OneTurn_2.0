@@ -14,8 +14,31 @@ public class OTController : MonoBehaviour
 	public void GetOnMoveForward(out UnityEngine.Events.UnityAction onMoveForward) { onMoveForward = ButtonMoveForward; }
 	public void GetOnTurn(out UnityEngine.Events.UnityAction onTurn) { onTurn = ButtonTurn; }
 
+	private UnityEngine.Events.UnityAction<OTController> ChaseMoveForward;
+	public void AssignOnMove(UnityEngine.Events.UnityAction<OTController> onMoveForward) { ChaseMoveForward += onMoveForward; }
+
 	public void SetInputBounds(Bounds bounds) { m_input.SetInputBounds(bounds); }
 	public void SetFacingDirection(EFacingDirection direction) { m_input.ResetCurrentDirection(direction); }
+
+	private GameObject m_bomb = null;
+	public void SetBomb(GameObject bomb)
+	{
+		m_bomb = bomb;
+		if (bomb == null) return;
+		m_bomb.transform.SetParent(transform);
+		m_bomb.transform.position = new Vector3(m_player.transform.position.x, m_player.transform.position.y, -5.0f);
+		m_bomb.transform.rotation = m_player.transform.rotation;
+	}
+
+	private GameObject m_chaser = null;
+	public void SetChaser(GameObject chaser)
+	{
+		m_chaser = chaser;
+		if (chaser == null) return;
+		m_chaser.transform.SetParent(transform);
+		m_chaser.transform.position = new Vector3(m_player.transform.position.x, m_player.transform.position.y, -5.0f);
+		m_chaser.transform.rotation = m_player.transform.rotation;
+	}
 	
 	private float m_gridSizeMultiplier = 1.0f;
 
@@ -60,11 +83,19 @@ public class OTController : MonoBehaviour
 		}
 	}
 
+	public void ResetChaseMoves(int numberOfMoves)
+	{
+		Stats.ChaseMovesLeft = numberOfMoves; 
+	}
+
 
 	private void Update()
     {
 		if (m_input.Check(out EMovement movement))
 		{
+			if (LevelSelectData.GameMode == EGameMode.M_Chase && Stats.ChaseMovesLeft == 0)
+				return;
+
 			switch (movement)
 			{
 				case EMovement.Forward:	MoveForward();	break;
@@ -111,6 +142,23 @@ public class OTController : MonoBehaviour
 	{
 		m_player.transform.position += m_gridSizeMultiplier * m_player.transform.up;
 		Stats.Moves++;
+
+		if (LevelSelectData.GameMode == EGameMode.M_Chase)
+		{
+			// NOTE: We already know it's our turn in here due to check in Update()
+			Stats.ChaseMovesLeft--;
+			ChaseMoveForward(this);
+			if (Stats.IsChaser)
+			{
+				m_chaser.transform.position = new Vector3(m_player.transform.position.x, m_player.transform.position.y, -5.0f);
+				m_chaser.transform.rotation = m_player.transform.rotation;
+			}
+		}
+		else if (LevelSelectData.GameMode == EGameMode.M_Bomb && Stats.HasBomb)
+		{
+			m_bomb.transform.position = new Vector3(m_player.transform.position.x, m_player.transform.position.y, -5.0f);
+			m_bomb.transform.rotation = m_player.transform.rotation;
+		}
 	}
 
 
@@ -146,6 +194,17 @@ public class OTController : MonoBehaviour
 		{
 			EFacingDirection spawnDirection = (LevelSelectData.TurnDirection == ETurnDirection.Right) ? LevelSelectData.MapData.PlayerSpawnDirectionRight[Index] : LevelSelectData.MapData.PlayerSpawnDirectionLeft[Index];
 			((InputSwipeDirectional)m_input).ResetCurrentDirection(spawnDirection);
+		}
+
+		if (LevelSelectData.GameMode == EGameMode.M_Chase && Stats.IsChaser)
+		{
+			m_chaser.transform.position = new Vector3(m_player.transform.position.x, m_player.transform.position.y, -5.0f);
+			m_chaser.transform.rotation = m_player.transform.rotation;
+		}
+		else if (LevelSelectData.GameMode == EGameMode.M_Bomb && Stats.HasBomb)
+		{
+			m_bomb.transform.position = new Vector3(m_player.transform.position.x, m_player.transform.position.y, -5.0f);
+			m_bomb.transform.rotation = m_player.transform.rotation;
 		}
 	}
 

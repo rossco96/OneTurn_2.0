@@ -28,4 +28,9 @@ public static class LevelSelectData
 
 	public static int GridDimension = 9;
 	public static float GridSizeMultiplier = 0.0f;
+
+	public static bool ChaseIsRoundTwo = false;
+	public static int ChaseStatsP1Lives = 0;
+	public static int ChaseStatsP1Moves = 0;
+	public static float ChaseStatsP1Time = 0.0f;
 }

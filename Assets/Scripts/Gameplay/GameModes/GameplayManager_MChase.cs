@@ -7,13 +7,25 @@ using UnityEngine;
 
 public class GameplayManager_MChase : GameplayManager
 {
+	public int MovesChaser = 0;
+	public int MovesTarget = 0;
+
 	protected override void Start()
 	{
 		InitInteractableBehaviour<Chaser>(OnPlayerInteractChaser);
-		base.Start();
-	}
+		m_hudManager.MovesChaser = MovesChaser;
+		m_hudManager.MovesTarget = MovesTarget;
+		if (LevelSelectData.ChaseIsRoundTwo == false)
+			m_hudManager.AssignMChaseNextRound(StartRoundTwo);
 
-	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
+		base.Start();
+		
+		for (int i = 0; i < m_controllers.Length; ++i)
+		{
+			m_controllers[i].AssignOnMove(CheckOnMove);
+			m_controllers[i].ResetChaseMoves((m_controllers[i].Stats.IsChaser) ? MovesChaser : 0);
+		}
+	}
 
 	protected override void UpdateTimer()
 	{
@@ -22,6 +34,7 @@ public class GameplayManager_MChase : GameplayManager
 		{
 			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
 			m_hudManager.UpdateTimerTextCountUpP1(m_levelDisplayTimeInt);
+			m_hudManager.UpdateTimerTextCountUpP2(m_levelDisplayTimeInt);
 		}
 	}
 
@@ -30,74 +43,133 @@ public class GameplayManager_MChase : GameplayManager
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActiveP1(false);
+		
+		m_hudManager.SetMultiplayerStatsActive();
+
+		m_hudManager.SetCountStatActiveP1(true);
+		m_hudManager.InitChaseMovesP1(LevelSelectData.ChaseIsRoundTwo == false);
 		m_hudManager.SetTimerSliderActiveP1(false);
-		if (LevelSelectData.IsMultiplayer)
-		{
-			m_hudManager.SetMultiplayerStatsActive();
-			m_hudManager.SetItemsCountActiveP2(false);
-			m_hudManager.SetTimerSliderActiveP2(false);
-		}
+		m_hudManager.UpdateTimerTextCountUpP1(0);
+
+		m_hudManager.SetCountStatActiveP2(true);
+		m_hudManager.InitChaseMovesP2(LevelSelectData.ChaseIsRoundTwo);
+		m_hudManager.SetTimerSliderActiveP2(false);
+		m_hudManager.UpdateTimerTextCountUpP2(0);
 	}
 
+
+	private void CheckOnMove(OTController controller)
+	{
+		if (controller.Index == 0)
+			m_hudManager.UpdateChaseMovesP1(controller.Stats.ChaseMovesLeft);
+		else //if (controller.Index == 1)
+			m_hudManager.UpdateChaseMovesP2(controller.Stats.ChaseMovesLeft);
+
+		if (controller.Stats.ChaseMovesLeft == 0)
+		{
+			for (int i = 0; i < m_controllers.Length; ++i)
+			{
+				if (m_controllers[i] == controller) continue;
+
+				int moves = (m_controllers[i].Stats.IsChaser) ? MovesChaser : MovesTarget;
+				m_controllers[i].ResetChaseMoves(moves);
+				if (m_controllers[i].Index == 0)
+					m_hudManager.InitChaseMovesP1(true);
+				else //if (m_controllers[i].Index == 1)
+					m_hudManager.InitChaseMovesP2(true);
+			}
+		}
+	}
 
 	private void OnPlayerInteractChaser(OTController controller, Interactable_Base interactable)
 	{
-		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
-		// If not, respawn (losing condition for lives == 0 in there)
-		// Otherwise then yeah, obviously win condition
+		if (controller.Stats.IsChaser) return;
 
 		// END GAME -- win (switch who is the chaser if it's the first round, otherwise END and compare number of moves!
-		if (LevelSelectData.IsMultiplayer)
-		{
+		if (LevelSelectData.ChaseIsRoundTwo == false)
+			EndRoundOne();
+		else
 			EndGameMultiplayer();
-		}
 	}
 
-
-	protected override void EndGame(bool isWin)
+	private void EndRoundOne()
 	{
-		base.EndGame(isWin);
-		/*
-		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
-		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
+		base.EndGameMultiplayer();
+	}
 
-		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves))
+	private void StartRoundTwo()
+	{
+		LevelSelectData.ChaseIsRoundTwo = true;
+		for (int i = 0; i < m_controllers.Length; ++i)
 		{
-			SaveSystem.SaveStatFileInfo(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
+			if (m_controllers[i].Index == 0)
+			{
+				LevelSelectData.ChaseStatsP1Lives = m_controllers[i].Stats.Lives;
+				LevelSelectData.ChaseStatsP1Moves = m_controllers[i].Stats.Moves;
+				LevelSelectData.ChaseStatsP1Time = m_levelTimeElapsedFloat;
+			}
 		}
-		//*/
+		m_hudManager.RetryLevel();
 	}
 
 	protected override void EndGameMultiplayer()
 	{
 		base.EndGameMultiplayer();
-		/*
-		OTController controllerP1 = null;
+		
 		OTController controllerP2 = null;
 		for (int i = 0; i < m_controllers.Length; ++i)
 		{
-			if (m_controllers[i].Index == 0)
-				controllerP1 = m_controllers[i];
-			else
+			if (m_controllers[i].Index == 1)
 				controllerP2 = m_controllers[i];
 		}
 
+		// NOTE need multiple nested IFs due to hierarchy of win-lose-draw condition
+
+		int scoreP1 = GetTotalScore(LevelSelectData.ChaseStatsP1Time, LevelSelectData.ChaseStatsP1Lives, LevelSelectData.ChaseStatsP1Moves);
+		int scoreP2 = GetTotalScore(m_countdownTimeRemainingFloat, controllerP2.Stats.Lives, controllerP2.Stats.Moves);
+		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, LevelSelectData.ChaseStatsP1Moves, LevelSelectData.ChaseStatsP1Lives);
+		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
+
 		EMultiplayerResult result = EMultiplayerResult.Draw;
-		if (m_winningMultiplayerController == controllerP1)
+		if (LevelSelectData.ChaseStatsP1Moves < controllerP2.Stats.Moves)
 		{
 			result = EMultiplayerResult.P1;
 			PlayerPrefsSystem.MultiplayerAddWinP1();
 		}
-		else //if (m_winningMultiplayerController == controllerP2)			// [NOTE] else-if here in case we're adding P3 and P4
+		else if (LevelSelectData.ChaseStatsP1Moves > controllerP2.Stats.Moves)
 		{
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
 		}
+		else if (LevelSelectData.ChaseStatsP1Lives > controllerP2.Stats.Lives)
+		{
+			result = EMultiplayerResult.P1;
+			PlayerPrefsSystem.MultiplayerAddWinP1();
+		}
+		else if (LevelSelectData.ChaseStatsP1Lives < controllerP2.Stats.Lives)
+		{
+			result = EMultiplayerResult.P2;
+			PlayerPrefsSystem.MultiplayerAddWinP2();
+		}
+		else
+		{
+			PlayerPrefsSystem.MultiplayerAddDraw();
+		}
+		// If do NOT want to allow drawing, uncomment the below!
+		/*
+		else if (LevelSelectData.ChaseStatsP1Time < m_countdownTimeRemainingFloat)
+		{
+			result = EMultiplayerResult.P1;
+			PlayerPrefsSystem.MultiplayerAddWinP1();
+		}
+		else if (LevelSelectData.ChaseStatsP1Time > m_countdownTimeRemainingFloat)
+		{
+			result = EMultiplayerResult.P2;
+			PlayerPrefsSystem.MultiplayerAddWinP2();
+		}
+		//*/
 
 		m_hudManager.SetWinLoseTitleMulti(result);
-		m_hudManager.ShowEndScreen();
-		//*/
 	}
 
 

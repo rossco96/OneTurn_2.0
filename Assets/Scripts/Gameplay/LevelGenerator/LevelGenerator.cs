@@ -16,6 +16,8 @@ public class LevelGenerator : MonoBehaviour
 	private readonly List<int> m_validGridSizes = new List<int>() { 9, 11, 13, 15, 17 };
 
 	[SerializeField] private MapPropertyData m_mapPropertyData;
+	[SerializeField] private SettingsDataInt m_movesChaserSettingsData;
+	[SerializeField] private SettingsDataInt m_movesTargetSettingsData;
 
 	[Space]
 	[SerializeField] private HUDManager m_hudManager;
@@ -35,7 +37,7 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private GameObject m_travelSquarePrefab;			// [TODO] IMPLEMENT!					<<<<<
 	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
 	[SerializeField] private GameObject m_bombPrefab;
-	//[SerializeField] private GameObject m_chaserPrefab;					// [TODO] Delete? Can just spawn the script?
+	[SerializeField] private GameObject m_chaserPrefab;					// [TODO] Delete? Can just spawn the script?
 
 	[Space]
 	[SerializeField] private GameObject m_inputButtonsP1;
@@ -63,7 +65,9 @@ public class LevelGenerator : MonoBehaviour
 	{
 		// DELETE
 		// LAPTOP TESTING ONLY
+#if UNITY_EDITOR
 		m_borderParent.localScale = new Vector3(1.111f, 1.111f, 1.0f);
+#endif
 		// ^^^ DELETE ^^^
 
 		m_themeData = LevelSelectData.ThemeData;
@@ -221,18 +225,21 @@ public class LevelGenerator : MonoBehaviour
 							playerControllerPrimary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[0]);
 							if (m_gameMode == EGameMode.M_Bomb)
 							{
-								// Feels a little hacky?
-								GameObject bomb = Instantiate(m_bombPrefab, playerControllerPrimary.GetComponentInChildren<BoxCollider2D>().transform);
+								GameObject bomb = Instantiate(m_bombPrefab, playerControllerPrimary.transform);
 								bomb.transform.localPosition = new Vector3(0.0f, 0.0f, -5.0f);
 								playerControllerPrimary.GetComponent<OTController>().Stats.HasBomb = true;
+								playerControllerPrimary.GetComponent<OTController>().SetBomb(bomb);
 							}
-							else if (m_gameMode == EGameMode.M_Chase)       // && if it's the first round only! THAT'S SUPER IMPORTANT!
+							else if (m_gameMode == EGameMode.M_Chase && LevelSelectData.ChaseIsRoundTwo == false)
 							{
-								// TODO
+								GameObject chaser = Instantiate(m_chaserPrefab, playerControllerPrimary.transform);
+								chaser.transform.localPosition = new Vector3(0.0f, 0.0f, -5.0f);
+								playerControllerPrimary.GetComponent<OTController>().Stats.IsChaser = true;
+								playerControllerPrimary.GetComponent<OTController>().SetChaser(chaser);
 							}
 							else if (m_gameMode == EGameMode.M_Tanks)
 							{
-								// TODO
+								// [TODO]
 							}
 						}
 						break;
@@ -260,13 +267,16 @@ public class LevelGenerator : MonoBehaviour
 									playerControllerSecondary.GetComponent<OTController>().GetOnTurn(out UnityEngine.Events.UnityAction onTurn);
 									m_buttonTurnP2.onClick.AddListener(onTurn);
 								}
-								else if (m_gameMode == EGameMode.M_Chase)		// && if it's the second round! THAT'S SUPER IMPORTANT!
+								else if (m_gameMode == EGameMode.M_Chase && LevelSelectData.ChaseIsRoundTwo)
 								{
-									// TODO
+									GameObject chaser = Instantiate(m_chaserPrefab, playerControllerSecondary.transform);
+									chaser.transform.localPosition = new Vector3(0.0f, 0.0f, -5.0f);
+									playerControllerSecondary.GetComponent<OTController>().Stats.IsChaser = true;
+									playerControllerSecondary.GetComponent<OTController>().SetChaser(chaser);
 								}
 								else if (m_gameMode == EGameMode.M_Tanks)
 								{
-									// TODO
+									// [TODO]
 								}
 							}
 							else
@@ -400,6 +410,8 @@ public class LevelGenerator : MonoBehaviour
 					break;
 				case EGameMode.M_Chase:
 					gameplayManager = gmGameObject.AddComponent<GameplayManager_MChase>();
+					((GameplayManager_MChase)gameplayManager).MovesChaser = int.Parse(SettingsSystem.GetValue(m_movesChaserSettingsData.Key));
+					((GameplayManager_MChase)gameplayManager).MovesTarget = int.Parse(SettingsSystem.GetValue(m_movesTargetSettingsData.Key));
 					break;
 				case EGameMode.M_Tanks:
 					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MTanks>();				// Create GameMode_MTanks

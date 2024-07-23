@@ -86,6 +86,9 @@ public class HUDManager : MonoBehaviour
 	[Space]
 	[Header("End Game (level editor)")]
 	[SerializeField] private GameObject m_endStatsParentEditor;
+
+	public int MovesChaser = 0;
+	public int MovesTarget = 0;
 	#endregion
 
 
@@ -188,10 +191,18 @@ public class HUDManager : MonoBehaviour
 
 	public void AssignLevelEditorResumeEndLevel(UnityAction onResume)
 	{
-		m_nextLevelButton.onClick.RemoveListener(NextLevel);
+		m_nextLevelButton.onClick.SetPersistentListenerState(0, UnityEventCallState.Off);
 		m_nextLevelButton.onClick.AddListener(LevelEditorContinue);
 		m_nextLevelButton.onClick.AddListener(onResume);
 		m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = "Continue?";
+	}
+
+	public void AssignMChaseNextRound(UnityAction onResume)
+	{
+		m_nextLevelButton.onClick.SetPersistentListenerState(0, UnityEventCallState.Off);
+		m_nextLevelButton.onClick.AddListener(RetryLevel);
+		m_nextLevelButton.onClick.AddListener(onResume);
+		m_nextLevelButton.GetComponentInChildren<TextMeshProUGUI>().text = "Next Round";
 	}
 
 
@@ -254,6 +265,29 @@ public class HUDManager : MonoBehaviour
 
 	public void UpdateTravelSquaresPercentP1(float squaresPercent) { m_countStatP1.text = $"Squares: {squaresPercent}%"; }
 	public void UpdateTravelSquaresPercentP2(float squaresPercent) { m_countStatP2.text = $"Squares: {squaresPercent}%"; }
+
+	public void InitChaseMovesP1(bool isPlayerTurn)
+	{
+		int totalMoves = (LevelSelectData.ChaseIsRoundTwo) ? MovesTarget : MovesChaser;
+		int initMoves = (isPlayerTurn) ? totalMoves : 0;
+		m_countStatP1.text = $"Moves: {initMoves}/{totalMoves}";
+	}
+	public void InitChaseMovesP2(bool isPlayerTurn)
+	{
+		int totalMoves = (LevelSelectData.ChaseIsRoundTwo) ? MovesChaser : MovesTarget;
+		int initMoves = (isPlayerTurn) ? totalMoves : 0;
+		m_countStatP2.text = $"Moves: {initMoves}/{totalMoves}";
+	}
+	public void UpdateChaseMovesP1(int movesLeft)
+	{
+		int totalMoves = (LevelSelectData.ChaseIsRoundTwo) ? MovesTarget : MovesChaser;
+		m_countStatP1.text = $"Moves: {movesLeft}/{totalMoves}";
+	}
+	public void UpdateChaseMovesP2(int movesLeft)
+	{
+		int totalMoves = (LevelSelectData.ChaseIsRoundTwo) ? MovesChaser : MovesTarget;
+		m_countStatP2.text = $"Moves: {movesLeft}/{totalMoves}";
+	}
 
 	public void UpdateTimerTextCountUpP1(int timeTaken) { m_timerTextP1.text = $"Time Taken: {timeTaken}s"; }
 	public void UpdateTimerTextCountUpP2(int timeTaken) { m_timerTextP2.text = $"Time Taken: {timeTaken}s"; }
