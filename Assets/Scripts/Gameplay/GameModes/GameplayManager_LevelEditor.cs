@@ -24,7 +24,7 @@ public class GameplayManager_LevelEditor : GameplayManager
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActiveP1(false);
+		m_hudManager.SetCountStatActiveP1(false);
 		m_hudManager.SetTimerSliderActiveP1(false);
 	}
 

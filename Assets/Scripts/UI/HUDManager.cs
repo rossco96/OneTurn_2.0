@@ -237,8 +237,8 @@ public class HUDManager : MonoBehaviour
 	public void SetTimerSliderActiveP1(bool active) { m_timerSliderP1.gameObject.SetActive(active); }
 	public void SetTimerSliderActiveP2(bool active) { m_timerSliderP2.gameObject.SetActive(active); }
 
-	public void SetItemsCountActiveP1(bool active) { m_countStatP1.gameObject.SetActive(active); }
-	public void SetItemsCountActiveP2(bool active) { m_countStatP2.gameObject.SetActive(active); }
+	public void SetCountStatActiveP1(bool active) { m_countStatP1.gameObject.SetActive(active); }
+	public void SetCountStatActiveP2(bool active) { m_countStatP2.gameObject.SetActive(active); }
 
 	public void SetMultiplayerStatsActive() { m_statsParentP2.SetActive(true); }
 	#endregion

@@ -25,12 +25,12 @@ public class GameplayManager_Exit : GameplayManager
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActiveP1(false);
+		m_hudManager.SetCountStatActiveP1(false);
 		m_hudManager.SetTimerSliderActiveP1(false);
 		if (LevelSelectData.IsMultiplayer)
 		{
 			m_hudManager.SetMultiplayerStatsActive();
-			m_hudManager.SetItemsCountActiveP2(false);
+			m_hudManager.SetCountStatActiveP2(false);
 			m_hudManager.SetTimerSliderActiveP2(false);
 		}
 	}
