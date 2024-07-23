@@ -108,14 +108,18 @@ public class GameplayManager_MBomb : GameplayManager
 
 	private void OnPlayerInteractBomb(OTController controller, Interactable_Base interactable)
 	{
+		if (controller.Stats.HasBomb) return;
+
 		for (int i = 0; i < m_controllers.Length; ++i)
 		{
 			if (m_controllers[i] != controller)
 			{
 				m_controllers[i].Stats.HasBomb = false;
+				m_controllers[i].SetBomb(null);
 			}
 		}
 		controller.Stats.HasBomb = true;
+		controller.SetBomb(interactable.gameObject);
 	}
 
 	protected override void EndGameMultiplayer()
@@ -141,7 +145,6 @@ public class GameplayManager_MBomb : GameplayManager
 		}
 
 		m_hudManager.SetWinLoseTitleMulti(result);
-		m_hudManager.ShowEndScreen();
 	}
 
 

@@ -27,11 +27,13 @@ public class GameplayManager_Exit : GameplayManager
 		base.InitHUD();
 		m_hudManager.SetCountStatActiveP1(false);
 		m_hudManager.SetTimerSliderActiveP1(false);
+		m_hudManager.UpdateTimerTextCountUpP1(0);
 		if (LevelSelectData.IsMultiplayer)
 		{
 			m_hudManager.SetMultiplayerStatsActive();
 			m_hudManager.SetCountStatActiveP2(false);
 			m_hudManager.SetTimerSliderActiveP2(false);
+			m_hudManager.UpdateTimerTextCountUpP2(0);
 		}
 	}
 
