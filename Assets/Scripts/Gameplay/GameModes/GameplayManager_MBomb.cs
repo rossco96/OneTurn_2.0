@@ -2,88 +2,144 @@ using UnityEngine;
 
 public class GameplayManager_MBomb : GameplayManager
 {
+	private OTController m_controllerP1 = null;
+	private OTController m_controllerP2 = null;
+
+	private float m_levelTimeElapsedP1 = 0.0f;
+	private float m_levelTimeElapsedP2 = 0.0f;
+
 	protected override void Start()
 	{
-		InitInteractableBehaviour<Bomb>(OnPlayerInteractBomb);							// Create Bonb type Interactable_Base!
+		InitInteractableBehaviour<Bomb>(OnPlayerInteractBomb);
+		m_timeLimit = LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit / 2.0f;
 		base.Start();
-	}
 
-	// AHHHHHH WE'RE NOT UPDATING P2 TIMER IF APPLICABLE!!
-	// ... note each timer is updated differently in this game mode
+		for (int i = 0; i < m_controllers.Length; ++i)
+		{
+			m_controllers[i].Stats.BombTimeLeft = m_timeLimit;
+			if (m_controllers[i].Index == 0)
+				m_controllerP1 = m_controllers[i];
+			else //if (m_controllers[i].Index == 1)
+				m_controllerP2 = m_controllers[i];
+		}
+	}
 
 	protected override void UpdateTimer()
 	{
-		m_levelTimeElapsedFloat = Time.time - m_levelStartTime - m_totalTimePaused;
-		if (Mathf.FloorToInt(m_levelTimeElapsedFloat) != m_levelDisplayTimeInt)
-		{
-			m_levelDisplayTimeInt = Mathf.FloorToInt(m_levelTimeElapsedFloat);
-			m_hudManager.UpdateTimerTextCountUpP1(m_levelDisplayTimeInt);
-		}
+		if (m_controllerP1.Stats.HasBomb)
+			UpdateTimerP1();
+		else //if (m_controllerP2.Stats.HasBomb)
+			UpdateTimerP2();
 	}
 
-	/*
+	private void UpdateTimerP1()
+	{
+		m_controllerP2.Stats.BombPauseTime += Time.deltaTime;
+
+		m_levelTimeElapsedP1 = Time.time - m_levelStartTime - m_totalTimePaused - m_controllerP1.Stats.BombPauseTime;
+		m_controllerP1.Stats.BombTimeLeft = m_timeLimit - m_levelTimeElapsedP1;
+
+		if (m_controllerP1.Stats.BombTimeLeft < 10.0f)
+		{
+			if (m_controllerP1.Stats.BombTimeLeft <= 0.0f)
+			{
+				m_hudManager.UpdateTimerTextCountDownP1(0.0f);
+				m_hudManager.UpdateTimerSliderP1(0.0f);
+				// END GAME (p2 win)
+				EndGameMultiplayer();
+				return;
+			}
+			m_hudManager.UpdateTimerTextCountDownP1(m_controllerP1.Stats.BombTimeLeft.RoundDP(2));
+		}
+		else if (Mathf.FloorToInt(m_controllerP1.Stats.BombTimeLeft) != m_levelDisplayTimeInt)
+		{
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_controllerP1.Stats.BombTimeLeft);
+			m_hudManager.UpdateTimerTextCountDownP1(m_levelDisplayTimeInt);
+		}
+
+		m_hudManager.UpdateTimerSliderP1(m_controllerP1.Stats.BombTimeLeft * 2.0f);
+	}
+
+	private void UpdateTimerP2()
+	{
+		m_controllerP1.Stats.BombPauseTime += Time.deltaTime;
+
+		m_levelTimeElapsedP2 = Time.time - m_levelStartTime - m_totalTimePaused - m_controllerP2.Stats.BombPauseTime;
+		m_controllerP2.Stats.BombTimeLeft = m_timeLimit - m_levelTimeElapsedP2;
+
+		if (m_controllerP2.Stats.BombTimeLeft < 10.0f)
+		{
+			if (m_controllerP2.Stats.BombTimeLeft <= 0.0f)
+			{
+				m_hudManager.UpdateTimerTextCountDownP2(0.0f);
+				m_hudManager.UpdateTimerSliderP2(0.0f);
+				// END GAME (p1 win)
+				EndGameMultiplayer();
+				return;
+			}
+			m_hudManager.UpdateTimerTextCountDownP2(m_controllerP2.Stats.BombTimeLeft.RoundDP(2));
+		}
+		else if (Mathf.FloorToInt(m_controllerP2.Stats.BombTimeLeft) != m_levelDisplayTimeInt)
+		{
+			m_levelDisplayTimeInt = Mathf.FloorToInt(m_controllerP2.Stats.BombTimeLeft);
+			m_hudManager.UpdateTimerTextCountDownP2(m_levelDisplayTimeInt);
+		}
+
+		m_hudManager.UpdateTimerSliderP2(m_controllerP2.Stats.BombTimeLeft * 2.0f);
+	}
+
+
 	protected override void InitHUD()
 	{
 		base.InitHUD();
-		m_hudManager.SetItemsCountActiveP1(false);
-		m_hudManager.SetTimerSliderActiveP1(false);
+		
+		m_hudManager.SetCountStatActiveP1(false);
+		m_hudManager.SetTimerSliderActiveP1(true);
+		m_hudManager.UpdateTimerSliderP1(m_timeLimit * 2.0f);
+		m_hudManager.UpdateTimerTextCountDownP1(m_timeLimit);
+
+		m_hudManager.SetCountStatActiveP2(false);
+		m_hudManager.SetTimerSliderActiveP2(true);
+		m_hudManager.UpdateTimerSliderP2(m_timeLimit * 2.0f);
+		m_hudManager.UpdateTimerTextCountDownP2(m_timeLimit);
 	}
-	//*/
 
 	private void OnPlayerInteractBomb(OTController controller, Interactable_Base interactable)
 	{
-		// [IMPORTANT][TODO] Must see if player is facing the same way as the exit specifies!
-		// If not, respawn (losing condition for lives == 0 in there)
-		// Otherwise then yeah, obviously win condition
-
-		EndGameMultiplayer();
-	}
-
-
-	protected override void EndGame(bool isWin)
-	{
-		base.EndGame(isWin);
-		/*
-		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
-		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
-
-		if (SaveSystem.StatFileSaveRequired(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves))
+		for (int i = 0; i < m_controllers.Length; ++i)
 		{
-			SaveSystem.SaveStatFileInfo(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
+			if (m_controllers[i] != controller)
+			{
+				m_controllers[i].Stats.HasBomb = false;
+			}
 		}
-		//*/
+		controller.Stats.HasBomb = true;
 	}
 
 	protected override void EndGameMultiplayer()
 	{
 		base.EndGameMultiplayer();
 
-		/*
-		OTController controllerP1 = null;
-		OTController controllerP2 = null;
-		for (int i = 0; i < m_controllers.Length; ++i)
-		{
-			if (m_controllers[i].Index == 0)
-				controllerP1 = m_controllers[i];
-			else
-				controllerP2 = m_controllers[i];
-		}
-
 		EMultiplayerResult result = EMultiplayerResult.Draw;
-		if (m_winningMultiplayerController == controllerP1)
-		{
-			result = EMultiplayerResult.P1;
-			PlayerPrefsSystem.MultiplayerAddWinP1();
-		}
-		else //if (m_winningMultiplayerController == controllerP2)			// [NOTE] else-if here in case we're adding P3 and P4
+		if (m_controllerP1.Stats.HasBomb)
 		{
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
+			m_hudManager.SetEndScreenStatsMultiP1(0, m_controllerP1.Stats.Moves, m_controllerP1.Stats.Lives);
+			int scoreP2 = GetTotalScore(m_controllerP2.Stats.BombTimeLeft, m_controllerP2.Stats.Lives, m_controllerP2.Stats.Moves);
+			m_hudManager.SetEndScreenStatsMultiP2(scoreP2, m_controllerP2.Stats.Moves, m_controllerP2.Stats.Lives);
+		}
+		else //if (m_controllerP2.Stats.HasBomb)			// [NOTE] else-if here in case we're adding P3 and P4
+		{
+			result = EMultiplayerResult.P1;
+			PlayerPrefsSystem.MultiplayerAddWinP1();
+			int scoreP1 = GetTotalScore(m_controllerP1.Stats.BombTimeLeft, m_controllerP1.Stats.Lives, m_controllerP1.Stats.Moves);
+			m_hudManager.SetEndScreenStatsMultiP1(scoreP1, m_controllerP1.Stats.Moves, m_controllerP1.Stats.Lives);
+			m_hudManager.SetEndScreenStatsMultiP2(0, m_controllerP2.Stats.Moves, m_controllerP2.Stats.Lives);
 		}
 
 		m_hudManager.SetWinLoseTitleMulti(result);
 		m_hudManager.ShowEndScreen();
-		//*/
 	}
 
 

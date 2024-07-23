@@ -14,4 +14,5 @@ public class InGameStats
 
 	public bool HasBomb = false;
 	public float BombTimeLeft = 0.0f;
+	public float BombPauseTime = 0.0f;
 }

@@ -34,6 +34,8 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private GameObject m_exitPrefab;
 	[SerializeField] private GameObject m_travelSquarePrefab;			// [TODO] IMPLEMENT!					<<<<<
 	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
+	[SerializeField] private GameObject m_bombPrefab;
+	//[SerializeField] private GameObject m_chaserPrefab;					// [TODO] Delete? Can just spawn the script?
 
 	[Space]
 	[SerializeField] private GameObject m_inputButtonsP1;
@@ -59,6 +61,11 @@ public class LevelGenerator : MonoBehaviour
 
 	private void Awake()
 	{
+		// DELETE
+		// LAPTOP TESTING ONLY
+		m_borderParent.localScale = new Vector3(1.111f, 1.111f, 1.0f);
+		// ^^^ DELETE ^^^
+
 		m_themeData = LevelSelectData.ThemeData;
 		m_mapData = LevelSelectData.MapData;
 		m_gameMode = LevelSelectData.GameMode;
@@ -200,6 +207,7 @@ public class LevelGenerator : MonoBehaviour
 						GameObject playerControllerPrimary = PlaceOnGrid(m_playerControllerPrefab, x, y, -5, spawnDirectionPrimary);
 						playerControllerPrimary.GetComponent<OTController>().SetFacingDirection(spawnDirectionPrimary);
 						playerControllerPrimary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[0]);
+						playerControllerPrimary.GetComponent<OTController>().RespawnPlayer();
 						if (playerControllerPrimary.GetComponent<OTController>().IsButtonsGameMode)
 						{
 							m_inputButtonsP1.SetActive(true);
@@ -211,6 +219,21 @@ public class LevelGenerator : MonoBehaviour
 						if (m_isMultiplayer)
 						{
 							playerControllerPrimary.GetComponent<OTController>().SetInputBounds(m_multiplayerBounds[0]);
+							if (m_gameMode == EGameMode.M_Bomb)
+							{
+								// Feels a little hacky?
+								GameObject bomb = Instantiate(m_bombPrefab, playerControllerPrimary.GetComponentInChildren<BoxCollider2D>().transform);
+								bomb.transform.localPosition = new Vector3(0.0f, 0.0f, -5.0f);
+								playerControllerPrimary.GetComponent<OTController>().Stats.HasBomb = true;
+							}
+							else if (m_gameMode == EGameMode.M_Chase)       // && if it's the first round only! THAT'S SUPER IMPORTANT!
+							{
+								// TODO
+							}
+							else if (m_gameMode == EGameMode.M_Tanks)
+							{
+								// TODO
+							}
 						}
 						break;
 
@@ -223,6 +246,7 @@ public class LevelGenerator : MonoBehaviour
 							GameObject playerControllerSecondary = PlaceOnGrid(m_playerControllerPrefab, x, y, -5, spawnDirectionSecondary);
 							playerControllerSecondary.GetComponent<OTController>().SetFacingDirection(spawnDirectionSecondary);
 							playerControllerSecondary.GetComponent<OTController>().SetPlayerPrefab(m_playerPrefabs[m_multiplayerSpawnIndex]);
+							playerControllerSecondary.GetComponent<OTController>().RespawnPlayer();
 							if (m_isMultiplayer)
 							{
 								playerControllerSecondary.GetComponent<OTController>().Index = m_multiplayerSpawnIndex;
@@ -235,6 +259,14 @@ public class LevelGenerator : MonoBehaviour
 									m_buttonMoveForwardP2.onClick.AddListener(onMoveForward);
 									playerControllerSecondary.GetComponent<OTController>().GetOnTurn(out UnityEngine.Events.UnityAction onTurn);
 									m_buttonTurnP2.onClick.AddListener(onTurn);
+								}
+								else if (m_gameMode == EGameMode.M_Chase)		// && if it's the second round! THAT'S SUPER IMPORTANT!
+								{
+									// TODO
+								}
+								else if (m_gameMode == EGameMode.M_Tanks)
+								{
+									// TODO
 								}
 							}
 							else

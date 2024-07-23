@@ -39,7 +39,7 @@ public abstract class GameplayManager : MonoBehaviour
 	protected float m_levelTimeElapsedFloat = 0.0f;			// items and exit and travel
 	protected int m_levelDisplayTimeInt = 0;				// items and exit and travel
 	protected float m_countdownTimeRemainingFloat = 0.0f;	// items and travel
-	protected int m_timeLimit = 0;							// items and travel
+	protected float m_timeLimit = 0;						// items and travel and m_bomb (but halved!)
 	protected int m_itemCount = 0;							// items
 
 
@@ -50,7 +50,7 @@ public abstract class GameplayManager : MonoBehaviour
 		for (int i = 0; i < m_controllers.Length; ++i)
 		{
 			OnPauseChanged += m_controllers[i].SetInputDisabled;
-			m_controllers[i].RespawnPlayer();
+			//m_controllers[i].RespawnPlayer();									// Call this from LevelGenerator instead!
 		}
 
 		if (LevelEditorData.IsTestingLevel == false)

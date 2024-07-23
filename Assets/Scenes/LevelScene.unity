@@ -13634,6 +13634,7 @@ MonoBehaviour:
   m_itemPrefab: {fileID: 5627526918740645347, guid: 120192b01dc96c24b902f8565a79c9ff, type: 3}
   m_exitPrefab: {fileID: 8887468549016088395, guid: 606b92b3173cb1b469e4176f1b66d466, type: 3}
   m_travelSquarePrefab: {fileID: 8887468549016088395, guid: 502c26f21cf859d4d96e8470d5098736, type: 3}
+  m_bombPrefab: {fileID: 5627526918740645347, guid: 96f1e0e70e5c68f48b38f771c13cd818, type: 3}
   m_inputButtonsP1: {fileID: 118489443}
   m_inputButtonsP2: {fileID: 2004133646}
   m_buttonMoveForwardP1: {fileID: 63935253}
