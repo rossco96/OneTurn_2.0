@@ -17094,6 +17094,7 @@ MonoBehaviour:
   m_buttonThemeDown: {fileID: 930277775}
   m_buttonMapUp: {fileID: 1804119993}
   m_buttonMapDown: {fileID: 1544174156}
+  m_multiplayerToggle: {fileID: 776742029}
   m_gameModeDropdown: {fileID: 2126600182}
   m_statsParentSinglePlayer: {fileID: 237909895}
   m_statTime: {fileID: 191135488}
