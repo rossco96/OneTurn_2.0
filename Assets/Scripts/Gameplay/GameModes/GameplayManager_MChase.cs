@@ -129,6 +129,8 @@ public class GameplayManager_MChase : GameplayManager
 		int scoreP2 = GetTotalScore(m_countdownTimeRemainingFloat, controllerP2.Stats.Lives, controllerP2.Stats.Moves);
 		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, LevelSelectData.ChaseStatsP1Moves, LevelSelectData.ChaseStatsP1Lives);
 		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
+		PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
+		PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
 
 		EMultiplayerResult result = EMultiplayerResult.Draw;
 		if (LevelSelectData.ChaseStatsP1Moves < controllerP2.Stats.Moves)

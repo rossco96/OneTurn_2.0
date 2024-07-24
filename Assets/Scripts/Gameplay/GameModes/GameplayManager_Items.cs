@@ -141,10 +141,12 @@ public class GameplayManager_Items : GameplayManager
 				controllerP2 = m_controllers[i];
 		}
 
-		int totalScoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, controllerP1.Stats.Items);
-		int totalScoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, controllerP2.Stats.Items);
-		m_hudManager.SetEndScreenStatsMultiP1(totalScoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, controllerP1.Stats.Items);
-		m_hudManager.SetEndScreenStatsMultiP2(totalScoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, controllerP2.Stats.Items);
+		int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, controllerP1.Stats.Items);
+		int scoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, controllerP2.Stats.Items);
+		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, controllerP1.Stats.Items);
+		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, controllerP2.Stats.Items);
+		PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
+		PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
 
 		// [TODO][Q] Currently only basing it on #items collected! Want to base also on other stats or total score?
 		// Work out in testing! See how different the scores can be, and people's reactions to if they want it to be based off everything or solely items

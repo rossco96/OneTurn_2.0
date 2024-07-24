@@ -202,10 +202,12 @@ public class GameplayManager_Travel : GameplayManager
 
 		float percentCoveredP1 = ((100.0f * controllerP1.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
 		float percentCoveredP2 = ((100.0f * controllerP2.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
-		int totalScoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, percentCoveredP1);
-		int totalScoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, percentCoveredP2);
-		m_hudManager.SetEndScreenStatsMultiP1(totalScoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, percentCoveredP1);
-		m_hudManager.SetEndScreenStatsMultiP2(totalScoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, percentCoveredP2);
+		int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, percentCoveredP1);
+		int scoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, percentCoveredP2);
+		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, percentCoveredP1);
+		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, percentCoveredP2);
+		PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
+		PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
 
 		EMultiplayerResult result = EMultiplayerResult.Draw;
 		if (percentCoveredP1 > percentCoveredP2)

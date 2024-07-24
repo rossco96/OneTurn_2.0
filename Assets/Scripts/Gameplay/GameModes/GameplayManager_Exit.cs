@@ -95,6 +95,7 @@ public class GameplayManager_Exit : GameplayManager
 			int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves);
 			m_hudManager.SetEndScreenStatsMultiP1((controllerP1.Stats.IsAtExit) ? scoreP1 : 1000, controllerP1.Stats.Moves, controllerP1.Stats.Lives);
 			m_hudManager.SetEndScreenStatsMultiP2(0, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
+			PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
 		}
 		else //if (controllerP2.Stats.IsAtExit || controllerP1.Stats.Lives == 0)			// [NOTE] else-if here in case we're adding P3 and P4
 		{
@@ -103,6 +104,7 @@ public class GameplayManager_Exit : GameplayManager
 			int scoreP2 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves);
 			m_hudManager.SetEndScreenStatsMultiP1(0, controllerP1.Stats.Moves, controllerP1.Stats.Lives);
 			m_hudManager.SetEndScreenStatsMultiP2((controllerP2.Stats.IsAtExit) ? scoreP2 : 1000, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
+			PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
 		}
 		// NOTE not currently any drawing in exit mode as no time-out
 

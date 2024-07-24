@@ -134,6 +134,7 @@ public class GameplayManager_MBomb : GameplayManager
 			m_hudManager.SetEndScreenStatsMultiP1(0, m_controllerP1.Stats.Moves, m_controllerP1.Stats.Lives);
 			int scoreP2 = GetTotalScore(m_controllerP2.Stats.BombTimeLeft, m_controllerP2.Stats.Lives, m_controllerP2.Stats.Moves);
 			m_hudManager.SetEndScreenStatsMultiP2(scoreP2, m_controllerP2.Stats.Moves, m_controllerP2.Stats.Lives);
+			PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
 		}
 		else //if (m_controllerP2.Stats.HasBomb)			// [NOTE] else-if here in case we're adding P3 and P4
 		{
@@ -142,6 +143,7 @@ public class GameplayManager_MBomb : GameplayManager
 			int scoreP1 = GetTotalScore(m_controllerP1.Stats.BombTimeLeft, m_controllerP1.Stats.Lives, m_controllerP1.Stats.Moves);
 			m_hudManager.SetEndScreenStatsMultiP1(scoreP1, m_controllerP1.Stats.Moves, m_controllerP1.Stats.Lives);
 			m_hudManager.SetEndScreenStatsMultiP2(0, m_controllerP2.Stats.Moves, m_controllerP2.Stats.Lives);
+			PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
 		}
 
 		m_hudManager.SetWinLoseTitleMulti(result);
