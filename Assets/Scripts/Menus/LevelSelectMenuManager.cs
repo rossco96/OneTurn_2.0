@@ -284,8 +284,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_multiStatsWinsP1.text = $"{PlayerPrefsSystem.MultiplayerGetWinsP1()}";
 		m_multiStatsDraws.text = $"{PlayerPrefsSystem.MultiplayerGetDraws()}";
 		m_multiStatsWinsP2.text = $"{PlayerPrefsSystem.MultiplayerGetWinsP2()}";
-		m_multiStatsScoreP1.text = $"{PlayerPrefsSystem.MultiplayerGetScoreP1()}";
-		m_multiStatsScoreP2.text = $"{PlayerPrefsSystem.MultiplayerGetScoreP2()}";
+		m_multiStatsScoreP1.text = $"{PlayerPrefsSystem.MultiplayerGetScoreP1():n0}";
+		m_multiStatsScoreP2.text = $"{PlayerPrefsSystem.MultiplayerGetScoreP2():n0}";
 	}
 
 
