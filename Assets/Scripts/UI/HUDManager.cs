@@ -153,7 +153,7 @@ public class HUDManager : MonoBehaviour
 		{
 			if (LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[i])
 			{
-				currentLevelIndex = i + i;
+				currentLevelIndex = i + 1;
 				break;
 			}
 		}
