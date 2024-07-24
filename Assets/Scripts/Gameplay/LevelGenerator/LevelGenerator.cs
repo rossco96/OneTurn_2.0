@@ -155,12 +155,17 @@ public class LevelGenerator : MonoBehaviour
 
 		// We have already positioned the gamespace and border if multiplayer mode
 		// ... Don't want repeated code in other places! How best do this?
+
+		// TEMP COMMENTED OUT FOR UNITY_EDITOR ONLY! TESTING!
+#if !UNITY_EDITOR
 		if (m_isMultiplayer == false)
 		{
 			float yOffset = -10.0f * ((Screen.currentResolution.height - Screen.safeArea.height) / Screen.currentResolution.height);    // [Q][IMPORTANT] Is this a correct and safe formula for all devices???
 			m_gameSpaceParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
 			m_borderParent.localPosition = new Vector3(0.0f, yOffset, 0.0f);
 		}
+#endif
+		// ^^^^^^^^^^ REMOVE THIS #if
 
 		return true;
 	}
@@ -445,7 +450,7 @@ public class LevelGenerator : MonoBehaviour
 		m_borderParent.position = new Vector3(0.0f, -worldPointCentreY.y, 0.0f);
 		//*/
 
-		// [TODO] Figure out how to get '5' from Camera or Screen etc.
+		// [TODO][IMPORTANT] Figure out how to get '5' from Camera or Screen etc.
 		m_gameSpaceParent.localPosition = new Vector3(0.05f, -5 * k_multiplayerGamespaceScreenPercentage, 0.0f);
 		m_borderParent.localPosition = new Vector3(0.05f, -5 * k_multiplayerGamespaceScreenPercentage, 0.0f);
 

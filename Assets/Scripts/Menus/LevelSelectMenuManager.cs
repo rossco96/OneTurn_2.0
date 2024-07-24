@@ -46,6 +46,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[Space]
 	[Header("Multiplayer Stats")]
 	[SerializeField] private GameObject m_statsParentMultiplayer;
+	[SerializeField] private TextMeshProUGUI m_multiStatsWinsP1;
+	[SerializeField] private TextMeshProUGUI m_multiStatsDraws;
+	[SerializeField] private TextMeshProUGUI m_multiStatsWinsP2;
+	[SerializeField] private TextMeshProUGUI m_multiStatsScoreP1;
+	[SerializeField] private TextMeshProUGUI m_multiStatsScoreP2;
 
 	private ThemeData m_currentTheme;
 
@@ -273,8 +278,14 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// [Q] Best place to call this?
 		if (LevelSelectData.GameMode == EGameMode.M_Chase)
 			LevelSelectData.ChaseIsRoundTwo = false;
-		
-		// [TODO]
+
+		m_statsParentMultiplayer.GetComponent<GridLayoutGroup>().cellSize = new Vector2(m_statsParentMultiplayer.GetComponent<RectTransform>().rect.width / 4.0f, 185.0f);
+
+		m_multiStatsWinsP1.text = $"{PlayerPrefsSystem.MultiplayerGetWinsP1()}";
+		m_multiStatsDraws.text = $"{PlayerPrefsSystem.MultiplayerGetDraws()}";
+		m_multiStatsWinsP2.text = $"{PlayerPrefsSystem.MultiplayerGetWinsP2()}";
+		m_multiStatsScoreP1.text = $"{PlayerPrefsSystem.MultiplayerGetScoreP1()}";
+		m_multiStatsScoreP2.text = $"{PlayerPrefsSystem.MultiplayerGetScoreP2()}";
 	}
 
 
@@ -316,6 +327,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
 		m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
+
+		if (LevelSelectData.IsMultiplayer)
+			UpdateStatsMultiplayer();
+		else
+			UpdateLevelStatsSinglePlayer();
 	}
 
 	public void UpdateGameMode(TMP_Dropdown dropdown)
