@@ -168,8 +168,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		m_buttonThemeUp.interactable = (m_themeIndex > 0);
 		m_buttonMapUp.interactable = (m_mapIndex > 0);
-		m_buttonThemeDown.interactable = (m_themeIndex < m_numberOfThemes);
-		m_buttonMapDown.interactable = (m_mapIndex < m_currentTheme.Maps.Length);
+		m_buttonThemeDown.interactable = (m_themeIndex < m_numberOfThemes - 1);
+		m_buttonMapDown.interactable = (m_mapIndex < m_currentTheme.Maps.Length - 1);
 
 		m_themeIconImage.sprite = m_currentTheme.LevelSelectIcon;
 		m_mapIndexText.text = $"{m_mapIndex}";
