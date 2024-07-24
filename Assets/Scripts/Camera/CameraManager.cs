@@ -34,6 +34,21 @@ public class CameraManager : MonoBehaviour
 
 	private void SetAllCanvasScalers(UnityEngine.SceneManagement.Scene s, UnityEngine.SceneManagement.LoadSceneMode lsm)
 	{
+		// DELETE! TESTING ON LAPTOP ONLY!
+#if UNITY_EDITOR
+		UnityEngine.UI.CanvasScaler[] canvasScalersTEST = FindObjectsOfType<UnityEngine.UI.CanvasScaler>(false);                // [TODO] Set to true! Only false for testing!
+		for (int i = 0; i < canvasScalersTEST.Length; ++i)
+		{
+			canvasScalersTEST[i].referenceResolution = new Vector2(1080, 2160);
+			for (int j = 0; j < canvasScalersTEST[i].transform.childCount; ++j)
+			{
+				SetCanvasToSafeArea(canvasScalersTEST[i].transform.GetChild(j).GetComponent<RectTransform>());
+			}
+		}
+		return;
+#endif
+		// ^^^ DELETE ^^^
+
 		UnityEngine.UI.CanvasScaler[] canvasScalers = FindObjectsOfType<UnityEngine.UI.CanvasScaler>(false);				// [TODO] Set to true! Only false for testing!
 		for (int i = 0; i < canvasScalers.Length; ++i)
 		{
