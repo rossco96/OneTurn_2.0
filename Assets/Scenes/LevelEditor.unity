@@ -16880,7 +16880,7 @@ GameObject:
   - component: {fileID: 781010924}
   - component: {fileID: 781010923}
   m_Layer: 5
-  m_Name: ToolsDropdown
+  m_Name: ThemeDropdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16960,7 +16960,19 @@ MonoBehaviour:
     m_Options: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 449290560}
+        m_TargetAssemblyTypeName: LevelEditor, Assembly-CSharp
+        m_MethodName: OnThemeSelected
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 781010923}
+          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_Dropdown, Unity.TextMeshPro
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_AlphaFadeSpeed: 0.15
 --- !u!114 &781010924
 MonoBehaviour:
@@ -37512,7 +37524,7 @@ GameObject:
   - component: {fileID: 1916362240}
   - component: {fileID: 1916362239}
   m_Layer: 5
-  m_Name: ToolsLabel
+  m_Name: ThemeLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

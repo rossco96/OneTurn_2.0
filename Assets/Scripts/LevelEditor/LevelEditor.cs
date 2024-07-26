@@ -21,7 +21,7 @@ public class LevelEditor : MonoBehaviour
 
 	[Space]
 	[SerializeField] private TMP_Dropdown m_toolsDropdown;
-	[SerializeField] private TMP_Dropdown m_themeDropdown;
+	[SerializeField] private TMP_Dropdown m_themeDropdown;					// [TODO] Need to set this to its correct value upon loading!
 
 	[Space]
 	[SerializeField] private GameObject m_tutorialPopup;					// Not currently used in script
@@ -88,7 +88,7 @@ public class LevelEditor : MonoBehaviour
 	{
 		int gridDimension = LevelEditorData.GridTexture.width;
 		m_gridSlider.value = (gridDimension - 7) / 2;
-		m_maxItems = ((int)m_gridSlider.value * (int)m_gridSlider.value) + (int)m_gridSlider.value + 6;
+		m_maxItems = LevelEditorTools.GetItemsFromSliderValue((int)m_gridSlider.value);
 
 		for (int i = 0; i < k_maxGridSize; ++i)
 		{
@@ -463,8 +463,8 @@ public class LevelEditor : MonoBehaviour
 
 	public void UpdateGridLayout(Slider slider)
 	{
-		m_gridDimension = ((int)slider.value * 2) + 7;
-		m_maxItems = ((int)slider.value * (int)slider.value) + (int)slider.value + 6;
+		m_gridDimension = LevelEditorTools.GetGridDimensionFromSliderValue((int)slider.value);
+		m_maxItems = LevelEditorTools.GetItemsFromSliderValue((int)slider.value);
 		m_extraInfoToolItemsUsed.text = $"Items placed: {m_placedItems}/{m_maxItems}";
 		SetNewGridSize();
 		m_sliderLabel.text = $"Size: {m_gridDimension}x{m_gridDimension}";
@@ -492,6 +492,12 @@ public class LevelEditor : MonoBehaviour
 				}
 			}
 		}
+	}
+
+	public void OnThemeSelected(TMP_Dropdown dropdown)
+	{
+
+		LevelEditorData.IsDirty = true;
 	}
 	#endregion
 
@@ -555,6 +561,7 @@ public class LevelEditor : MonoBehaviour
 			SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.GridDimension, $"{m_gridDimension}");
 		}
 		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.UpdatedTime, $"{System.DateTime.Now.Ticks}");
+		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.Theme, $"{m_themeDropdown.options[m_themeDropdown.value].text}");
 
 		LevelEditorData.IsDirty = false;
 		// [TODO] "Saved" popup? Or brief text bubble which doesn't get in the way?
