@@ -3,8 +3,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MapData_", menuName = "Data/Map Data")]
 public class MapData : ScriptableObject
 {
-	// [TODO] THIS IS ONLY CORRECT FOR GAME MAPS! MUST FIGURE OUT HOW TO DO THIS IN GENERAL!
-	public string FileName => $"{Hash128.Compute(GridLayout.EncodeToPNG())}";
+	// [TODO][IMPORTANT] THIS IS ONLY CORRECT FOR GAME MAPS! MUST FIGURE OUT HOW TO DO THIS IN GENERAL!
+	// >>> Currently creating this asset in LevelSelectMenuManager... No idea how that's working tbh
+	public string FileName => (LevelSelectData.MapType == EMapType.Game) ? $"{Hash128.Compute(GridLayout.EncodeToPNG())}" : CustomImportedMapFileName;
+
+	// These are used for CustomImported maps only
+	// [Q] Create child MapData SOs?
+	public string CustomImportedMapFileName;
+	public string MapName;
 
 	public Texture2D GridLayout;
 	

@@ -39,7 +39,7 @@ public abstract class GameplayManager : MonoBehaviour
 	protected float m_levelTimeElapsedFloat = 0.0f;			// items and exit and travel
 	protected int m_levelDisplayTimeInt = 0;				// items and exit and travel
 	protected float m_countdownTimeRemainingFloat = 0.0f;	// items and travel
-	protected float m_timeLimit = 0;						// items and travel and m_bomb (but halved!)
+	protected float m_timeLimit = 0;						// items and travel, and m_bomb (but halved!)
 	protected int m_itemCount = 0;							// items
 
 

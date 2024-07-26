@@ -117,12 +117,12 @@ public class LevelGenerator : MonoBehaviour
 			case EGameMode.Exit:
 				m_exitPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.ExitSprite;
 				break;
-			case EGameMode.Travel:
-				break;
-			case EGameMode.M_Bomb:
-				break;
-			case EGameMode.M_Chase:
-				break;
+			//case EGameMode.Travel:
+			//	break;
+			//case EGameMode.M_Bomb:
+			//	break;
+			//case EGameMode.M_Chase:
+			//	break;
 			case EGameMode.M_Tanks:
 				break;
 			default:

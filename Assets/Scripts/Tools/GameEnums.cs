@@ -75,7 +75,8 @@ public enum EMapmetaInfo
 	AuthorName,
 	MapName,
 	Description,				// This is optional!
-	GridDimension
+	GridDimension,
+	Theme
 }
 
 // [TODO] Should really consider separate classes for best practice. And for some of the above, too.
