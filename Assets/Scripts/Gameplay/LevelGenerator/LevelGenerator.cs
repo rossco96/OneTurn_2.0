@@ -126,8 +126,8 @@ public class LevelGenerator : MonoBehaviour
 			//	break;
 			//case EGameMode.M_Chase:
 			//	break;
-			case EGameMode.M_Tanks:
-				break;
+			//case EGameMode.M_Tanks:
+			//	break;
 			default:
 				break;
 		}
@@ -245,10 +245,10 @@ public class LevelGenerator : MonoBehaviour
 								playerControllerPrimary.GetComponent<OTController>().Stats.IsChaser = true;
 								playerControllerPrimary.GetComponent<OTController>().SetChaser(chaser);
 							}
-							else if (m_gameMode == EGameMode.M_Tanks)
-							{
-								// [TODO]
-							}
+							//else if (m_gameMode == EGameMode.M_Tanks)
+							//{
+							//	// [TODO]
+							//}
 						}
 						break;
 
@@ -282,10 +282,10 @@ public class LevelGenerator : MonoBehaviour
 									playerControllerSecondary.GetComponent<OTController>().Stats.IsChaser = true;
 									playerControllerSecondary.GetComponent<OTController>().SetChaser(chaser);
 								}
-								else if (m_gameMode == EGameMode.M_Tanks)
-								{
-									// [TODO]
-								}
+								//else if (m_gameMode == EGameMode.M_Tanks)
+								//{
+								//	// [TODO]
+								//}
 							}
 							else
 							{
@@ -421,9 +421,9 @@ public class LevelGenerator : MonoBehaviour
 					((GameplayManager_MChase)gameplayManager).MovesChaser = int.Parse(SettingsSystem.GetValue(m_movesChaserSettingsData.Key));
 					((GameplayManager_MChase)gameplayManager).MovesTarget = int.Parse(SettingsSystem.GetValue(m_movesTargetSettingsData.Key));
 					break;
-				case EGameMode.M_Tanks:
-					//gameplayManager = gmGameObject.AddComponent<GameplayManager_MTanks>();				// Create GameMode_MTanks
-					break;
+				//case EGameMode.M_Tanks:
+				//	//gameplayManager = gmGameObject.AddComponent<GameplayManager_MTanks>();				// [TODO] Create GameMode_MTanks
+				//	break;
 				default:
 					break;
 			}

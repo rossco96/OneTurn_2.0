@@ -22,8 +22,8 @@ public enum EGameMode
 	Exit,
 	Travel,						// New game mode idea! Cover every (possible?) square in the time limit. Multiplayer version you have to turn all or as many of the squares to your colour
 	M_Bomb,
-	M_Chase,
-	M_Tanks						// New game mode idea! Like the classic Tank game. Could do 1 shot per move, 3 or 5 lives, either reset or not upon being hit
+	M_Chase//,
+	//M_Tanks						// New game mode idea! Like the classic Tank game. Could do 1 shot per move, 3 or 5 lives, either reset or not upon being hit
 }
 
 [System.Serializable]
