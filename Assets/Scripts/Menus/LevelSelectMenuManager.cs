@@ -182,9 +182,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 			ThemeData themeData = (ThemeData)ScriptableObject.CreateInstance(typeof(ThemeData));
 			themeData.ThemeName = $"{gridDimension}x{gridDimension}";
+			
 			// [Q][IMPORTANT] Is this Rect set up enough? Need to set actual params?
-			// Also want pic of e.g. "9x9" pls?																		// CURRENTLY JUST USING TEXT! CHANGE!
-			themeData.LevelSelectIcon = Sprite.Create(null/*levelTexture*/, new Rect(), 0.5f * Vector2.one);
+			// Also want pic of e.g. "9x9" pls?																		// CURRENTLY JUST USING TEXT!
+			//themeData.LevelSelectIcon = Sprite.Create(null/*levelTexture*/, new Rect(), 0.5f * Vector2.one);		// CHANGE!
+			
 			themeData.Maps = new MapData[0];
 
 			LevelPlayInfo levelPlayInfo = (LevelPlayInfo)ScriptableObject.CreateInstance(typeof(LevelPlayInfo));
@@ -306,7 +308,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_buttonThemeDown.interactable = (m_themeIndex < m_currentThemesList.ThemesData.Length - 1);
 		m_buttonMapDown.interactable = (m_mapIndex < m_currentTheme.Maps.Length - 1);
 
-		m_themeIconImage.sprite = m_currentTheme.LevelSelectIcon;
+		if (LevelSelectData.MapType == EMapType.Game)
+			m_themeIconImage.sprite = ((ThemeDataGameMaps)m_currentTheme).LevelSelectIcon;
 		m_mapIndexText.text = $"{m_mapIndex}";
 
 		// Init game mode dropdown choices:
@@ -338,7 +341,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		m_currentTheme = m_currentThemesList.ThemesData[m_themeIndex];
 		if (LevelSelectData.MapType == EMapType.Game)
-			m_themeIconImage.sprite = m_currentTheme.LevelSelectIcon;
+			m_themeIconImage.sprite = ((ThemeDataGameMaps)m_currentTheme).LevelSelectIcon;
 		else
 			m_customImportedThemeText.text = m_currentTheme.ThemeName;
 		

@@ -89,12 +89,15 @@ public class LevelGenerator : MonoBehaviour
 
 		GenerateMap();
 
-		if (m_themeData.IsSpecialLevel)
+		if (LevelSelectData.MapType == EMapType.Game)
 		{
-			// [TODO]
-			// Spawn SpecialLevel script!
-			// Ensure it spawns the correct prefabs in the correct locations and sets up the function of them
-			// (or is the function on the prefab itself? which implementation would be better?)
+			if (((ThemeDataGameMaps)m_themeData).IsSpecialLevel)
+			{
+				// [TODO]
+				// Spawn SpecialLevel script!
+				// Ensure it spawns the correct prefabs in the correct locations and sets up the function of them
+				// (or is the function on the prefab itself? which implementation would be better?)
+			}
 		}
 
 		InitGameplayManager();
