@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
+  m_Name: TutorialData_LevelSelect
+  m_EditorClassIdentifier: 
+  Title: Level Select Screen
+  Content:
+  - Image: {fileID: 0}
+    Text: Welcome to the level select screen! Here you can choose which level you
+      want to play, and how you want to play it!
+  - Image: {fileID: 0}
+    Text: There are three tabs at the top. The "Game Maps" are ones packaged with
+      the game. The "Custom Maps" are the ones you have created. And the "Imported
+      Maps" are ones others have created that you have downloaded (ordered by author
+      name).
+  - Image: {fileID: 0}
+    Text: Beneath, you have the level select itself. Simply pick a theme on the left,
+      and then pick a level within that theme! If you come across a special level,
+      click on the INFO button to see what's so different about it..
+  - Image: {fileID: 0}
+    Text: In the same section, you can select which way you want to be turning, you
+      can select which game mode you wish to play, and you can also opt in to play
+      multiplayer with someone sat with you.
+  - Image: {fileID: 0}
+    Text: At the bottom you have your stats. More points means more levels unlocked.
+      You then have your individual map's best score just above that - which will
+      change depending on which turn direction and game mode you have selected. All
+      count to the total score!
+  - Image: {fileID: 0}
+    Text: Enjoy!

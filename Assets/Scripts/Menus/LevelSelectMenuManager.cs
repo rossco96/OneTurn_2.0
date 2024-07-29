@@ -8,7 +8,10 @@ using UnityEngine.UI;
 public class LevelSelectMenuManager : MonoBehaviour
 {
 	[SerializeField] private ThemesList m_gamesThemesList;
-	[SerializeField] private ThemesList m_levelEditorThemes;						// Used by both m_customThemesList and m_importedThemesList
+	[SerializeField] private ThemesList m_levelEditorThemes;                        // Used by both m_customThemesList and m_importedThemesList
+
+	[Space]
+	[SerializeField] private TutorialPopup m_tutorialPopup;
 
 	[Space]
 	[SerializeField] private SettingsDataString m_mapTypeSettingsData;
@@ -94,6 +97,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		// [NOTE] THIS IS SUPER HACKY BUT IT WORKS
 		StartCoroutine(SetTabsParent());
+
+		m_tutorialPopup.TryShow();
 	}
 
 
