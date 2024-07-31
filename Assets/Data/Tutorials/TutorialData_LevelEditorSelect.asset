@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
+  m_Name: TutorialData_LevelEditorSelect
+  m_EditorClassIdentifier: 
+  Title: Level Editor Select
+  Content:
+  - Image: {fileID: 0}
+    Text: Welcome to the level editor select screen! This gives you the chance to
+      create your own levels, and you can go back and edit ones you've worked on
+      previously!
+  - Image: {fileID: 0}
+    Text: 'NOTE: Currently working on exporting levels as a feature. Watch this space!'

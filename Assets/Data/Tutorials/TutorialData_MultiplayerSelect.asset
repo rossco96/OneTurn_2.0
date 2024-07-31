@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
+  m_Name: TutorialData_MultiplayerSelect
+  m_EditorClassIdentifier: 
+  Title: Level Editor Select
+  Content:
+  - Image: {fileID: 0}
+    Text: Wanting to challenge a friend, huh? We've got you covered!
+  - Image: {fileID: 0}
+    Text: You can play with someone sat next to you - just sit either end of the
+      phone and tap/swipe on your half of the screen to control your character!
+  - Image: {fileID: 0}
+    Text: In addition to the three single player game modes, there are two others
+      you can play (with a third being currently worked on!)
+  - Image: {fileID: 0}
+    Text: CHASE (player 2 will get 4 moves to run away from player 1. After these
+      4, player one then gets 5 moves to chase player 2. Once you're caught you switch!
+      Winner is the player who racked up the most moves)
+  - Image: {fileID: 0}
+    Text: BOMB (simply, you have a bomb attached to you! The timer is running down,
+      but bumping into the other player will put it on them and their timer will
+      start! whoever has the bomb when it goes off loses)
+  - Image: {fileID: 0}
+    Text: Your session results (wins/draws/total scores) are stored below and wiped
+      clean every time you load the game. Now batlle it out!

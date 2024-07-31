@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
+  m_Name: TutorialData_Options
+  m_EditorClassIdentifier: 
+  Title: Level Editor Select
+  Content:
+  - Image: {fileID: 0}
+    Text: All your options can be found here.
+  - Image: {fileID: 0}
+    Text: Anything ranging from changing the volume, which control style you wish
+      to use, further 'about' info, and a few other things to tweak to your own experience.
+  - Image: {fileID: 0}
+    Text: 'NOTE: Currently working on a few cheat codes. Watch this space!'

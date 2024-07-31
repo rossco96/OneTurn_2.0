@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
+  m_Name: TutorialData_Gameplay
+  m_EditorClassIdentifier: 
+  Title: Level Editor Select
+  Content:
+  - Image: {fileID: 0}
+    Text: First level! Let me get you started...
+  - Image: {fileID: 0}
+    Text: The game is quite simple - navigate your way around the map and achieve
+      the objective of your chosen game mode. The twist? You can only move forward
+      or turn in ONE direction.
+  - Image: {fileID: 0}
+    Text: If you've selected right hand turns, you can only turn to the right and
+      not the left... So think ahead and make sure you don't get stuck!
+  - Image: {fileID: 0}
+    Text: Default controls are to tap anywhere on screen to move forward, and swipe
+      anywhere and in any direction to turn in that direction.
+  - Image: {fileID: 0}
+    Text: Other controls, to be changed in the options menu, are either using buttons
+      on the screen or swiping in the direction you wish to move.
+  - Image: {fileID: 0}
+    Text: Anyway enough from me - get out of here and rack up those points!

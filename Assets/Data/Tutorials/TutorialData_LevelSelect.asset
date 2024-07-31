@@ -31,6 +31,10 @@ MonoBehaviour:
       can select which game mode you wish to play, and you can also opt in to play
       multiplayer with someone sat with you.
   - Image: {fileID: 0}
+    Text: 'Single player game modes: ITEMS (collect as many items in the time limit)
+      EXIT (reach the exit as quick as possible) TRAVEL (cover every reachable square
+      on the grid)'
+  - Image: {fileID: 0}
     Text: At the bottom you have your stats. More points means more levels unlocked.
       You then have your individual map's best score just above that - which will
       change depending on which turn direction and game mode you have selected. All
