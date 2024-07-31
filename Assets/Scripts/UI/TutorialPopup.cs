@@ -49,20 +49,16 @@ public class TutorialPopup : MonoBehaviour
 			ShowCloseButton();
 	}
 
-	// [TODO] DELETE and just use the inspector for this
-	//public void OnClose()
-	//{
-	//	m_popupParent.SetActive(false);
-	//}
-
 	public void OnDontShow()
 	{
 		SettingsSystem.UpdateSettings(m_thisTutorialSettingsData.Key, $"{false}");
+		SettingsSystem.SaveSettings();
 	}
 
 	public void OnDisableTutorials()
 	{
 		SettingsSystem.UpdateSettings(m_masterTutorialsSettingsData.Key, $"{false}");
+		SettingsSystem.SaveSettings();
 	}
 
 
@@ -73,7 +69,6 @@ public class TutorialPopup : MonoBehaviour
 		m_closeButton.SetActive(false);
 	}
 
-	// [TODO] Assign in the inspector!																<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	private void SetImageText()
 	{
 		m_image.sprite = m_tutorialData.Content[m_index].Image;
