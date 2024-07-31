@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
   m_Name: TutorialData_Options
   m_EditorClassIdentifier: 
-  Title: Level Editor Select
+  Title: Options
   Content:
   - Image: {fileID: 0}
     Text: All your options can be found here.

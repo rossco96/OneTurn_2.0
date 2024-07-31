@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6efdd0f8bcf8b3643b9e261df8e08b69, type: 3}
   m_Name: TutorialData_Gameplay
   m_EditorClassIdentifier: 
-  Title: Level Editor Select
+  Title: Gameplay
   Content:
   - Image: {fileID: 0}
     Text: First level! Let me get you started...

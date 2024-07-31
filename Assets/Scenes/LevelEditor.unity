@@ -32287,6 +32287,10 @@ PrefabInstance:
       propertyPath: m_tutorialData
       value: 
       objectReference: {fileID: 11400000, guid: a40eae07f2a08e84f863fea44ffb0a0d, type: 2}
+    - target: {fileID: 7557661018884801067, guid: ef1d5d07f63d8f5418e1e16f56663b85, type: 3}
+      propertyPath: m_thisTutorialSettingsData
+      value: 
+      objectReference: {fileID: 11400000, guid: d5a17af7e6a63b44bba77f6ad6af51ca, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ef1d5d07f63d8f5418e1e16f56663b85, type: 3}
 --- !u!224 &1641029489 stripped
