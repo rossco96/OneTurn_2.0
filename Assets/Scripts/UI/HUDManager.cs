@@ -17,6 +17,8 @@ public class HUDManager : MonoBehaviour
 	[Space]
 	[Header("Tutorial")]
 	[SerializeField] private TutorialPopup m_tutorialPopup;
+	[SerializeField] private Button m_tutorialDisableButton;
+	[SerializeField] private Button m_tutorialDontShowButton;
 	[SerializeField] private Button m_tutorialCloseButton;
 
 	[Space]
@@ -166,6 +168,8 @@ public class HUDManager : MonoBehaviour
 	#region UI Buttons
 	public void AssignTutorialCloseButton(UnityAction onClose)
 	{
+		m_tutorialDisableButton.onClick.AddListener(onClose);
+		m_tutorialDontShowButton.onClick.AddListener(onClose);
 		m_tutorialCloseButton.onClick.AddListener(onClose);
 	}
 

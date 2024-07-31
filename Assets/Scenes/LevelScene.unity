@@ -4493,6 +4493,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_mapIndexSettingsData: {fileID: 11400000, guid: 9c24c3c7d10aa7a438d8e2facddba9b9, type: 2}
   m_tutorialPopup: {fileID: 1408842727}
+  m_tutorialDisableButton: {fileID: 1408842731}
+  m_tutorialDontShowButton: {fileID: 1408842730}
   m_tutorialCloseButton: {fileID: 1408842729}
   m_statsParentP1: {fileID: 1190446406}
   m_timerTextP1: {fileID: 876457769}
@@ -8206,6 +8208,28 @@ RectTransform:
 --- !u!114 &1408842729 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7557661020594663749, guid: ef1d5d07f63d8f5418e1e16f56663b85, type: 3}
+  m_PrefabInstance: {fileID: 1408842726}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1408842730 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7557661020465890113, guid: ef1d5d07f63d8f5418e1e16f56663b85, type: 3}
+  m_PrefabInstance: {fileID: 1408842726}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1408842731 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7557661020630782714, guid: ef1d5d07f63d8f5418e1e16f56663b85, type: 3}
   m_PrefabInstance: {fileID: 1408842726}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
