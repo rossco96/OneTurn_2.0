@@ -11,7 +11,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private ThemesList m_levelEditorThemes;                        // Used by both m_customThemesList and m_importedThemesList
 
 	[Space]
-	[SerializeField] private TutorialPopup m_tutorialPopup;
+	[SerializeField] private TutorialPopup m_tutorialPopupLevelSelect;
+	[SerializeField] private TutorialPopup m_tutorialPopupMultiplayer;
 
 	[Space]
 	[SerializeField] private SettingsDataString m_mapTypeSettingsData;
@@ -98,7 +99,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// [NOTE] THIS IS SUPER HACKY BUT IT WORKS
 		StartCoroutine(SetTabsParent());
 
-		m_tutorialPopup.TryShow();
+		m_tutorialPopupLevelSelect.TryShow();
 	}
 
 
@@ -420,7 +421,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 		if (LevelSelectData.GameMode == EGameMode.M_Chase)
 			LevelSelectData.ChaseIsRoundTwo = false;
 
-		m_statsParentMultiplayer.GetComponent<GridLayoutGroup>().cellSize = new Vector2(m_statsParentMultiplayer.GetComponent<RectTransform>().rect.width / 4.0f, 185.0f);
+		m_statsParentMultiplayer.GetComponent<GridLayoutGroup>().cellSize = new Vector2
+		(
+			m_statsParentMultiplayer.GetComponent<RectTransform>().rect.width / 4.0f,
+			m_statsParentMultiplayer.GetComponent<GridLayoutGroup>().cellSize.y
+		);
 
 		m_multiStatsWinsP1.text = $"{PlayerPrefsSystem.MultiplayerGetWinsP1()}";
 		m_multiStatsDraws.text = $"{PlayerPrefsSystem.MultiplayerGetDraws()}";
@@ -473,6 +478,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 			UpdateStatsMultiplayer();
 		else
 			UpdateLevelStatsSinglePlayer();
+
+		if (isMultiplayerToggle.isOn)
+			m_tutorialPopupMultiplayer.TryShow();
 	}
 
 	public void UpdateGameMode(TMP_Dropdown dropdown)

@@ -26,16 +26,17 @@ public class TutorialPopup : MonoBehaviour
 	private int m_index = 0;
 
 
-	public void TryShow()
+	public bool TryShow()
 	{
 		if (SettingsSystem.GetValue(m_masterTutorialsSettingsData.Key) == $"{false}" || SettingsSystem.GetValue(m_thisTutorialSettingsData.Key) == $"{false}")
-			return;
-
+			return false;
+		Init();
 		SetImageText();
 		if (m_tutorialData.Content.Length == 1)
 			ShowCloseButton();
 		m_title.text = m_tutorialData.Title;
 		gameObject.SetActive(true);
+		return true;
 	}
 
 
@@ -64,6 +65,13 @@ public class TutorialPopup : MonoBehaviour
 		SettingsSystem.UpdateSettings(m_masterTutorialsSettingsData.Key, $"{false}");
 	}
 
+
+	private void Init()
+	{
+		m_index = 0;
+		m_nextButton.SetActive(true);
+		m_closeButton.SetActive(false);
+	}
 
 	// [TODO] Assign in the inspector!																<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	private void SetImageText()

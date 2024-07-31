@@ -16,8 +16,8 @@ public class HUDManager : MonoBehaviour
 
 	[Space]
 	[Header("Tutorial")]
-	[SerializeField] private GameObject m_tutorialParent;
-	[SerializeField] private SettingsData_Base m_tutorialSettingsData;
+	[SerializeField] private TutorialPopup m_tutorialPopup;
+	[SerializeField] private Button m_tutorialCloseButton;
 
 	[Space]
 	[Header("Stats (single player)")]
@@ -87,32 +87,25 @@ public class HUDManager : MonoBehaviour
 	[Header("End Game (level editor)")]
 	[SerializeField] private GameObject m_endStatsParentEditor;
 
-	public int MovesChaser = 0;
-	public int MovesTarget = 0;
+	[HideInInspector] public int MovesChaser = 0;
+	[HideInInspector] public int MovesTarget = 0;
+	[HideInInspector] public bool PauseGameplayManagerOnStart = false;
 	#endregion
 
 
 	private void Awake()
 	{
-		// [TODO] Implement in editor, so we can turn it off and not always have this popup. Or at least be able to close it!
-		//InitTutorialPopup();
-		
 		InitStats();
 		InitInputButtons();
 		InitPauseMenu();
 		InitEndScreen();
+
+		if (m_tutorialPopup.TryShow())
+			PauseGameplayManagerOnStart = true;
 	}
 
 
 	#region INIT
-	private void InitTutorialPopup()
-	{
-		if (bool.Parse(SettingsSystem.GetValue(m_inputSettingsData.Key)))
-		{
-			m_tutorialParent.SetActive(true);
-		}
-	}
-
 	private void InitStats()
 	{
 		// [TODO][IMPORTANT] This wiil also change for multiplayer! Calculate!	<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -171,6 +164,12 @@ public class HUDManager : MonoBehaviour
 
 
 	#region UI Buttons
+	public void AssignTutorialCloseButton(UnityAction onClose)
+	{
+		m_tutorialCloseButton.onClick.AddListener(onClose);
+	}
+
+
 	public void AssignPauseButton(UnityAction onPause)
 	{
 		m_pauseButton.onClick.AddListener(onPause);

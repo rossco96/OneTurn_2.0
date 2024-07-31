@@ -24,7 +24,7 @@ public class LevelEditor : MonoBehaviour
 	[SerializeField] private TMP_Dropdown m_themeDropdown;					// [TODO] Need to set this to its correct value upon loading!
 
 	[Space]
-	[SerializeField] private GameObject m_tutorialPopup;					// Not currently used in script
+	[SerializeField] private TutorialPopup m_tutorialPopup;
 	[SerializeField] private GameObject m_unsavedDataPopup;
 	[SerializeField] private GameObject m_testOptionsPopup;					// Not currently used in script
 
@@ -80,6 +80,8 @@ public class LevelEditor : MonoBehaviour
 		// [TODO] Also display level name on the screen?
 
 		m_initComplete = true;
+
+		m_tutorialPopup.TryShow();
 	}
 
 

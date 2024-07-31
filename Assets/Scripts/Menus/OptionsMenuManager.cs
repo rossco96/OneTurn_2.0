@@ -4,10 +4,12 @@ using UnityEngine;
 public class OptionsMenuManager : MonoBehaviour
 {
 	[SerializeField] private TMP_Dropdown m_inputModeDropdown;
+	[SerializeField] private TutorialPopup m_tutorialPopup;
 
 	private void OnEnable()
 	{
 		InitInputModeDropdown();
+		m_tutorialPopup.TryShow();
 	}
 
 	private void InitInputModeDropdown()

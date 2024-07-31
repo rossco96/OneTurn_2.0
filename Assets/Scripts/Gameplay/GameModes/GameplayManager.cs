@@ -25,6 +25,9 @@ public abstract class GameplayManager : MonoBehaviour
 	//private int m_livesCount = 3;										// [TODO] Delete! Now managing with InGameStats via each controller. Keep this until TODO above is completed
 
 	private float m_introStartTime = 0.0f;
+
+	// [TODO][IMPORTANT] USE GAME STATES! DUH!
+	private bool m_initialised = false;
 	private bool m_hasStarted = false;
 	protected bool m_hasEnded = false;									// [TODO] Won't need this eventually? [NOTE] Made protected for GameplayManager_LevelEditor ONLY.
 	private bool m_isPaused = false;
@@ -45,6 +48,16 @@ public abstract class GameplayManager : MonoBehaviour
 
 
 	protected virtual void Start()
+	{
+		if (m_hudManager.PauseGameplayManagerOnStart)
+		{
+			m_hudManager.AssignTutorialCloseButton(Init);
+			return;
+		}
+		Init();
+	}
+
+	private void Init()
 	{
 		m_controllers = FindObjectsOfType<OTController>();
 		for (int i = 0; i < m_controllers.Length; ++i)
@@ -69,11 +82,12 @@ public abstract class GameplayManager : MonoBehaviour
 		// Also have scene transition -- e.g. black circle in and out
 
 		m_introStartTime = Time.time;                               // Rather call in Awake? Or elsewhere?
+		m_initialised = true;
 	}
 
 	private void Update()
 	{
-		if (m_hasEnded) return;
+		if (m_initialised == false || m_hasEnded) return;
 
 		if (m_hasStarted == false)
 		{

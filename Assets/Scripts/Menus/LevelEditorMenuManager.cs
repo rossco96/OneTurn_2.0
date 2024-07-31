@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class LevelEditorMenuManager : MonoBehaviour
 {
 	[Space]
+	[SerializeField] private TutorialPopup m_tutorialPopup;
 	[SerializeField] private Button m_buttonLoadLevel;
 	[SerializeField] private TMP_Dropdown m_loadLevelDropdown;
 
@@ -38,6 +39,7 @@ public class LevelEditorMenuManager : MonoBehaviour
 		//m_inputAuthorName.characterLimit =
 
 		InitExistingLevelsOptions();
+		m_tutorialPopup.TryShow();
 	}
 
 
