@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5736b172475fe7845b525921914c433a, type: 3}
-  m_Name: MapData_Garden_003
+  m_Name: MapData_001_Garden_005
   m_EditorClassIdentifier: 
-  GridLayout: {fileID: 2800000, guid: 00e317fb0e77c7c44bc37e48fd9d7a93, type: 3}
+  GridLayout: {fileID: 2800000, guid: 5e3a465519eccf541aa808db268f5bf5, type: 3}
   PlayerSpawnDirectionRight: 0000000002000000
   PlayerSpawnDirectionLeft: 0100000003000000
   ExitFacingDirectionRight: 1
