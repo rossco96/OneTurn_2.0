@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bca8ad0fb499a74bb2f9e1d6e01b80b, type: 3}
+  m_Name: SpecialManager_TEST
+  m_EditorClassIdentifier: 
+  IsInteractable: 0
+  SpecialInteractablePrefabs: []
+  IsPersistent: 0
+  SpecialPersistentPrefab: {fileID: 0}
