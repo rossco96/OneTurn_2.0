@@ -17,5 +17,6 @@ public class ThemeDataGameMaps : ThemeData
 	
 	public bool IsSpecialLevel;
 	public Sprite SpecialSprite;
-	public SpecialLevel_Base SpecialLevelFunction;
+	public SpecialManager_Base SpecialManager;
+	public GameObject SpecialManagerPrefab;
 }

@@ -34,8 +34,7 @@ public class LevelGenerator : MonoBehaviour
 	[SerializeField] private GameObject m_wallPrefab;
 	[SerializeField] private GameObject m_itemPrefab;
 	[SerializeField] private GameObject m_exitPrefab;
-	[SerializeField] private GameObject m_travelSquarePrefab;			// [TODO] IMPLEMENT!					<<<<<
-	//[SerializeField] private GameObject m_specialPrefab;				// [TODO] REMOVE FROM HERE!
+	[SerializeField] private GameObject m_travelSquarePrefab;
 	[SerializeField] private GameObject m_bombPrefab;
 	[SerializeField] private GameObject m_chaserPrefab;					// [TODO] Delete? Can just spawn the script?
 
@@ -51,8 +50,11 @@ public class LevelGenerator : MonoBehaviour
 	private MapData m_mapData;
 	private EGameMode m_gameMode;
 	private ETurnDirection m_turnDirection;
-	private bool m_isMultiplayer = false;
 
+	private SpecialManager_Base m_specialManager = null;
+	private int m_specialIndex = 0;
+
+	private bool m_isMultiplayer = false;
 	private int m_multiplayerSpawnIndex = 1;
 	private Bounds[] m_multiplayerBounds;
 
@@ -75,8 +77,11 @@ public class LevelGenerator : MonoBehaviour
 		m_gameMode = LevelSelectData.GameMode;
 		m_turnDirection = LevelSelectData.TurnDirection;
 
-		m_isMultiplayer = (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer);
+		ThemeDataGameMaps gameMapThemeData = LevelSelectData.ThemeData as ThemeDataGameMaps;
+		if (gameMapThemeData && LevelEditorData.IsTestingLevel == false && gameMapThemeData.IsSpecialLevel)
+			m_specialManager = Instantiate(gameMapThemeData.SpecialManager);
 
+		m_isMultiplayer = (LevelEditorData.IsTestingLevel == false && LevelSelectData.IsMultiplayer);
 		if (m_isMultiplayer)
 		{
 			InitLocalMultiplayerBounds();
@@ -97,6 +102,10 @@ public class LevelGenerator : MonoBehaviour
 				// Spawn SpecialLevel script!
 				// Ensure it spawns the correct prefabs in the correct locations and sets up the function of them
 				// (or is the function on the prefab itself? which implementation would be better?)
+				
+				//Instantiate(LevelSelectData.MapData)
+				// PICK UP FROM HERE - Need individual MapData for interactable specials
+				// Can still use theme data for persistent specials
 			}
 		}
 
@@ -131,11 +140,6 @@ public class LevelGenerator : MonoBehaviour
 			default:
 				break;
 		}
-
-		// [TODO][IMPORTANT] Do not do this here! Should spawn special script and handle through that
-		// e.g. may have more than one type of special sprite - like different bridge components, or two types of portals
-		//if (m_themeData.IsSpecialLevel)
-		//	m_specialPrefab.GetComponent<SpriteRenderer>().sprite = m_themeData.SpecialSprite;
 	}
 
 	private bool SetGridInfo()
@@ -176,10 +180,10 @@ public class LevelGenerator : MonoBehaviour
 
 	private void GenerateMap()
 	{
-		for (int x = 0; x < m_gridDimension; ++x)
+		for (int y = 0; y < m_gridDimension; ++y)
 		{
 			// [NOTE] This will need changing if allowing rectangular levels!
-			for (int y = 0; y < m_gridDimension; ++y)
+			for (int x = 0; x < m_gridDimension; ++x)
 			{
 				EMapPropertyName colorName = m_mapPropertyData.GetNameByColor(m_mapData.GridLayout.GetPixel(x, y));
 				switch (colorName)
@@ -303,9 +307,14 @@ public class LevelGenerator : MonoBehaviour
 						break;
 
 					case EMapPropertyName.Special:
-						// [NOTE] DO NOT DEAL WITH IN HERE?
-						// Or have reference to the script, if it's a special level, and call Script.Spawn()?
-						// ... As in, spawn the script here? And INIT
+						GameObject interactablePrefab = m_specialManager.GetInteractablePrefabAtIndex(m_specialIndex);
+						ThemeDataGameMaps themeDataGameMap = m_themeData as ThemeDataGameMaps;
+						if (themeDataGameMap)
+							interactablePrefab.GetComponent<SpriteRenderer>().sprite = themeDataGameMap.SpecialSprite;
+						GameObject interactable = PlaceOnGrid(interactablePrefab, x, y, interactablePrefab.GetComponent<SpecialInteractable_Base>().FacingDirection);
+						interactable.GetComponent<SpecialInteractable_Base>().SetGridPos(x, y);
+						m_specialManager.AddToPlacedInteractables(interactable.GetComponent<SpecialInteractable_Base>());
+						m_specialIndex++;
 						break;
 
 					default:
@@ -395,12 +404,15 @@ public class LevelGenerator : MonoBehaviour
 	{
 		GameObject gmGameObject = new GameObject("GameplayManager");
 		GameplayManager gameplayManager = default;
+
 		if (LevelEditorData.IsTestingLevel)
 		{
 			gameplayManager = gmGameObject.AddComponent<GameplayManager_LevelEditor>();
 		}
 		else
 		{
+			// [TODO][Q] Could turn these into prefabs, like doing with special levels just below?
+
 			switch (m_gameMode)
 			{
 				// [TODO][IMPORTANT][Q] Consider making GameplayManager_MItems (child)						<<<<< <<<<< <<<<< <<<<< <<<<<
@@ -427,7 +439,12 @@ public class LevelGenerator : MonoBehaviour
 				default:
 					break;
 			}
+
+			ThemeDataGameMaps gameMapThemeData = LevelSelectData.ThemeData as ThemeDataGameMaps;
+			if (gameMapThemeData && gameMapThemeData.IsSpecialLevel)
+				m_specialManager.Init();
 		}
+		
 		gameplayManager.SetHUDManager(m_hudManager);
 	}
 

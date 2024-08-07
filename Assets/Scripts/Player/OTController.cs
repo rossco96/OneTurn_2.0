@@ -163,6 +163,24 @@ public class OTController : MonoBehaviour
 
 
 
+	public void ForceMovePlayer(Vector3 offset)
+	{
+		m_player.transform.position += m_gridSizeMultiplier * offset;
+	}
+
+	public void SetPlayerPosition(Vector3 position)
+	{
+		m_player.transform.position = m_gridSizeMultiplier * position;
+	}
+
+	public Vector3 GetPlayerPosition()
+	{
+		// [NOTE][IMPORTANT] In multiplayer, on boosters special level, it is possible to end the game whilst one of the players is on a booster. In that case, they will continue going indefinitely!
+		return (1 / m_gridSizeMultiplier) * m_player.transform.position;
+	}
+
+
+
 	// [TODO][Q] Will eventually want to remove this method, and call via animation instead?
 	public void SetInputDisabled(bool disabled)
 	{
