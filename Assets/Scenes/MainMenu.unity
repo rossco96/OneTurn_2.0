@@ -18275,7 +18275,9 @@ MonoBehaviour:
   m_buttonMapDown: {fileID: 1544174156}
   m_multiplayerToggle: {fileID: 776742029}
   m_gameModeDropdown: {fileID: 2126600182}
+  m_playButton: {fileID: 327031014}
   m_statsParentSinglePlayer: {fileID: 237909895}
+  m_lockedInfo: {fileID: 448939525}
   m_statTime: {fileID: 191135488}
   m_statMoves: {fileID: 5198251}
   m_statLives: {fileID: 224083125}
