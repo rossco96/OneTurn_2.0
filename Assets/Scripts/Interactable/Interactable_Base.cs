@@ -5,7 +5,7 @@ public abstract class Interactable_Base : MonoBehaviour
 {
 	public UnityAction<OTController, Interactable_Base> PlayerEnterEvent;
 	
-	protected OTController m_playerController = null;                               // [TODO][Q] Is this required for children?
+	protected OTController m_playerController = null;
 	protected bool m_canInteract = true;
 
 	private void OnTriggerEnter2D(Collider2D col)

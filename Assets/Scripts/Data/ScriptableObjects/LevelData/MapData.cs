@@ -9,8 +9,8 @@ public class MapData : ScriptableObject
 
 	// These are used for CustomImported maps only
 	// [Q] Create child MapData SOs?
-	public string CustomImportedMapFileName;
-	public string MapName;
+	[HideInInspector] public string CustomImportedMapFileName;
+	[HideInInspector] public string MapName;
 
 	public Texture2D GridLayout;
 	
