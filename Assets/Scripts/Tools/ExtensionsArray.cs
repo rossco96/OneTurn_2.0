@@ -81,4 +81,31 @@ public static class ExtensionsArray
 
 		return listOrder;
 	}
+
+	public static ThemeData[] GetOrderedCustomThemeData(this ThemeData[] array)
+	{
+		ThemeData[] orderedList = new ThemeData[0];
+		int smallestIndex = 0;
+		int previousSmallestValue = 0;
+
+		for (int i = 0; i < array.Length; ++i)
+		{
+			int smallestValue = int.MaxValue;
+			for (int j = 0; j < array.Length; ++j)
+			{
+				string themeName = array[j].ThemeName;
+				string gridSizeString = themeName.Split('x')[0];
+				int currentValue = int.Parse(gridSizeString);
+				if (currentValue > previousSmallestValue && currentValue < smallestValue)
+				{
+					smallestValue = currentValue;
+					smallestIndex = j;
+				}
+			}
+			previousSmallestValue = smallestValue;
+			orderedList = orderedList.Add(array[smallestIndex]);
+		}
+
+		return orderedList;
+	}
 }

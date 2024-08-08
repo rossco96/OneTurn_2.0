@@ -256,6 +256,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 			m_customThemesList.ThemesData = m_customThemesList.ThemesData.Add(themeData);
 		}
 
+		m_customThemesList.ThemesData = m_customThemesList.ThemesData.GetOrderedCustomThemeData();
+
 		m_customMapsTab.interactable = (customMapsDictionary.Count > 0);
 
 		//
