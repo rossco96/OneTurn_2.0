@@ -79,8 +79,15 @@ public class LevelEditor : MonoBehaviour
 		//m_levelFileName = LevelSelectData.CustomData.											// [TODO] Implement? Or just use LevelEditorData.CustomMapFileName?
 		// [TODO] Also display level name on the screen?
 
-		m_initComplete = true;
+		// Save a new map immediately
+		if (LevelEditorData.LoadExistingLevel == false && LevelEditorData.IsTestingLevel == false)
+		{
+			Save();
+		}
+		LevelSelectData.IsInGame = false;
+		LevelSelectData.IsMultiplayer = false;
 
+		m_initComplete = true;
 		m_tutorialPopup.TryShow();
 	}
 
@@ -165,14 +172,6 @@ public class LevelEditor : MonoBehaviour
 				}
 			}
 		}
-
-		// Save a new map immediately
-		if (LevelEditorData.LoadExistingLevel == false && LevelEditorData.IsTestingLevel == false)
-		{
-			Save();
-		}
-		LevelSelectData.IsInGame = false;
-		LevelSelectData.IsMultiplayer = false;
 	}
 
 	private void InitToolsDropdown()
@@ -539,16 +538,16 @@ public class LevelEditor : MonoBehaviour
 				switch (property)
 				{
 					case EMapPropertyName.Exit:
-						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Right, m_exitDirectionRight);
-						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Left, m_exitDirectionLeft);
+						SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, property, ETurnDirection.Right, m_exitDirectionRight);
+						SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, property, ETurnDirection.Left, m_exitDirectionLeft);
 						break;
 					case EMapPropertyName.SpawnPointPrimary:
-						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Right, m_spawnPrimaryDirectionRight);
-						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Left, m_spawnPrimaryDirectionLeft);
+						SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, property, ETurnDirection.Right, m_spawnPrimaryDirectionRight);
+						SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, property, ETurnDirection.Left, m_spawnPrimaryDirectionLeft);
 						break;
 					case EMapPropertyName.SpawnPointSecondary:
-						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Right, m_spawnSecondaryDirectionRight);
-						SaveSystem.AddDirectionToCustomMap(property, ETurnDirection.Left, m_spawnSecondaryDirectionLeft);
+						SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, property, ETurnDirection.Right, m_spawnSecondaryDirectionRight);
+						SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, property, ETurnDirection.Left, m_spawnSecondaryDirectionLeft);
 						break;
 					default:
 						break;
