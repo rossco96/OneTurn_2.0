@@ -50,7 +50,7 @@ public static class SaveSystem
 		writer.Write(currentVersion);
 		writer.Dispose();
 		File.SetAttributes(m_initFullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(statPath, FileAttributes.Hidden);
+		File.SetAttributes(m_initFullFilepath, FileAttributes.Hidden);
 
 		InitNewLevels();
 	}
@@ -112,7 +112,7 @@ public static class SaveSystem
 		wrtierMapmeta.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
 		wrtierMapmeta.Dispose();
 		File.SetAttributes(m_mapFullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(m_mapFullFilePath, FileAttributes.Hidden);
+		File.SetAttributes(m_mapFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -153,7 +153,7 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
+		File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
 	}
 
 	public static void UpdateExistingMapmetaFile(string mapFileName, EMapmetaInfo infoType, string value)
@@ -170,7 +170,7 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
+		File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 
 	public static void UpdateExistingMapmetaFile(string mapFileName, EMapPropertyName property, ETurnDirection turnDirection, EFacingDirection facingDirection)
@@ -193,7 +193,7 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
+		File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -244,7 +244,7 @@ public static class SaveSystem
 		dictWriter.Write(jsonData);
 		dictWriter.Close();
 		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+		File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 
 	public static bool StatFileSaveRequired(float time, int lives, int moves, float extraInfo = -1)
@@ -340,7 +340,7 @@ public static class SaveSystem
 		dictWriter.Write(jsonData);
 		dictWriter.Close();
 		File.SetAttributes(statFullFilepath, FileAttributes.ReadOnly);
-		//File.SetAttributes(statFullFilepath, FileAttributes.Hidden);
+		File.SetAttributes(statFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
