@@ -25,7 +25,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private GridLayoutGroup m_mapTabsParentGridLayoutGroup;
 
 	[Space]
-	[SerializeField] private TextMeshProUGUI m_themeHeading;						// IMPLEMENT (GameMap = ThemeName, Custom and Imported = MapName) <<<<<
+	[SerializeField] private TextMeshProUGUI m_themeHeading;						// (GameMap = ThemeName, Custom and Imported = MapName)
 	[SerializeField] private Image m_themeIconImage;
 	[SerializeField] private TextMeshProUGUI m_customImportedThemeText;
 	[SerializeField] private TextMeshProUGUI m_mapIndexText;
@@ -396,6 +396,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 				m_statsParentMultiplayer.SetActive(false);
 				m_lockedInfo.text = $"This theme is locked! Get {((ThemeDataGameMaps)m_currentTheme).PointsToUnlock:n0} points to Unlock.";
 			}
+			m_themeHeading.text = m_currentTheme.ThemeName;
 		}
 		else
 		{
@@ -437,6 +438,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
 		LevelSelectData.ChosenMapIndex = m_mapIndex;
 		LevelSelectData.FileName = m_currentTheme.Maps[m_mapIndex].FileName;
+
+		if (LevelSelectData.MapType != EMapType.Game)
+			m_themeHeading.text = m_currentTheme.Maps[m_mapIndex].MapName;
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
