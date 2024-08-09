@@ -22,8 +22,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private SettingsDataString m_levelDirectionSettingsData;
 
 	[Space]
-	[SerializeField] private GridLayoutGroup m_mapTabsParentGridLayoutGroup;		// DON'T NEED BOTH OF THESE, SURELY?
-	[SerializeField] private RectTransform m_mapTabsParentRectTransform;            // Can just use GetComponent?
+	[SerializeField] private GridLayoutGroup m_mapTabsParentGridLayoutGroup;
 
 	[Space]
 	[SerializeField] private TextMeshProUGUI m_themeHeading;						// IMPLEMENT (GameMap = ThemeName, Custom and Imported = MapName) <<<<<
@@ -112,7 +111,8 @@ public class LevelSelectMenuManager : MonoBehaviour
 	{
 		yield return null;
 		// 3 is the number of tabs
-		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, m_mapTabsParentGridLayoutGroup.cellSize.y);
+		int cellWidth = Mathf.FloorToInt(m_mapTabsParentGridLayoutGroup.GetComponent<RectTransform>().rect.width / 3);
+		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(cellWidth, m_mapTabsParentGridLayoutGroup.cellSize.y);
 	}
 
 
