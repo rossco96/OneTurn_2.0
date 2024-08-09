@@ -30,6 +30,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	[SerializeField] private Image m_themeIconImage;
 	[SerializeField] private TextMeshProUGUI m_customImportedThemeText;
 	[SerializeField] private TextMeshProUGUI m_mapIndexText;
+	[SerializeField] private Button m_gameMapsTab;
 	[SerializeField] private Button m_customMapsTab;
 	[SerializeField] private Button m_importedMapsTab;
 	
@@ -84,6 +85,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// If no level exists (i.e. a new download) then default to first level -- Same with m_mapIndex
 		// --> Make sure to also show tutorial hints if that is the case!
 
+		m_totalPoints = SaveSystem.GetTotalPoints(m_gamesThemesList);
+		m_statTotalPoints.text = $"Total Points: {m_totalPoints:n0}";
+
 		InitCustomImportedThemesLists();
 		InitSelection();
 
@@ -91,14 +95,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 			UpdateLevelStatsSinglePlayer();
 		else
 			UpdateStatsMultiplayer();
-
-		m_totalPoints = SaveSystem.GetTotalPoints(m_gamesThemesList);
-		m_statTotalPoints.text = $"Total Points: {m_totalPoints:n0}";
-		// [TODO] Figure out if we're displaying the total points - only if it was a GameMap that was played previously! Similarly, also set the correct tab.
 		
-		//m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);							// CAN DELETE THESE (handled by SetThemeMapIndexes --> UpdateThemeIndex)
-		//m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
-
 		LevelSelectData.IsInGame = true;
 		LevelEditorData.IsTestingLevel = false;
 
@@ -114,7 +111,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 	private System.Collections.IEnumerator SetTabsParent()
 	{
 		yield return null;
-		// 3 is the number of tabs. 80.0f is the pre-defined height
+		// 3 is the number of tabs
 		m_mapTabsParentGridLayoutGroup.cellSize = new Vector2(m_mapTabsParentRectTransform.rect.width / 3, m_mapTabsParentGridLayoutGroup.cellSize.y);
 	}
 
@@ -122,10 +119,15 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	public void SelectGameTab()
 	{
+		m_gameMapsTab.targetGraphic.color = Color.yellow;
+		m_customMapsTab.targetGraphic.color = m_customMapsTab.colors.normalColor;
+		m_importedMapsTab.targetGraphic.color = m_importedMapsTab.colors.normalColor;
+
 		LevelSelectData.MapType = EMapType.Game;
 		m_statTotalPoints.gameObject.SetActive(true);
 		m_themeIconImage.gameObject.SetActive(true);
 		m_customImportedThemeText.gameObject.SetActive(false);
+
 		m_currentThemesList = m_gamesThemesList;
 		m_themeIndex = 0;
 		UpdateThemeIndex(0);
@@ -133,6 +135,10 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 	public void SelectCustomTab()
 	{
+		m_gameMapsTab.targetGraphic.color = m_gameMapsTab.colors.normalColor;
+		m_customMapsTab.targetGraphic.color = Color.yellow;
+		m_importedMapsTab.targetGraphic.color = m_importedMapsTab.colors.normalColor;
+
 		LevelSelectData.MapType = EMapType.Custom;
 		m_statTotalPoints.gameObject.SetActive(false);
 		m_themeIconImage.gameObject.SetActive(false);
@@ -147,14 +153,16 @@ public class LevelSelectMenuManager : MonoBehaviour
 		// ... Does it matter?
 
 		m_currentThemesList = m_customThemesList;
-		Debug.Log($"{m_currentThemesList}");
-
 		m_themeIndex = 0;
 		UpdateThemeIndex(0);
 	}
 
 	public void SelectImportedTab()
 	{
+		m_gameMapsTab.targetGraphic.color = m_gameMapsTab.colors.normalColor;
+		m_customMapsTab.targetGraphic.color = m_customMapsTab.colors.normalColor;
+		m_importedMapsTab.targetGraphic.color = Color.yellow;
+
 		LevelSelectData.MapType = EMapType.Imported;
 		m_statTotalPoints.gameObject.SetActive(false);
 		m_themeIconImage.gameObject.SetActive(false);
@@ -279,16 +287,27 @@ public class LevelSelectMenuManager : MonoBehaviour
 				break;
 			}
 		}
+
 		switch (LevelSelectData.MapType)
 		{
-			case EMapType.Game:		m_currentThemesList = m_gamesThemesList;	break;
-			case EMapType.Custom:	m_currentThemesList = m_customThemesList;	break;
-			case EMapType.Imported:	m_currentThemesList = m_importedThemesList;	break;
+			case EMapType.Game:
+				m_currentThemesList = m_gamesThemesList;
+				m_gameMapsTab.onClick.Invoke();
+				m_gameMapsTab.Select();
+				break;
+			case EMapType.Custom:
+				m_currentThemesList = m_customThemesList;
+				m_customMapsTab.onClick.Invoke();
+				m_customMapsTab.Select();
+				break;
+			case EMapType.Imported:
+				m_currentThemesList = m_importedThemesList;
+				m_importedMapsTab.onClick.Invoke();
+				m_importedMapsTab.Select();
+				break;
 			default:
 				break;
 		}
-
-		m_multiplayerToggle.isOn = LevelSelectData.IsMultiplayer;
 
 		string themeName = SettingsSystem.GetValue(m_themeSettingsData.Key);
 		for (int i = 0; i < m_currentThemesList.ThemesData.Length; ++i)
@@ -299,14 +318,15 @@ public class LevelSelectMenuManager : MonoBehaviour
 				break;
 			}
 		}
-		m_mapIndex = int.Parse(SettingsSystem.GetValue(m_mapIndexSettingsData.Key));
-
 		m_currentTheme = m_currentThemesList.ThemesData[m_themeIndex];
-
 		LevelSelectData.ThemeData = m_currentTheme;
-		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
+		
+		m_mapIndex = int.Parse(SettingsSystem.GetValue(m_mapIndexSettingsData.Key));
 		LevelSelectData.ChosenMapIndex = m_mapIndex;
+		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
 		LevelSelectData.FileName = m_currentTheme.Maps[m_mapIndex].FileName;
+
+		m_multiplayerToggle.isOn = LevelSelectData.IsMultiplayer;
 
 		for (int i = 0; i < System.Enum.GetValues(typeof(EGameMode)).Length; ++i)
 		{
@@ -328,17 +348,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 		UpdateThemeIndex(0);
 		UpdateMapIndex(0);
-		/*
-		m_buttonThemeUp.interactable = (m_themeIndex > 0);
-		m_buttonMapUp.interactable = (m_mapIndex > 0);
-		m_buttonThemeDown.interactable = (m_themeIndex < m_currentThemesList.ThemesData.Length - 1);
-		m_buttonMapDown.interactable = (m_mapIndex < m_currentTheme.Maps.Length - 1);
-
-		if (LevelSelectData.MapType == EMapType.Game)
-			m_themeIconImage.sprite = ((ThemeDataGameMaps)m_currentTheme).LevelSelectIcon;
-		m_mapIndexText.text = $"{m_mapIndex}";
-		//*/
-
+		
 		// Init game mode dropdown choices:
 
 		int gameModeValue = (int)LevelSelectData.GameMode;
