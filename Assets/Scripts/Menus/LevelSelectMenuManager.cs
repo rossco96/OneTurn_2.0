@@ -386,21 +386,21 @@ public class LevelSelectMenuManager : MonoBehaviour
 		if (LevelSelectData.MapType == EMapType.Game)
 		{
 			m_themeIconImage.sprite = ((ThemeDataGameMaps)m_currentTheme).LevelSelectIcon;
-			bool isUnlocked = ((ThemeDataGameMaps)m_currentTheme).PointsToUnlock < m_totalPoints;
-			m_themeIconImage.color = (isUnlocked) ? new Color(1, 1, 1, 1) : new Color(0.7f, 0.7f, 0.7f, 1);
-			m_playButton.interactable = isUnlocked;
-			if (isUnlocked)
-			{
-				m_lockedInfo.gameObject.SetActive(false);
-				m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
-				m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
-			}
-			else
+			bool isLocked = m_totalPoints < ((ThemeDataGameMaps)m_currentTheme).PointsToUnlock;
+			m_themeIconImage.color = (isLocked) ? new Color(0.7f, 0.7f, 0.7f, 1) : new Color(1, 1, 1, 1);
+			m_playButton.interactable = (isLocked == false);
+			if (isLocked)
 			{
 				m_lockedInfo.gameObject.SetActive(true);
 				m_statsParentSinglePlayer.SetActive(false);
 				m_statsParentMultiplayer.SetActive(false);
 				m_lockedInfo.text = $"This theme is locked! Get {((ThemeDataGameMaps)m_currentTheme).PointsToUnlock:n0} points to Unlock.";
+			}
+			else
+			{
+				m_lockedInfo.gameObject.SetActive(false);
+				m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
+				m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
 			}
 			m_themeHeading.text = m_currentTheme.ThemeName;
 		}
