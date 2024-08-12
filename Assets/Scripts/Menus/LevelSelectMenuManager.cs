@@ -247,6 +247,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 				themeData.Maps = themeData.Maps.Add(mapData);
 
+				// [TODO][IMPORTANT]
+				// Need to implement the below!
+				// Not currently saving the theme type inside .mapmeta file!
+				
+				/*
 				for (int j = 0; j < m_levelEditorThemes.ThemesData.Length; ++j)
 				{
 					if (m_levelEditorThemes.ThemesData[j].ThemeName == SaveSystem.GetMapmetaInfo(currentGridSizeMaps[i], EMapmetaInfo.Theme))
@@ -259,6 +264,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 						break;
 					}
 				}
+				//*/
 			}
 
 			m_customThemesList.ThemesData = m_customThemesList.ThemesData.Add(themeData);
