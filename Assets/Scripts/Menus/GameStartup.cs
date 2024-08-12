@@ -3,10 +3,11 @@ using UnityEngine;
 public class GameStartup : MonoBehaviour
 {
 	[SerializeField] private SettingsData_Base[] m_settingsKeys;
+	[SerializeField] private ThemesList m_themesList;
 
 	private void Awake()
 	{
-		SaveSystem.Init();
+		SaveSystem.Init(m_themesList);
 		SettingsSystem.InitAllSettings(m_settingsKeys);
 		PlayerPrefsSystem.InitAllPrefs();
 

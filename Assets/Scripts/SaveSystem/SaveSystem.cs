@@ -16,8 +16,10 @@ public static class SaveSystem
 	private static readonly string m_mapMetaExtension = "mapmeta";
 	private static readonly string m_mapStatsExtension = "stat";
 
-	private static readonly string m_multiplayerGameModePrefix = "M_";					// [TODO] Move as is also used elsewhere... Or make public // Make a file of consts, similar to enums file?
+	private static readonly string m_multiplayerGameModePrefix = "M_";                  // [TODO] Move as is also used elsewhere... Or make public // Make a file of consts, similar to enums file?
 
+
+	private static ThemesList m_themesListGame;
 	
 	private static string m_mapFullFilepath = string.Empty;
 	private static string m_mapmetaFullFilepath = string.Empty;
@@ -28,7 +30,7 @@ public static class SaveSystem
 
 
 	#region Init / Version Check
-	public static void Init()																// [TODO][IMPORTANT] Ensure this is being called from GameStartup or Splash script!
+	public static void Init(ThemesList themesList)										// [TODO][IMPORTANT] Ensure this is being called from GameStartup or Splash script!
 	{
 		string currentVersion = Application.version;
 		
@@ -46,19 +48,21 @@ public static class SaveSystem
 			InitCustomImportDirectories();
 		}
 
+		m_themesListGame = themesList;
+
 		StreamWriter writer = File.CreateText(m_initFullFilepath);
 		writer.Write(currentVersion);
 		writer.Dispose();
 		File.SetAttributes(m_initFullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(m_initFullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(m_initFullFilepath, FileAttributes.Hidden);
 
 		InitNewLevels();
+		CheckExistingStatFileGameModes();
 	}
 
 	private static void InitNewLevels()
 	{
-		ThemesList themesList = Resources.Load<ThemesList>("ThemesList");                     // [TODO] Super important! Move this to a folder called Resources!
-		ThemeData[] themeData = themesList.ThemesData;
+		ThemeData[] themeData = m_themesListGame.ThemesData;
 
 		for (int i = 0; i < themeData.Length; ++i)
 		{
@@ -112,7 +116,7 @@ public static class SaveSystem
 		wrtierMapmeta.Write(m_customMapTexture.EncodeToPNG(), 0, m_customMapTexture.EncodeToPNG().Length);
 		wrtierMapmeta.Dispose();
 		File.SetAttributes(m_mapFullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(m_mapFullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(m_mapFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -153,7 +157,7 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(m_mapmetaFullFilepath, FileAttributes.Hidden);
 	}
 
 	public static void UpdateExistingMapmetaFile(string mapFileName, EMapmetaInfo infoType, string value)
@@ -170,7 +174,7 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 
 	public static void UpdateExistingMapmetaFile(string mapFileName, EMapPropertyName property, ETurnDirection turnDirection, EFacingDirection facingDirection)
@@ -193,7 +197,7 @@ public static class SaveSystem
 		metaWriter.Write(dataJson);
 		metaWriter.Close();
 		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -244,7 +248,137 @@ public static class SaveSystem
 		dictWriter.Write(jsonData);
 		dictWriter.Close();
 		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+	}
+
+	private static void CheckExistingStatFileGameModes()
+	{
+		ThemeData[] themeData = m_themesListGame.ThemesData;
+
+		string sampleThemeDirectory = $"{m_gameMapsDirectory}/{themeData[0].ThemeName}";
+		string sampleCompleteFilePath = $"{sampleThemeDirectory}/{Hash128.Compute(themeData[0].Maps[0].GridLayout.EncodeToPNG())}.{m_mapStatsExtension}";
+		string sampleStatFile = File.ReadAllText(sampleCompleteFilePath);
+		
+		StatsDictionary sampleStatsData = JsonUtility.FromJson<StatsDictionary>(sampleStatFile);
+		bool containsAllGameModes = true;
+		EGameMode[] missingGameModes = new EGameMode[0];
+		
+		for (int i = 0; i < Enum.GetValues(typeof(EGameMode)).Length; ++i)
+		{
+			string gameModeString = $"{(EGameMode)i}";
+			if (gameModeString.StartsWith(m_multiplayerGameModePrefix)) continue;
+			if (sampleStatsData.ContainsKey($"{gameModeString}{ETurnDirection.Right}{EStatsSection.Score}") == false)
+			{
+				containsAllGameModes = false;
+				missingGameModes = missingGameModes.Add((EGameMode)i);
+			}
+		}
+
+		if (containsAllGameModes)
+			return;
+
+		string[] turnDirection = Enum.GetNames(typeof(ETurnDirection));
+		string[] statsSection = Enum.GetNames(typeof(EStatsSection));
+
+		StatsDictionary statsDataToAdd = new StatsDictionary();
+
+		for (int gameModeIndex = 0; gameModeIndex < missingGameModes.Length; ++gameModeIndex)
+		{
+			string mode = $"{missingGameModes[gameModeIndex]}";
+			for (int turnDirectionIndex = 0; turnDirectionIndex < turnDirection.Length; ++turnDirectionIndex)
+			{
+				string direction = turnDirection[turnDirectionIndex];
+				for (int statsSectionIndex = 0; statsSectionIndex < statsSection.Length; ++statsSectionIndex)
+				{
+					if (mode == $"{EGameMode.Exit}" && ((EStatsSection)statsSectionIndex == EStatsSection.Items || (EStatsSection)statsSectionIndex == EStatsSection.Area)) continue;
+					if (mode == $"{EGameMode.Items}" && (EStatsSection)statsSectionIndex == EStatsSection.Area) continue;
+					if (mode == $"{EGameMode.Travel}" && (EStatsSection)statsSectionIndex == EStatsSection.Items) continue;
+					string stat = statsSection[statsSectionIndex];
+					statsDataToAdd.Add($"{mode}{direction}{stat}", 0);
+				}
+			}
+		}
+
+		string[] customMapFiles = Directory.GetFiles(m_customMapsDirectory, "*.stat");
+		string[] importedMapFiles = Directory.GetFiles(m_importedMapsDirectory, "*.stat");
+
+		// [IMPORTANT]
+		// This is extrememly inneficient, opening and writing and closing this many files this many times.
+		// But it does work. Just try and do it better!!!
+
+		var statsDataEnumerator = statsDataToAdd.Keys.GetEnumerator();
+		// Game Maps:
+		for (int gameThemesIndex = 0; gameThemesIndex < themeData.Length; ++gameThemesIndex)
+		{
+			ThemeData currentGameMapTheme = themeData[gameThemesIndex];
+			string gameThemeDirectory = $"{m_gameMapsDirectory}/{currentGameMapTheme.ThemeName}";
+			MapData[] gameThemeMaps = currentGameMapTheme.Maps;
+			for (int gameMapsIndex = 0; gameMapsIndex < gameThemeMaps.Length; ++gameMapsIndex)
+			{
+				string currentGameMapFilepath = $"{gameThemeDirectory}/{Hash128.Compute(gameThemeMaps[gameMapsIndex].GridLayout.EncodeToPNG())}.{m_mapStatsExtension}";
+				string gameMapStatsFile = File.ReadAllText(currentGameMapFilepath);
+				MapmetaData<string, float> gameMapStatsData = JsonUtility.FromJson<MapmetaData<string, float>>(gameMapStatsFile);
+
+				while (statsDataEnumerator.MoveNext())
+				{
+					gameMapStatsData.Add(statsDataEnumerator.Current, statsDataToAdd[statsDataEnumerator.Current]);
+				}
+				string gameMapJsonData = JsonUtility.ToJson(gameMapStatsData);
+
+				File.SetAttributes(currentGameMapFilepath, FileAttributes.Normal);
+				StreamWriter gameMapWriter = File.CreateText(currentGameMapFilepath);
+				gameMapWriter.Write(gameMapJsonData);
+				gameMapWriter.Close();
+				File.SetAttributes(currentGameMapFilepath, FileAttributes.ReadOnly);
+				//File.SetAttributes(currentGameMapFilepath, FileAttributes.Hidden);
+			}
+		}
+		statsDataEnumerator.Dispose();
+
+		statsDataEnumerator = statsDataToAdd.Keys.GetEnumerator();
+		// Custom Maps:
+		for (int customMapsIndex = 0; customMapsIndex < customMapFiles.Length; ++customMapsIndex)
+		{
+			string currentCustomMapFilepath = customMapFiles[customMapsIndex];
+			string customMapStatsFile = File.ReadAllText(currentCustomMapFilepath);
+			MapmetaData<string, float> customMapStatsData = JsonUtility.FromJson<MapmetaData<string, float>>(customMapStatsFile);
+
+			while (statsDataEnumerator.MoveNext())
+			{
+				customMapStatsData.Add(statsDataEnumerator.Current, statsDataToAdd[statsDataEnumerator.Current]);
+			}
+			string customMapJsonData = JsonUtility.ToJson(customMapStatsData);
+
+			File.SetAttributes(currentCustomMapFilepath, FileAttributes.Normal);
+			StreamWriter customMapWriter = File.CreateText(currentCustomMapFilepath);
+			customMapWriter.Write(customMapJsonData);
+			customMapWriter.Close();
+			File.SetAttributes(currentCustomMapFilepath, FileAttributes.ReadOnly);
+			//File.SetAttributes(currentCustomMapFilepath, FileAttributes.Hidden);
+		}
+		statsDataEnumerator.Dispose();
+
+		statsDataEnumerator = statsDataToAdd.Keys.GetEnumerator();
+		// Imported Maps:
+		for (int importedMapsIndex = 0; importedMapsIndex < importedMapFiles.Length; ++importedMapsIndex)
+		{
+			string currentImportedMapFilepath = importedMapFiles[importedMapsIndex];
+			string importedMapStatsFile = File.ReadAllText(currentImportedMapFilepath);
+			MapmetaData<string, float> importedMapStatsData = JsonUtility.FromJson<MapmetaData<string, float>>(importedMapStatsFile);
+
+			while (statsDataEnumerator.MoveNext())
+			{
+				importedMapStatsData.Add(statsDataEnumerator.Current, statsDataToAdd[statsDataEnumerator.Current]);
+			}
+			string importedMapJsonData = JsonUtility.ToJson(importedMapStatsData);
+
+			File.SetAttributes(currentImportedMapFilepath, FileAttributes.Normal);
+			StreamWriter importedMapWriter = File.CreateText(currentImportedMapFilepath);
+			importedMapWriter.Write(importedMapJsonData);
+			importedMapWriter.Close();
+			File.SetAttributes(currentImportedMapFilepath, FileAttributes.ReadOnly);
+			//File.SetAttributes(currentImportedMapFilepath, FileAttributes.Hidden);
+		}
 	}
 
 	public static bool StatFileSaveRequired(float time, int lives, int moves, float extraInfo = -1)
@@ -340,7 +474,7 @@ public static class SaveSystem
 		dictWriter.Write(jsonData);
 		dictWriter.Close();
 		File.SetAttributes(statFullFilepath, FileAttributes.ReadOnly);
-		File.SetAttributes(statFullFilepath, FileAttributes.Hidden);
+		//File.SetAttributes(statFullFilepath, FileAttributes.Hidden);
 	}
 	#endregion
 
@@ -490,7 +624,9 @@ public static class SaveSystem
 						if ($"{(EGameMode)gm}".StartsWith(m_multiplayerGameModePrefix)) continue;
 						for (int td = 0; td < Enum.GetValues(typeof(ETurnDirection)).Length; ++td)
 						{
-							totalPoints += (int)statsInfo[$"{(EGameMode)gm}{(ETurnDirection)td}{(EStatsSection.Score)}"];
+							string statsInfoKey = $"{(EGameMode)gm}{(ETurnDirection)td}{(EStatsSection.Score)}";
+							if (statsInfo.ContainsKey(statsInfoKey))
+								totalPoints += (int)statsInfo[statsInfoKey];
 						}
 					}
 				}
