@@ -6,11 +6,15 @@ public class OptionsMenuManager : MonoBehaviour
 	[SerializeField] private TMP_Dropdown m_inputModeDropdown;
 	[SerializeField] private TutorialPopup m_tutorialPopup;
 
+
+
 	private void OnEnable()
 	{
 		InitInputModeDropdown();
 		m_tutorialPopup.TryShow();
 	}
+
+
 
 	private void InitInputModeDropdown()
 	{
@@ -27,6 +31,8 @@ public class OptionsMenuManager : MonoBehaviour
 		m_inputModeDropdown.AddOptions(inputModes);
 	}
 
+
+
 	public void SaveSettings()
 	{
 		// [TODO] Disable or hide button if no settings changed
@@ -42,5 +48,12 @@ public class OptionsMenuManager : MonoBehaviour
 	public void TEMP_DiscardSettings()
 	{
 		SettingsSystem.DiscardSettings();
+	}
+
+
+
+	public void ResetScores()
+	{
+		//SaveSystem.ResetAllStatFiles();
 	}
 }
