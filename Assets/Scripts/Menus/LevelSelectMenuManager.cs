@@ -352,8 +352,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 			}
 		}
 
-		UpdateThemeIndex(0);
-		UpdateMapIndex(0);
+		UpdateThemeIndex(0, true);
 		
 		// Init game mode dropdown choices:
 
@@ -378,7 +377,7 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 
 
-	public void UpdateThemeIndex(int indexDirection)
+	public void UpdateThemeIndex(int indexDirection, bool keepMapIndex = false)
 	{
 		m_themeIndex += indexDirection;
 
@@ -409,15 +408,17 @@ public class LevelSelectMenuManager : MonoBehaviour
 			m_customImportedThemeText.text = m_currentTheme.ThemeName;
 		}
 
-		m_mapIndex = 0;
+		if (keepMapIndex == false)
+			m_mapIndex = 0;
+		
 		m_mapIndexText.text = $"{m_mapIndex}";
 		// [TODO] Show "1", or whatever we're using to represent the first level
 		m_buttonMapUp.interactable = false;
 		m_buttonMapDown.interactable = true;
 
 		LevelSelectData.ThemeData = m_currentTheme;
-		LevelSelectData.SetMapData(m_currentTheme.Maps[0]);
-		LevelSelectData.ChosenMapIndex = 0;
+		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
+		LevelSelectData.ChosenMapIndex = m_mapIndex;
 		LevelSelectData.FileName = m_currentTheme.Maps[m_mapIndex].FileName;
 		
 		if (LevelSelectData.IsMultiplayer == false)
