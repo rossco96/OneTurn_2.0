@@ -95,7 +95,7 @@ public class GameplayManager_Exit : GameplayManager
 	{
 		base.EndGame(isWin);
 
-		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves);
+		int totalScore = GetTotalScore(m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_levelTimeElapsedFloat);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives);
 
 		if (PlayerPrefsSystem.ScoreDisablingCheatsEnabled())
@@ -126,7 +126,7 @@ public class GameplayManager_Exit : GameplayManager
 		{
 			result = EMultiplayerResult.P1;
 			PlayerPrefsSystem.MultiplayerAddWinP1();
-			int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves);
+			int scoreP1 = GetTotalScore(controllerP1.Stats.Lives, controllerP1.Stats.Moves, m_levelTimeElapsedFloat);
 			m_hudManager.SetEndScreenStatsMultiP1((controllerP1.Stats.IsAtExit) ? scoreP1 : 1000, controllerP1.Stats.Moves, controllerP1.Stats.Lives);
 			m_hudManager.SetEndScreenStatsMultiP2(0, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
 			PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
@@ -135,7 +135,7 @@ public class GameplayManager_Exit : GameplayManager
 		{
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
-			int scoreP2 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves);
+			int scoreP2 = GetTotalScore(controllerP1.Stats.Lives, controllerP1.Stats.Moves, m_levelTimeElapsedFloat);
 			m_hudManager.SetEndScreenStatsMultiP1(0, controllerP1.Stats.Moves, controllerP1.Stats.Lives);
 			m_hudManager.SetEndScreenStatsMultiP2((controllerP2.Stats.IsAtExit) ? scoreP2 : 1000, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
 			PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
@@ -152,35 +152,19 @@ public class GameplayManager_Exit : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int lives, int moves)
+	private int GetTotalScore(int lives, int moves, float time)
 	{
-		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
+		int maxTime = LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
 		if (lives == 0 || time >= maxTime) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		float timeRatio = (maxTime - time) / maxTime;
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
+		float timeLeft = maxTime - time;
+		int maxMoves = LevelSelectData.GridDimension * LevelSelectData.GridDimension * 5;
+		const int scoreMultiplier = 1;
+		const int livesMultiplier = 500;
 
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
-		return Mathf.Max(0, score);
-	}
-
-	private int GetTotalScoreMultiplayer(int lives, int moves)
-	{
-		if (lives == 0) return 0;
-
-		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
-
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		int score = Mathf.RoundToInt(scoreMultiplier * gridRatio * ((lives * livesMultiplier) + Mathf.Max(0, maxMoves - moves) + timeLeft));
+		Debug.Log($"[NEW] {score} = Mathf.RoundToInt({scoreMultiplier} * {gridRatio} * (({lives} * {livesMultiplier}) + Mathf.Max(0, {maxMoves - moves}) + {timeLeft}))");
 		return Mathf.Max(0, score);
 	}
 }

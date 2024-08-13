@@ -115,7 +115,7 @@ public class GameplayManager_Items : GameplayManager
 	{
 		base.EndGame(isWin);
 
-		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Items);
+		int totalScore = GetTotalScore(m_controllers[0].Stats.Items, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_countdownTimeRemainingFloat);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat.RoundDP(2), m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Items);
 		
 		if (PlayerPrefsSystem.ScoreDisablingCheatsEnabled())
@@ -141,8 +141,8 @@ public class GameplayManager_Items : GameplayManager
 				controllerP2 = m_controllers[i];
 		}
 
-		int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, controllerP1.Stats.Items);
-		int scoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, controllerP2.Stats.Items);
+		int scoreP1 = GetTotalScore(controllerP1.Stats.Items, controllerP1.Stats.Lives, controllerP1.Stats.Moves, m_countdownTimeRemainingFloat);
+		int scoreP2 = GetTotalScore(controllerP2.Stats.Items, controllerP2.Stats.Lives, controllerP2.Stats.Moves, m_countdownTimeRemainingFloat);
 		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, controllerP1.Stats.Items);
 		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, controllerP2.Stats.Items);
 		PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
@@ -179,39 +179,19 @@ public class GameplayManager_Items : GameplayManager
 	// Work on the formula! Base on actual player testing -- not just what *I* can achieve in a level!
 	// Also note that none of this needs to be passed. Only leaving like this for now to highlight that #moves are not yet taken into account
 
-	// [TODO] Make abstract in base?
-	private int GetTotalScore(float time, int lives, int moves, int items)
+	// [TODO] Make abstract in base? Virtual in base as always same formula, just have ITEMS and TRAVEL multiplying by a set ratio??
+	private int GetTotalScore(int items, int lives, int moves, float time)
 	{
 		if (m_countdownTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		float itemsRatio = (float)items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems;
-		float timeRatio = time / LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
+		float itemsRatio = (float)Mathf.Pow(items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems, 2);
+		int maxMoves = LevelSelectData.GridDimension * LevelSelectData.GridDimension * 5;
+		const int scoreMultiplier = 1;
+		const int livesMultiplier = 500;
 
-		// [TODO] Work out how to involve #moves!
-		// Take away the number of moves time a const?
-		// or multiply by e.g. max number of moves (= e.g. 1000) minus moves taken?
-
-		int score = Mathf.RoundToInt((gridRatio * itemsRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {itemsRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
-		return Mathf.Max(0, score);
-	}
-
-	private int GetTotalScoreMultiplayer(int lives, int moves, int items)
-	{
-		if (m_countdownTimeRemainingFloat == 0.0f || lives == 0 || items == 0) return 0;
-
-		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		float itemsRatio = (float)items / LevelSelectData.ThemeData.LevelPlayInfo.TotalItems;
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
-
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * itemsRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {itemsRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		int score = Mathf.RoundToInt(scoreMultiplier * gridRatio * itemsRatio * ((lives * livesMultiplier) + Mathf.Max(0, maxMoves - moves) + time));
+		Debug.Log($"[NEW] {score} = Mathf.RoundToInt({scoreMultiplier} * {gridRatio} * {itemsRatio} * (({lives} * {livesMultiplier}) + Mathf.Max(0, {maxMoves - moves}) + {time}))");
 		return Mathf.Max(0, score);
 	}
 }

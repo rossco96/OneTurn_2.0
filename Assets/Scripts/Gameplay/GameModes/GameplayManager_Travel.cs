@@ -171,7 +171,7 @@ public class GameplayManager_Travel : GameplayManager
 		base.EndGame(isWin);
 
 		float percentCovered = ((100.0f * m_squaresCovered) / m_travelSquares.Length).RoundDP(2);
-		int totalScore = GetTotalScore(m_levelTimeElapsedFloat, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, percentCovered);
+		int totalScore = GetTotalScore(percentCovered, m_controllers[0].Stats.Lives, m_controllers[0].Stats.Moves, m_countdownTimeRemainingFloat);
 		m_hudManager.SetEndScreenStatsSingle(totalScore, m_levelTimeElapsedFloat, m_controllers[0].Stats.Moves, m_controllers[0].Stats.Lives, percentCovered);
 
 		if (PlayerPrefsSystem.ScoreDisablingCheatsEnabled())
@@ -202,8 +202,8 @@ public class GameplayManager_Travel : GameplayManager
 
 		float percentCoveredP1 = ((100.0f * controllerP1.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
 		float percentCoveredP2 = ((100.0f * controllerP2.Stats.TravelSquares) / m_travelSquares.Length).RoundDP(2);
-		int scoreP1 = GetTotalScoreMultiplayer(controllerP1.Stats.Lives, controllerP1.Stats.Moves, percentCoveredP1);
-		int scoreP2 = GetTotalScoreMultiplayer(controllerP2.Stats.Lives, controllerP2.Stats.Moves, percentCoveredP2);
+		int scoreP1 = GetTotalScore(percentCoveredP1, controllerP1.Stats.Lives, controllerP1.Stats.Moves, m_countdownTimeRemainingFloat);
+		int scoreP2 = GetTotalScore(percentCoveredP2, controllerP2.Stats.Lives, controllerP2.Stats.Moves, m_countdownTimeRemainingFloat);
 		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, controllerP1.Stats.Moves, controllerP1.Stats.Lives, percentCoveredP1);
 		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives, percentCoveredP2);
 		PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
@@ -235,35 +235,17 @@ public class GameplayManager_Travel : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int lives, int moves, float covered)
+	private int GetTotalScore(float covered, int lives, int moves, float time)
 	{
-		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
-		if (lives == 0 || time >= maxTime) return 0;
+		if (m_countdownTimeRemainingFloat == 0.0f || lives == 0 || covered == 0) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		float timeRatio = (maxTime - time) / maxTime;
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
+		int maxMoves = LevelSelectData.GridDimension * LevelSelectData.GridDimension * 5;
+		const int scoreMultiplier = 1;
+		const int livesMultiplier = 500;
 
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
-		return Mathf.Max(0, score);
-	}
-
-	private int GetTotalScoreMultiplayer(int lives, int moves, float covered)
-	{
-		if (lives == 0) return 0;
-
-		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
-
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		int score = Mathf.RoundToInt(scoreMultiplier * gridRatio * (covered * covered) * ((lives * livesMultiplier) + Mathf.Max(0, maxMoves - moves) + time));
+		Debug.Log($"[NEW] {score} = Mathf.RoundToInt({scoreMultiplier} * {gridRatio} * ({covered} * {covered}) * (({lives} * {livesMultiplier}) + Mathf.Max(0, {maxMoves - moves}) + {time}))");
 		return Mathf.Max(0, score);
 	}
 }

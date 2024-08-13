@@ -132,7 +132,7 @@ public class GameplayManager_MBomb : GameplayManager
 			result = EMultiplayerResult.P2;
 			PlayerPrefsSystem.MultiplayerAddWinP2();
 			m_hudManager.SetEndScreenStatsMultiP1(0, m_controllerP1.Stats.Moves, m_controllerP1.Stats.Lives);
-			int scoreP2 = GetTotalScore(m_controllerP2.Stats.BombTimeLeft, m_controllerP2.Stats.Lives, m_controllerP2.Stats.Moves);
+			int scoreP2 = GetTotalScore(m_controllerP2.Stats.Lives, m_controllerP2.Stats.Moves, m_controllerP2.Stats.BombTimeLeft);
 			m_hudManager.SetEndScreenStatsMultiP2(scoreP2, m_controllerP2.Stats.Moves, m_controllerP2.Stats.Lives);
 			PlayerPrefsSystem.MultiplayerAddScoreP2(scoreP2);
 		}
@@ -140,7 +140,7 @@ public class GameplayManager_MBomb : GameplayManager
 		{
 			result = EMultiplayerResult.P1;
 			PlayerPrefsSystem.MultiplayerAddWinP1();
-			int scoreP1 = GetTotalScore(m_controllerP1.Stats.BombTimeLeft, m_controllerP1.Stats.Lives, m_controllerP1.Stats.Moves);
+			int scoreP1 = GetTotalScore(m_controllerP1.Stats.Lives, m_controllerP1.Stats.Moves, m_controllerP1.Stats.BombTimeLeft);
 			m_hudManager.SetEndScreenStatsMultiP1(scoreP1, m_controllerP1.Stats.Moves, m_controllerP1.Stats.Lives);
 			m_hudManager.SetEndScreenStatsMultiP2(0, m_controllerP2.Stats.Moves, m_controllerP2.Stats.Lives);
 			PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
@@ -156,20 +156,19 @@ public class GameplayManager_MBomb : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int lives, int moves)
+	private int GetTotalScore(int lives, int moves, float time)
 	{
-		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
-		if (lives == 0 || time > maxTime) return 0;
+		int maxTime = LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
+		if (lives == 0 || time >= maxTime) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		float timeRatio = (maxTime - time) / maxTime;
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
+		float timeLeft = maxTime - time;
+		int maxMoves = LevelSelectData.GridDimension * LevelSelectData.GridDimension * 5;
+		const int scoreMultiplier = 1;
+		const int livesMultiplier = 500;
 
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		int score = Mathf.RoundToInt(scoreMultiplier * gridRatio * ((lives * livesMultiplier) + Mathf.Max(0, maxMoves - moves) + timeLeft));
+		Debug.Log($"[NEW] {score} = Mathf.RoundToInt({scoreMultiplier} * {gridRatio} * (({lives} * {livesMultiplier}) + Mathf.Max(0, {maxMoves - moves}) + {timeLeft}))");
 		return Mathf.Max(0, score);
 	}
 }

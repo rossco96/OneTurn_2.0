@@ -125,8 +125,8 @@ public class GameplayManager_MChase : GameplayManager
 
 		// NOTE need multiple nested IFs due to hierarchy of win-lose-draw condition
 
-		int scoreP1 = GetTotalScore(LevelSelectData.ChaseStatsP1Time, LevelSelectData.ChaseStatsP1Lives, LevelSelectData.ChaseStatsP1Moves);
-		int scoreP2 = GetTotalScore(m_countdownTimeRemainingFloat, controllerP2.Stats.Lives, controllerP2.Stats.Moves);
+		int scoreP1 = GetTotalScore(LevelSelectData.ChaseStatsP1Lives, LevelSelectData.ChaseStatsP1Moves, LevelSelectData.ChaseStatsP1Time);
+		int scoreP2 = GetTotalScore(controllerP2.Stats.Lives, controllerP2.Stats.Moves, m_countdownTimeRemainingFloat);
 		m_hudManager.SetEndScreenStatsMultiP1(scoreP1, LevelSelectData.ChaseStatsP1Moves, LevelSelectData.ChaseStatsP1Lives);
 		m_hudManager.SetEndScreenStatsMultiP2(scoreP2, controllerP2.Stats.Moves, controllerP2.Stats.Lives);
 		PlayerPrefsSystem.MultiplayerAddScoreP1(scoreP1);
@@ -181,20 +181,18 @@ public class GameplayManager_MChase : GameplayManager
 
 	// [TODO][IMPORTANT]
 	// Work on the formula, based on actual player testing -- not just what *I* can achieve in a level!
-	private int GetTotalScore(float time, int lives, int moves)
+	private int GetTotalScore(int lives, int moves, float time)
 	{
-		int maxTime = LevelSelectData.GridDimension * LevelSelectData.GridDimension;
-		if (lives == 0 || time > maxTime) return 0;
+		int maxTime = LevelSelectData.ThemeData.LevelPlayInfo.ItemTimeLimit;
+		if (lives == 0 || time >= maxTime) return 0;
 
 		float gridRatio = (float)(LevelSelectData.GridDimension * LevelSelectData.GridDimension) / (17 * 17);
-		float timeRatio = (maxTime - time) / maxTime;
-		const int scoreMultiplier = 10000;
-		const int livesMultiplier = 1000;
+		float timeLeft = maxTime - time;
+		const int scoreMultiplier = 1;
+		const int livesMultiplier = 500;
 
-		// [TODO] How to involve #moves? If at all?
-
-		int score = Mathf.RoundToInt((gridRatio * timeRatio * scoreMultiplier) - ((LevelSelectData.LivesCount - lives) * livesMultiplier));
-		Debug.Log($"{score} = Mathf.RoundToInt(({gridRatio} * {timeRatio} * {scoreMultiplier}) - (({LevelSelectData.LivesCount} - {lives}) * {livesMultiplier}))");
+		int score = Mathf.RoundToInt(scoreMultiplier * gridRatio * ((lives * livesMultiplier) + (moves * 10.0f) + timeLeft));
+		Debug.Log($"[NEW] {score} = Mathf.RoundToInt({scoreMultiplier} * {gridRatio} * (({lives} * {livesMultiplier}) + ({moves} * 10.0f) + {timeLeft}))");
 		return Mathf.Max(0, score);
 	}
 }
