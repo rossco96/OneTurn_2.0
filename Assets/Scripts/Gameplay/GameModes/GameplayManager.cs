@@ -166,7 +166,10 @@ public abstract class GameplayManager : MonoBehaviour
 			controller.SetInputDisabled(false);
 		}
 
-		m_hudManager.UpdateLivesCountP1(controller.Stats.Lives);
+		if (controller.Index == 0)
+			m_hudManager.UpdateLivesCountP1(controller.Stats.Lives);
+		else //if (controller.Index == 1)
+			m_hudManager.UpdateLivesCountP2(controller.Stats.Lives);
 	}
 
 
