@@ -99,6 +99,7 @@ public enum EMultiplayerResult
 
 // If implementing a "3x max travel" feature, then can include here too?
 // Idea: could be worth more points if travelled to multiple times, but on the fourth time it'll turn into a wall (removed from total score and makes level more difficult)
+// [TODO] Merge (and rename) the above and below enums
 public enum ETravelSquareState
 {
 	NONE,
