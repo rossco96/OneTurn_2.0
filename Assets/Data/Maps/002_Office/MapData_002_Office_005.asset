@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5736b172475fe7845b525921914c433a, type: 3}
   m_Name: MapData_002_Office_005
   m_EditorClassIdentifier: 
+  CustomImportedMapFileName: 
+  MapName: 
   GridLayout: {fileID: 2800000, guid: 1d5ced5a71d6ad541bbac655b9ca037d, type: 3}
   PlayerSpawnDirectionRight: 0100000002000000
   PlayerSpawnDirectionLeft: 0100000002000000
-  ExitFacingDirectionRight: 2
-  ExitFacingDirectionLeft: 2
+  ExitFacingDirectionRight: 0
+  ExitFacingDirectionLeft: 0

@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5736b172475fe7845b525921914c433a, type: 3}
   m_Name: MapData_001_Garden_003
   m_EditorClassIdentifier: 
+  CustomImportedMapFileName: 
+  MapName: 
   GridLayout: {fileID: 2800000, guid: 00e317fb0e77c7c44bc37e48fd9d7a93, type: 3}
   PlayerSpawnDirectionRight: 0000000002000000
   PlayerSpawnDirectionLeft: 0100000003000000
-  ExitFacingDirectionRight: 1
+  ExitFacingDirectionRight: 3
   ExitFacingDirectionLeft: 1
