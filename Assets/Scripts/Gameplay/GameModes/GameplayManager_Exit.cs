@@ -44,6 +44,40 @@ public class GameplayManager_Exit : GameplayManager
 		// If not, respawn (losing condition for lives == 0 in there)
 		// Otherwise then yeah, obviously win condition
 
+		Vector3 playerRotation = controller.GetPlayerRotationEuler();
+
+		if (interactable.transform.rotation.eulerAngles.z % 360 != playerRotation.z % 360)
+		{
+			// [TODO] Refactor to the base??
+			controller.SetInputDisabled(true);
+			controller.DestroyPlayerGameObject();
+
+			controller.Stats.Lives--;
+			if (controller.Stats.Lives == 0)
+			{
+				if (LevelSelectData.IsMultiplayer)
+					EndGameMultiplayer();                                                       // [Q] Do we want to end the game if the other player dies? Or allow keep playing? TEST!
+				else
+					EndGame(false);
+			}
+			else
+			{
+				// [NOTE] This should be done after the death animation is complete! Need another callback...
+				// [NOTE] Need also a spawn animation, and THEN can resume control of player
+				controller.RespawnPlayer();
+
+				// [TODO] DO THIS ELSEWHERE! Needs to be done after death animation complete
+				controller.SetInputDisabled(false);
+			}
+
+			if (controller.Index == 0)
+				m_hudManager.UpdateLivesCountP1(controller.Stats.Lives);
+			else //if (controller.Index == 1)
+				m_hudManager.UpdateLivesCountP2(controller.Stats.Lives);
+
+			return;
+		}
+
 		// END GAME -- win
 		if (LevelSelectData.IsMultiplayer)
 		{

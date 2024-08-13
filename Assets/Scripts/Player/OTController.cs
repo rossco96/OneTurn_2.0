@@ -179,6 +179,11 @@ public class OTController : MonoBehaviour
 		return (1 / m_gridSizeMultiplier) * m_player.transform.position;
 	}
 
+	public Vector3 GetPlayerRotationEuler()
+	{
+		return m_player.transform.rotation.eulerAngles;
+	}
+
 
 
 	// [TODO][Q] Will eventually want to remove this method, and call via animation instead?
