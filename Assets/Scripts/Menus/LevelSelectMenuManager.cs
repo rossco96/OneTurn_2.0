@@ -90,11 +90,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 		InitCustomImportedThemesLists();
 		InitSelection();
 
-		if (LevelSelectData.IsMultiplayer == false)
-			UpdateLevelStatsSinglePlayer();
-		else
-			UpdateStatsMultiplayer();
-		
 		LevelSelectData.IsInGame = true;
 		LevelEditorData.IsTestingLevel = false;
 
@@ -145,8 +140,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_customImportedThemeText.gameObject.SetActive(true);
 		
 		m_lockedInfo.gameObject.SetActive(false);
-		m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
-		m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
 
 		// [TODO][Q] For stats on custom levels. Do we force reset upon any editing?
 		// Otherwise could create a straight line of items for max points and then turn it into a really hard level
@@ -169,8 +162,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_customImportedThemeText.gameObject.SetActive(true);
 
 		m_lockedInfo.gameObject.SetActive(false);
-		m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
-		m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
 
 		m_currentThemesList = m_importedThemesList;
 		m_themeIndex = 0;
@@ -417,12 +408,6 @@ public class LevelSelectMenuManager : MonoBehaviour
 		m_buttonMapDown.interactable = true;
 
 		LevelSelectData.ThemeData = m_currentTheme;
-		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
-		LevelSelectData.ChosenMapIndex = m_mapIndex;
-		LevelSelectData.FileName = m_currentTheme.Maps[m_mapIndex].FileName;
-		
-		if (LevelSelectData.IsMultiplayer == false)
-			UpdateLevelStatsSinglePlayer();
 
 		if (m_themeIndex == 0)
 			m_buttonThemeUp.interactable = false;
@@ -441,7 +426,9 @@ public class LevelSelectMenuManager : MonoBehaviour
 	{
 		m_mapIndex += indexDirection;
 		m_mapIndexText.text = $"{m_mapIndex}";
+		
 		// [TODO] Show "1", or whatever we're using to represent the first level
+		
 		LevelSelectData.SetMapData(m_currentTheme.Maps[m_mapIndex]);
 		LevelSelectData.ChosenMapIndex = m_mapIndex;
 		LevelSelectData.FileName = m_currentTheme.Maps[m_mapIndex].FileName;
@@ -533,10 +520,18 @@ public class LevelSelectMenuManager : MonoBehaviour
 		if (gameModeValue == 1 || gameModeValue == 2)									// Same note as NOT IDEAL above
 			m_gameModeDropdown.value = gameModeValue;
 
-		if (m_totalPoints >= ((ThemeDataGameMaps)m_currentTheme).PointsToUnlock)
+		if (m_totalPoints >= ((ThemeDataGameMaps)m_currentTheme).PointsToUnlock)		// This IF-ELSE is repeated!
 		{
+			m_lockedInfo.gameObject.SetActive(false);
 			m_statsParentSinglePlayer.SetActive(LevelSelectData.IsMultiplayer == false);
 			m_statsParentMultiplayer.SetActive(LevelSelectData.IsMultiplayer);
+		}
+		else
+		{
+			m_lockedInfo.gameObject.SetActive(true);
+			m_statsParentSinglePlayer.SetActive(false);
+			m_statsParentMultiplayer.SetActive(false);
+			m_lockedInfo.text = $"This theme is locked! Get {((ThemeDataGameMaps)m_currentTheme).PointsToUnlock:n0} points to Unlock.";
 		}
 
 		if (LevelSelectData.IsMultiplayer)
