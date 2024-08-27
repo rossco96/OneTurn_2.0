@@ -212,6 +212,7 @@ public class HUDManager : MonoBehaviour
 	public void NextLevel()
 	{
 		LevelSelectData.ChosenMapIndex++;
+		LevelSelectData.FileName = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex].FileName;
 		LevelSelectData.MapData = LevelSelectData.ThemeData.Maps[LevelSelectData.ChosenMapIndex];
 		SettingsSystem.UpdateSettings(m_mapIndexSettingsData.Key, $"{LevelSelectData.ChosenMapIndex}");
 		// NOTE we want to autosave the map index
@@ -371,7 +372,8 @@ public class HUDManager : MonoBehaviour
 
 	public void ShowEndScreen()
 	{
-		if (LevelEditorData.IsTestingLevel == false && LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1])
+		if ((LevelEditorData.IsTestingLevel == false && LevelSelectData.MapData == LevelSelectData.ThemeData.Maps[LevelSelectData.ThemeData.Maps.Length - 1]) ||
+			LevelSelectData.IsCustomMap)
 			m_nextLevelButton.gameObject.SetActive(false);
 		m_endScreenParent.SetActive(true);
 	}
