@@ -251,6 +251,7 @@ public static class SaveSystem
 		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
 	}
 
+	// [Q] Can this be in any way optimised?? Pretty long method... And parts do feel hacky
 	private static void CheckExistingStatFileGameModes()
 	{
 		ThemeData[] themeData = m_themesListGame.ThemesData;
@@ -475,6 +476,40 @@ public static class SaveSystem
 		dictWriter.Close();
 		File.SetAttributes(statFullFilepath, FileAttributes.ReadOnly);
 		//File.SetAttributes(statFullFilepath, FileAttributes.Hidden);
+	}
+	#endregion
+
+
+	#region Resets
+	public static void ResetStatFile(string mapFileName)
+	{
+
+	}
+
+	public static void ResetAllStatFilesGame(ThemesList gameThemesList)
+	{
+		ThemeData[] themeData = gameThemesList.ThemesData;
+		for (int i = 0; i < themeData.Length; ++i)
+		{
+			ThemeData currentTheme = themeData[i];
+			string themeDirectory = $"{m_gameMapsDirectory}/{currentTheme.ThemeName}";
+			MapData[] themeMaps = currentTheme.Maps;
+			for (int j = 0; j < themeMaps.Length; ++j)
+			{
+				string completeFilePath = $"{themeDirectory}/{Hash128.Compute(themeMaps[j].GridLayout.EncodeToPNG())}.{m_mapStatsExtension}";
+				CreateStatFile($"{completeFilePath}");
+			}
+		}
+	}
+
+	public static void ResetAllStatFilesCustom()
+	{
+
+	}
+
+	public static void ResetAllStatFilesImported()
+	{
+
 	}
 	#endregion
 

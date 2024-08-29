@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class OptionsMenuManager : MonoBehaviour
 {
+	[SerializeField] private ThemesList m_gameThemesList;
+
+	[Space]
 	[SerializeField] private TMP_Dropdown m_inputModeDropdown;
 	[SerializeField] private TutorialPopup m_tutorialPopup;
 
@@ -52,8 +55,8 @@ public class OptionsMenuManager : MonoBehaviour
 
 
 
-	public void ResetScores()
+	public void ResetScoresGame()
 	{
-		//SaveSystem.ResetAllStatFiles();
+		SaveSystem.ResetAllStatFilesGame(m_gameThemesList);
 	}
 }
