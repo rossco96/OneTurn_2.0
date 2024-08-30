@@ -368,6 +368,11 @@ public class LevelSelectMenuManager : MonoBehaviour
 
 
 
+	public void UpdateThemeButton(int indexDirection)
+	{
+		UpdateThemeIndex(indexDirection);
+	}
+
 	public void UpdateThemeIndex(int indexDirection, bool keepMapIndex = false)
 	{
 		m_themeIndex += indexDirection;
