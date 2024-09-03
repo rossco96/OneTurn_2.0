@@ -15,6 +15,10 @@ MonoBehaviour:
   ThemeName: Boosters
   Maps:
   - {fileID: 11400000, guid: ea2f803675af6c541b8086cc11b0b37b, type: 2}
+  - {fileID: 11400000, guid: b257aaa2600fd3545852f4528cbb0766, type: 2}
+  - {fileID: 11400000, guid: a8a4f9f3f1045814fa27e8d9c787d138, type: 2}
+  - {fileID: 11400000, guid: be6c0db1819cd834abf68530a3afa369, type: 2}
+  - {fileID: 11400000, guid: b873c17a5dde2964fb9be52c9d17db19, type: 2}
   LevelPlayInfo: {fileID: 11400000, guid: d2a905bf0b291d240b3e1c478a14aef1, type: 2}
   BackgroundSprite: {fileID: 0}
   PlayerSprite: {fileID: 21300000, guid: ca5b505bde973db4e9457a6f94ce8b2b, type: 3}
