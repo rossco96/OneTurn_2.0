@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cc0f88c8d6372f4dab1b96d0c151d34, type: 3}
+  m_Name: ThemeData_006s_Bridges
+  m_EditorClassIdentifier: 
+  ThemeName: Bridges
+  Maps:
+  - {fileID: 11400000, guid: 7ee9ed46866534e4aa9b3a26af9d7466, type: 2}
+  - {fileID: 11400000, guid: e445b133c79284143aaeed54b7f47a0d, type: 2}
+  - {fileID: 11400000, guid: d3b0f92593df9344bbb3ddcbae032432, type: 2}
+  - {fileID: 11400000, guid: deaed6cdc89284b4fba381e69e088d77, type: 2}
+  - {fileID: 11400000, guid: 101cad5951a490647819e8574e52ed81, type: 2}
+  LevelPlayInfo: {fileID: 11400000, guid: 645a67b8d9363e541b908e50a8a7cbdb, type: 2}
+  BackgroundSprite: {fileID: 0}
+  PlayerSprite: {fileID: 21300000, guid: ca5b505bde973db4e9457a6f94ce8b2b, type: 3}
+  WallSprite: {fileID: 21300000, guid: 83a7743f932ba78458073bdbec2d5ec0, type: 3}
+  ItemSprite: {fileID: 21300000, guid: c03ff6128bcb02a499f6d3e876906a3f, type: 3}
+  ExitSprite: {fileID: 21300000, guid: 0746efe3df13b744095a8cbf8609290d, type: 3}
+  PointsToUnlock: 0
+  IsNew: 0
+  IsComplete: 0
+  LevelSelectIcon: {fileID: 21300000, guid: c03ff6128bcb02a499f6d3e876906a3f, type: 3}
+  IsSpecialLevel: 1
+  SpecialSprite: {fileID: 21300000, guid: 8b45a4bddca66c940b161336744f411f, type: 3}
+  SpecialManager: {fileID: 8941403990068391057, guid: be9db67a7645139479d8b4676e9883a5, type: 3}
+  SpecialManagerPrefab: {fileID: 8941403990068391056, guid: be9db67a7645139479d8b4676e9883a5, type: 3}
