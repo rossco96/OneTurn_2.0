@@ -68,11 +68,19 @@ public abstract class GameplayManager : MonoBehaviour
 
 		if (LevelEditorData.IsTestingLevel == false)
 		{
-			InitInteractableBehaviour<Border>(OnPlayerInteractWall);
+			InitInteractableBehaviour<Border>(OnPlayerInteractWall);			// [TODO] Move this to outside the IF statement! Figure out where we're re-Initting it (presumably GameMan_Editor?)
 			InitInteractableBehaviour<Wall>(OnPlayerInteractWall);
 		}
 
-		//InitInteractableBehaviour<Special>(OnPlayerInteractSpecial);			// e.g. booster or turn pads
+		// [TODO] Refactor the below? And the above??
+		SpecialInteractable_Base[] specialInteractables = FindObjectsOfType<SpecialInteractable_Base>();
+		if (specialInteractables != null && specialInteractables.Length > 0)
+		{
+			for (int i = 0; i < specialInteractables.Length; ++i)
+			{
+				specialInteractables[i].OnPlayerCrash(SpecialEndGame, SpecialUpdateHUDLives);
+			}
+		}
 
 		InitHUD();
 
@@ -148,9 +156,7 @@ public abstract class GameplayManager : MonoBehaviour
 		controller.Stats.Lives--;
 		if (controller.Stats.Lives == 0)
 		{
-
-			Debug.Log($"[ccc] {LevelSelectData.IsMultiplayer}");
-
+			//Debug.Log($"[ccc] {LevelSelectData.IsMultiplayer}");
 			if (LevelSelectData.IsMultiplayer)
 				EndGameMultiplayer();														// [Q] Do we want to end the game if the other player dies? Or allow keep playing? TEST!
 			else
@@ -173,7 +179,23 @@ public abstract class GameplayManager : MonoBehaviour
 	}
 
 
+	// DUPLICATE OF ABOVE FOR EXTERNAL ACCESS, BUT MEANS WE CAN REFACTOR THE ABOVE (NO?)
+	public void SpecialUpdateHUDLives(bool isP1, int lives)
+	{
+		if (isP1)
+			m_hudManager.UpdateLivesCountP1(lives);
+		else //if (controller.Index == 1)
+			m_hudManager.UpdateLivesCountP2(lives);
+	}
 
+	public void SpecialEndGame(bool isMultiplayer, bool isWin)
+	{
+		if (isMultiplayer)
+			EndGameMultiplayer();
+		else
+			EndGame(isWin);
+	}
+	
 	// [TODO][Q] Can we delete OTController?
 	// Also can we please sort out whatever is going on with m_controllers indexing - this looks terrible
 	protected virtual void EndGame(bool isWin)

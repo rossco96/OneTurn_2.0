@@ -179,6 +179,11 @@ public class OTController : MonoBehaviour
 		return (1 / m_gridSizeMultiplier) * m_player.transform.position;
 	}
 
+	public Vector3 GetPlayerLocalPosition()
+	{
+		return m_player.transform.localPosition;
+	}
+
 	public Vector3 GetPlayerRotationEuler()
 	{
 		return m_player.transform.rotation.eulerAngles;
@@ -210,6 +215,7 @@ public class OTController : MonoBehaviour
 		m_playerPrefab = player;
 	}
 
+	//private void RespawnPlayer()
 	public void RespawnPlayer()
 	{
 		m_player = Instantiate(m_playerPrefab, transform);
@@ -240,6 +246,10 @@ public class OTController : MonoBehaviour
 		// [Q] Should we play sound via GameplayManager->AudioManager ??? Or through here
 		// [A] Through here - can have m_deathSound as var and pass to AudioManager to play the clip
 		// ... Or, if animating death, play through there? Would need separate function in here anyway
+
+		// [TODO] Replace somehow - feels hacky always calling this! ... This whole thing feels hacky regardless!
+		if (LevelSelectData.MapType == EMapType.Game && ((ThemeDataGameMaps)LevelSelectData.ThemeData).IsSpecialLevel)
+			Stats.IsOnSpecial = false;
 
 		// [TEMP HERE?]
 		Destroy(m_player);

@@ -52,7 +52,6 @@ public class LevelGenerator : MonoBehaviour
 	private ETurnDirection m_turnDirection;
 
 	private SpecialManager_Base m_specialManager = null;
-	private int m_specialIndex = 0;
 
 	private bool m_isMultiplayer = false;
 	private int m_multiplayerSpawnIndex = 1;
@@ -307,14 +306,14 @@ public class LevelGenerator : MonoBehaviour
 						break;
 
 					case EMapPropertyName.Special:
-						GameObject interactablePrefab = m_specialManager.GetInteractablePrefabAtIndex(m_specialIndex);
+						GameObject interactablePrefab = m_specialManager.GetInteractable(x, y);
 						ThemeDataGameMaps themeDataGameMap = m_themeData as ThemeDataGameMaps;
-						if (themeDataGameMap)
-							interactablePrefab.GetComponent<SpriteRenderer>().sprite = themeDataGameMap.SpecialSprite;
+						// [TODO] COMMENTED OUT FOR TESTING ONLY!
+						//if (themeDataGameMap)
+						//	interactablePrefab.GetComponentInChildren<SpriteRenderer>().sprite = themeDataGameMap.SpecialSprite;			// "InChildren" not ideal...
 						GameObject interactable = PlaceOnGrid(interactablePrefab, x, y, interactablePrefab.GetComponent<SpecialInteractable_Base>().FacingDirection);
 						interactable.GetComponent<SpecialInteractable_Base>().SetGridPos(x, y);
 						m_specialManager.AddToPlacedInteractables(interactable.GetComponent<SpecialInteractable_Base>());
-						m_specialIndex++;
 						break;
 
 					default:
@@ -358,7 +357,6 @@ public class LevelGenerator : MonoBehaviour
 		GameObject placedObject = Instantiate(objectToPlace, Vector2.zero, Quaternion.identity, m_gameSpaceParent);
 		Vector2 position = new Vector2(posX + 0.6f, posY + 0.6f);
 		placedObject.transform.localPosition = position;
-
 		int zRotation = 0;
 		switch (direction)
 		{

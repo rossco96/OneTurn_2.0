@@ -1,5 +1,5 @@
 using UnityEngine;
-//using UnityEngine.Events;
+using UnityEngine.Events;
 
 public abstract class SpecialInteractable_Base : MonoBehaviour
 {
@@ -14,6 +14,8 @@ public abstract class SpecialInteractable_Base : MonoBehaviour
 	public void SetGridPos(int x, int y) { m_gridPosX = x; m_gridPosY = y; }
 	protected int m_gridPosX = 0;
 	protected int m_gridPosY = 0;
+	public int GridPosX => m_gridPosX;
+	public int GridPosY => m_gridPosY;
 
 	public EFacingDirection FacingDirection = EFacingDirection.Up;
 
@@ -34,5 +36,18 @@ public abstract class SpecialInteractable_Base : MonoBehaviour
 		}
 	}
 
-	public abstract void PlayerEnter();
+	private void OnTriggerExit2D(Collider2D col)
+	{
+		if (col.CompareTag("Player")/* && m_canInteract*/)
+		{
+			PlayerExit();
+			//m_playerController = null;							// ... This may not always be possible (or certainly not always the best... How to avoid?) !!! !!! !!! TEMP COMMENTED OUT
+		}
+	}
+
+	protected abstract void PlayerEnter();
+	protected abstract void PlayerExit();
+
+
+	public abstract void OnPlayerCrash(UnityAction<bool, bool> endGameEvent, UnityAction<bool, int> updateHUDLives);
 }
