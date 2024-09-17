@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SpecialInteractableBooster : SpecialInteractable_Base
 {
@@ -15,11 +16,16 @@ public class SpecialInteractableBooster : SpecialInteractable_Base
 		SetDestination();
 	}
 
-	public override void PlayerEnter()
+	protected override void PlayerEnter()
 	{
 		//OnPlayerEnter();
 		m_playerController.SetInputDisabled(true);
 		m_isMovingPlayer = true;
+	}
+
+	protected override void PlayerExit()
+	{
+		m_playerController = null;
 	}
 
 	private void Update()												// [Q] Should put into FixedUpdate? And move the rigidbody2d rather than the transform?
@@ -67,4 +73,6 @@ public class SpecialInteractableBooster : SpecialInteractable_Base
 		m_destination = transform.localPosition + new Vector3(count * xDiff, count * yDiff, 0.0f);
 		//m_destinationOffset = new Vector3(count * xDiff, count * yDiff, 0.0f);
 	}
+
+	public override void OnPlayerCrash(UnityAction<bool, bool> endGameEvent, UnityAction<bool, int> updateHUDLives) { }
 }
