@@ -106,3 +106,13 @@ public enum ETravelSquareState
 	P1,
 	P2
 }
+
+public enum EBridgePiece
+{
+	Single,
+	End,
+	Mid,
+	Corner,
+	T,
+	Cross
+}
