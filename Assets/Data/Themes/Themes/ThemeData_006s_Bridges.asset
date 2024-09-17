@@ -30,6 +30,6 @@ MonoBehaviour:
   IsComplete: 0
   LevelSelectIcon: {fileID: 21300000, guid: c03ff6128bcb02a499f6d3e876906a3f, type: 3}
   IsSpecialLevel: 1
-  SpecialSprite: {fileID: 21300000, guid: 8b45a4bddca66c940b161336744f411f, type: 3}
-  SpecialManager: {fileID: 8941403990068391057, guid: be9db67a7645139479d8b4676e9883a5, type: 3}
-  SpecialManagerPrefab: {fileID: 8941403990068391056, guid: be9db67a7645139479d8b4676e9883a5, type: 3}
+  SpecialSprite: {fileID: 21300000, guid: 0c1b08d9289b6a247bb0012048c2a02e, type: 3}
+  SpecialManager: {fileID: -3927199310387067424, guid: 4a427926d05c39845ba2b1c196b8a73a, type: 3}
+  SpecialManagerPrefab: {fileID: 8941403990068391056, guid: 4a427926d05c39845ba2b1c196b8a73a, type: 3}
