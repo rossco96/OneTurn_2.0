@@ -4,6 +4,8 @@ public class SpecialManagerBooster : SpecialManager_Base
 {
 	[SerializeField] private float m_boosterSpeed;
 
+	private int m_placementCount = 0;
+
 	public override void Init()
 	{
 		base.Init();
@@ -11,5 +13,10 @@ public class SpecialManagerBooster : SpecialManager_Base
 		{
 			((SpecialInteractableBooster)m_placedInteractables[i]).Speed = m_boosterSpeed;
 		}
+	}
+
+	public override GameObject GetInteractable(int posX, int posY)
+	{
+		return m_interactablePrefabs[m_placementCount++];
 	}
 }
