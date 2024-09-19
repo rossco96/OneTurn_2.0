@@ -23,10 +23,7 @@ public class SpecialInteractableBooster : SpecialInteractable_Base
 		m_isMovingPlayer = true;
 	}
 
-	protected override void PlayerExit()
-	{
-		m_playerController = null;
-	}
+	protected override void PlayerExit() { }
 
 	private void Update()												// [Q] Should put into FixedUpdate? And move the rigidbody2d rather than the transform?
 	{
@@ -36,13 +33,12 @@ public class SpecialInteractableBooster : SpecialInteractable_Base
 
 	private void MovePlayer()
 	{
-		Debug.Log($"([{m_playerController.GetPlayerPosition()}] - [{m_destination}]) . GetMagnitude2D() = [{(m_playerController.GetPlayerPosition() - m_destination).GetMagnitude2D()}] ... < {k_distanceFromDestination} ???");
 		if ((m_playerController.GetPlayerPosition() - m_destination).GetMagnitude2D() < k_distanceFromDestination)
 		{
-			Debug.LogWarning("STOP");
 			m_isMovingPlayer = false;
 			m_playerController.SetInputDisabled(false);
 			m_playerController.SetPlayerPosition(m_destination);
+			m_playerController = null;
 			return;
 		}
 		m_playerController.ForceMovePlayer(Speed * Time.deltaTime * transform.up);
