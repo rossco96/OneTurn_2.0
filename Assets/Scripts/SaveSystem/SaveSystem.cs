@@ -525,7 +525,7 @@ public static class SaveSystem
 		{
 			if (allFiles[i].Contains($".{m_mapMetaExtension}"))
 			{
-				string fileName = FullPathToCustomFileName(allFiles[i]);
+				string fileName = LevelEditorTools.FullPathToCustomFilename(allFiles[i], m_customMapsDirectory);
 				fileNames = fileNames.Add(fileName);
 
 				string mapmetaFile = File.ReadAllText(allFiles[i]);
@@ -677,23 +677,5 @@ public static class SaveSystem
 	{
 		return new string[0];
 	}
-	#endregion
-
-
-	#region Tools
-	// [TODO] Feels hacky replacing "/" and "\\", but it's needed and it works?
-	private static string FullPathToCustomFileName(string fullFilepath)
-	{
-		string fileName = fullFilepath.Replace($"{m_customMapsDirectory}", "");
-		fileName = fileName.Replace("/", "");
-		fileName = fileName.Replace("\\", "");
-		int extensionIndex = fileName.LastIndexOf(".");
-		return fileName.Substring(0, extensionIndex);
-	}
-
-	//public string GetTextureHash(Texture2D texture)
-	//{
-	//	return $"{Hash128.Compute(texture.EncodeToPNG())}";
-	//}
 	#endregion
 }

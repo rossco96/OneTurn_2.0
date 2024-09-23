@@ -35,4 +35,19 @@ public static class LevelEditorTools
 		}
 		return (15 * gridDimension) - 105;
 	}
+
+	// [TODO] Feels hacky replacing "/" and "\\", but it's needed and it works?
+	public static string FullPathToCustomFilename(string fullFilepath, string customMapsDirectory)
+	{
+		string fileName = fullFilepath.Replace($"{customMapsDirectory}", "");
+		fileName = fileName.Replace("/", "");
+		fileName = fileName.Replace("\\", "");
+		int extensionIndex = fileName.LastIndexOf(".");
+		return fileName.Substring(0, extensionIndex);
+	}
+
+	//public string GetTextureHash(Texture2D texture)
+	//{
+	//	return $"{Hash128.Compute(texture.EncodeToPNG())}";
+	//}
 }
