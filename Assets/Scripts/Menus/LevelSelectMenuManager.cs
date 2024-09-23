@@ -439,7 +439,13 @@ public class LevelSelectMenuManager : MonoBehaviour
 		LevelSelectData.FileName = m_currentTheme.Maps[m_mapIndex].FileName;
 
 		if (LevelSelectData.MapType != EMapType.Game)
+		{
 			m_themeHeading.text = m_currentTheme.Maps[m_mapIndex].MapName;
+			m_playButton.interactable = SaveSystem.IsMapPlayable(LevelSelectData.FileName, EGameMode.Items) || SaveSystem.IsMapPlayable(LevelSelectData.FileName, EGameMode.Exit);
+			if (SaveSystem.IsMapPlayableMultiplayer(LevelSelectData.FileName) == false)
+				m_multiplayerToggle.isOn = false;
+			m_multiplayerToggle.interactable = SaveSystem.IsMapPlayableMultiplayer(LevelSelectData.FileName);
+		}
 
 		if (LevelSelectData.IsMultiplayer == false)
 			UpdateLevelStatsSinglePlayer();
@@ -556,6 +562,13 @@ public class LevelSelectMenuManager : MonoBehaviour
 		{
 			m_statExtraInfo.gameObject.SetActive(gameMode == EGameMode.Items || gameMode == EGameMode.Travel);
 			UpdateLevelStatsSinglePlayer();
+		}
+		if (LevelSelectData.MapType != EMapType.Game)
+		{
+			if (gameMode == EGameMode.Items || gameMode == EGameMode.Exit)
+				m_playButton.interactable = SaveSystem.IsMapPlayable(LevelSelectData.FileName, gameMode);
+			else
+				m_playButton.interactable = true;
 		}
 	}
 

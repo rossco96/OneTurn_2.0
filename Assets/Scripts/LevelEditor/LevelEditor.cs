@@ -608,6 +608,11 @@ public class LevelEditor : MonoBehaviour
 		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.UpdatedTime, $"{System.DateTime.Now.Ticks}");
 		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapmetaInfo.Theme, $"{m_themeDropdown.options[m_themeDropdown.value].text}");
 
+		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapPropertyName.Exit, m_placedExits, m_maxExits);
+		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapPropertyName.Item, m_placedItems, m_maxItems);
+		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapPropertyName.SpawnPointPrimary, m_placedSpawnPointsPrimary, m_maxSpawnPoints);
+		SaveSystem.UpdateExistingMapmetaFile(LevelEditorData.CustomMapFileName, EMapPropertyName.SpawnPointSecondary, m_placedSpawnPointsSecondary, m_maxSpawnPoints);
+
 		LevelEditorData.IsDirty = false;
 		// [TODO] "Saved" popup? Or brief text bubble which doesn't get in the way?
 	}

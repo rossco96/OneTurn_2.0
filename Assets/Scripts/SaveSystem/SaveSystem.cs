@@ -17,6 +17,7 @@ public static class SaveSystem
 	private static readonly string m_mapStatsExtension = "stat";
 
 	private static readonly string m_multiplayerGameModePrefix = "M_";                  // [TODO] Move as is also used elsewhere... Or make public // Make a file of consts, similar to enums file?
+	private static readonly string m_countMetaSuffix = "count";
 
 
 	private static ThemesList m_themesListGame;
@@ -131,7 +132,12 @@ public static class SaveSystem
 		m_customMapmetaInfo = new MapmetaData<string, string>();
 		m_customMapmetaInfo.Add($"{EMapmetaInfo.CreationTime}", $"{DateTime.Now.Ticks}");
 		m_customMapmetaInfo.Add($"{EMapmetaInfo.UpdatedTime}", $"{DateTime.Now.Ticks}");
-		m_customMapmetaInfo.Add($"{EMapmetaInfo.GridDimension}", "9");					// All new levels initialised as a 9x9 grid
+		m_customMapmetaInfo.Add($"{EMapmetaInfo.GridDimension}", "9");                  // All new levels initialised as a 9x9 grid
+
+		m_customMapmetaInfo.Add($"{EMapPropertyName.Exit}{m_countMetaSuffix}", "0/1");                 // [TODO] Save "_count" as const?
+		m_customMapmetaInfo.Add($"{EMapPropertyName.Item}{m_countMetaSuffix}", "0/8");
+		m_customMapmetaInfo.Add($"{EMapPropertyName.SpawnPointPrimary}{m_countMetaSuffix}", "0/1");
+		m_customMapmetaInfo.Add($"{EMapPropertyName.SpawnPointSecondary}{m_countMetaSuffix}", "0/1");
 
 		// [TODO] Delete this!
 		// Well, move it to the UPDATE section
@@ -166,6 +172,23 @@ public static class SaveSystem
 		string mapmetaFile = File.ReadAllText(fullFilepath);
 		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
 		mapmetaInfo[$"{infoType}"] = value;
+		mapmetaInfo[$"{EMapmetaInfo.UpdatedTime}"] = $"{DateTime.Now.Ticks}";
+		string dataJson = JsonUtility.ToJson(mapmetaInfo);
+
+		File.SetAttributes(fullFilepath, FileAttributes.Normal);
+		StreamWriter metaWriter = File.CreateText(fullFilepath);
+		metaWriter.Write(dataJson);
+		metaWriter.Close();
+		File.SetAttributes(fullFilepath, FileAttributes.ReadOnly);
+		//File.SetAttributes(fullFilepath, FileAttributes.Hidden);
+	}
+
+	public static void UpdateExistingMapmetaFile(string mapFileName, EMapPropertyName mapProperty, int value, int maxValue)
+	{
+		string fullFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
+		string mapmetaFile = File.ReadAllText(fullFilepath);
+		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
+		mapmetaInfo[$"{mapProperty}{m_countMetaSuffix}"] = $"{value}/{maxValue}";
 		mapmetaInfo[$"{EMapmetaInfo.UpdatedTime}"] = $"{DateTime.Now.Ticks}";
 		string dataJson = JsonUtility.ToJson(mapmetaInfo);
 
@@ -547,6 +570,39 @@ public static class SaveSystem
 		return orderedFileNames;
 	}
 
+	// [TODO] Use this instead of the one above? Allow user choosing in settings?
+	public static string[] GetCustomMapFileNamesByEditTime()
+	{
+		string[] allFiles = Directory.GetFiles(m_customMapsDirectory);
+		string[] fileNames = new string[0];
+		long[] fileCreationTimes = new long[0];
+
+		for (int i = 0; i < allFiles.Length; ++i)
+		{
+			if (allFiles[i].Contains($".{m_mapMetaExtension}"))
+			{
+				string fileName = LevelEditorTools.FullPathToCustomFilename(allFiles[i], m_customMapsDirectory);
+				fileNames = fileNames.Add(fileName);
+
+				string mapmetaFile = File.ReadAllText(allFiles[i]);
+				MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmetaFile);
+				long creationTime = long.Parse(mapmetaInfo[$"{EMapmetaInfo.UpdatedTime}"]);
+				fileCreationTimes = fileCreationTimes.Add(creationTime);
+			}
+		}
+
+		int[] creationTimesOrder = fileCreationTimes.RetrieveListOrder();
+		string[] orderedFileNames = new string[fileNames.Length];
+
+		for (int i = 0; i < fileNames.Length; ++i)
+		{
+			int orderIndex = creationTimesOrder[i];
+			orderedFileNames[i] = fileNames[orderIndex];
+		}
+
+		return orderedFileNames;
+	}
+
 
 	public static Texture2D GetCustomMapTexture(string mapFileName)
 	{
@@ -614,6 +670,45 @@ public static class SaveSystem
 		}
 
 		return infoString;
+	}
+
+	public static bool IsMapPlayable(string mapFileName, EGameMode gameMode)
+	{
+		string mapmetaFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
+		string mapmeta = File.ReadAllText(mapmetaFilepath);
+		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmeta);
+
+		string primarySpawns = mapmetaInfo[$"{EMapPropertyName.SpawnPointPrimary}{m_countMetaSuffix}"];
+		bool primarySpawnsCount = int.Parse(primarySpawns.Split('/')[0]) == int.Parse(primarySpawns.Split('/')[1]);
+
+		switch (gameMode)
+		{
+			case EGameMode.Items:
+				string items = mapmetaInfo[$"{EMapPropertyName.Item}{m_countMetaSuffix}"];
+				bool itemsCount = int.Parse(items.Split('/')[0]) == int.Parse(items.Split('/')[1]);
+				return primarySpawnsCount && itemsCount;
+			case EGameMode.Exit:
+				string exits = mapmetaInfo[$"{EMapPropertyName.Exit}{m_countMetaSuffix}"];
+				bool exitsCount = int.Parse(exits.Split('/')[0]) == int.Parse(exits.Split('/')[1]);
+				return primarySpawnsCount && exitsCount;
+			default:
+				// Doesn't matter what we return here? For now?
+				return false;
+		}
+	}
+
+	public static bool IsMapPlayableMultiplayer(string mapFileName)
+	{
+		string mapmetaFilepath = $"{m_customMapsDirectory}/{mapFileName}.{m_mapMetaExtension}";
+		string mapmeta = File.ReadAllText(mapmetaFilepath);
+		MapmetaData<string, string> mapmetaInfo = JsonUtility.FromJson<MapmetaData<string, string>>(mapmeta);
+		
+		string primarySpawns = mapmetaInfo[$"{EMapPropertyName.SpawnPointPrimary}{m_countMetaSuffix}"];
+		bool primarySpawnsCount = int.Parse(primarySpawns.Split('/')[0]) == int.Parse(primarySpawns.Split('/')[1]);
+		string secondarySpawns = mapmetaInfo[$"{EMapPropertyName.SpawnPointSecondary}{m_countMetaSuffix}"];
+		bool secondarySpawnsCount = int.Parse(secondarySpawns.Split('/')[0]) == int.Parse(secondarySpawns.Split('/')[1]);
+
+		return (primarySpawnsCount && secondarySpawnsCount);
 	}
 
 
