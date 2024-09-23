@@ -38,6 +38,7 @@ public class LevelEditor : MonoBehaviour
 
 	// [TODO] Move the below to their own TestModePopup script???
 	[Space]
+	[SerializeField] private Button m_testButton;
 	[SerializeField] private TMP_Dropdown m_gameModeDropdown;
 	[SerializeField] private TMP_Dropdown m_turnDirectionDropdown;
 	[SerializeField] private Toggle m_startAtSecondSpawnToggle;
@@ -66,6 +67,9 @@ public class LevelEditor : MonoBehaviour
 	private EFacingDirection m_spawnPrimaryDirectionLeft = EFacingDirection.Up;
 	private EFacingDirection m_spawnSecondaryDirectionRight = EFacingDirection.Up;
 	private EFacingDirection m_spawnSecondaryDirectionLeft = EFacingDirection.Up;
+
+	private bool m_allowTestPrimary = false;
+	private bool m_allowTestSecondary = false;
 
 
 	private void Awake()
@@ -137,6 +141,10 @@ public class LevelEditor : MonoBehaviour
 
 						case EMapPropertyName.SpawnPointPrimary:
 							m_placedSpawnPointsPrimary++;
+							m_allowTestPrimary = true;
+							m_testButton.interactable = true;
+							m_startAtSecondSpawnToggle.isOn = false;
+							m_startAtSecondSpawnToggle.interactable = m_allowTestSecondary;
 							if (LevelEditorData.IsTestingLevel)
 							{
 								m_spawnPrimaryDirectionRight = LevelSelectData.MapData.PlayerSpawnDirectionRight[0];
@@ -151,6 +159,10 @@ public class LevelEditor : MonoBehaviour
 
 						case EMapPropertyName.SpawnPointSecondary:
 							m_placedSpawnPointsSecondary++;
+							m_allowTestSecondary = true;
+							m_testButton.interactable = true;
+							m_startAtSecondSpawnToggle.isOn = (m_allowTestPrimary == false);
+							m_startAtSecondSpawnToggle.interactable = m_allowTestPrimary;
 							if (LevelEditorData.IsTestingLevel)
 							{
 								m_spawnSecondaryDirectionRight = LevelSelectData.MapData.PlayerSpawnDirectionRight[1];
@@ -426,12 +438,20 @@ public class LevelEditor : MonoBehaviour
 					return false;
 				m_placedSpawnPointsPrimary++;
 				m_extraInfoToolItemsUsed.text = $"Primary spawns placed: {m_placedSpawnPointsPrimary}/{m_maxSpawnPoints}";
+				m_allowTestPrimary = true;
+				m_testButton.interactable = true;
+				m_startAtSecondSpawnToggle.isOn = false;
+				m_startAtSecondSpawnToggle.interactable = m_allowTestSecondary;
 				break;
 			case EMapPropertyName.SpawnPointSecondary:
 				if (m_placedSpawnPointsSecondary >= m_maxSpawnPoints)
 					return false;
 				m_placedSpawnPointsSecondary++;
 				m_extraInfoToolItemsUsed.text = $"Secondary spawns placed: {m_placedSpawnPointsSecondary}/{m_maxSpawnPoints}";
+				m_allowTestSecondary = true;
+				m_testButton.interactable = true;
+				m_startAtSecondSpawnToggle.isOn = (m_allowTestPrimary == false);
+				m_startAtSecondSpawnToggle.interactable = m_allowTestPrimary;
 				break;
 			default:
 				break;
@@ -449,11 +469,35 @@ public class LevelEditor : MonoBehaviour
 				break;
 			case EMapPropertyName.SpawnPointPrimary:
 				if (m_currentTool != EMapPropertyName.SpawnPointPrimary)
+				{
 					m_placedSpawnPointsPrimary--;
+					m_allowTestPrimary = false;
+					if (m_allowTestSecondary)
+					{
+						m_startAtSecondSpawnToggle.isOn = true;
+						m_startAtSecondSpawnToggle.interactable = false;
+					}
+					else
+					{
+						m_testButton.interactable = false;
+					}
+				}
 				break;
 			case EMapPropertyName.SpawnPointSecondary:
 				if (m_currentTool != EMapPropertyName.SpawnPointSecondary)
+				{
 					m_placedSpawnPointsSecondary--;
+					m_allowTestSecondary = false;
+					if (m_allowTestPrimary)
+					{
+						m_startAtSecondSpawnToggle.isOn = false;
+						m_startAtSecondSpawnToggle.interactable = false;
+					}
+					else
+					{
+						m_testButton.interactable = false;
+					}
+				}
 				break;
 			default:
 				break;

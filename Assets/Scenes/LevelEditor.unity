@@ -1406,7 +1406,7 @@ GameObject:
   - component: {fileID: 45407852}
   - component: {fileID: 45407851}
   m_Layer: 5
-  m_Name: Test - DO NOT AUTOSAVE
+  m_Name: Test
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1471,7 +1471,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 45407852}
   m_OnClick:
     m_PersistentCalls:
@@ -9799,6 +9799,7 @@ MonoBehaviour:
   m_extraInfoRotationLeft_Label: {fileID: 281551845}
   m_extraInfoRotationRight_Dropdown: {fileID: 1593979465}
   m_extraInfoRotationLeft_Dropdown: {fileID: 75232462}
+  m_testButton: {fileID: 45407851}
   m_gameModeDropdown: {fileID: 604428765}
   m_turnDirectionDropdown: {fileID: 1278473274}
   m_startAtSecondSpawnToggle: {fileID: 1758323236}
