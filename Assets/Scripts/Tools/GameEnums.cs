@@ -47,7 +47,7 @@ public enum EMovement
 }
 
 [System.Serializable]
-public enum EMapPropertyName
+public enum EMapPropertyName		// [TODO] Rename to "EMapProperty", or "EMapSquareProperty" ?
 {
 	BlankSquare,
 	Wall,
@@ -71,7 +71,7 @@ public enum EStatsSection
 public enum EMapmetaInfo
 {
 	CreationTime,
-	UpdatedTime,
+	UpdatedTime,				// [TODO] Rename to "EditTime" ?
 	AuthorName,
 	MapName,
 	Description,				// This is optional!
