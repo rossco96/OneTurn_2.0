@@ -24,10 +24,11 @@ MonoBehaviour:
     Text: If you've selected right hand turns, you can only turn to the right and
       not the left... So think ahead and make sure you don't get stuck!
   - Image: {fileID: 0}
-    Text: Default controls are to tap anywhere on screen to move forward, and swipe
-      anywhere and in any direction to turn in that direction.
+    Text: Default controls are simply to swipe in the direction you wish to move,
+      as long as you remember which way you're allowed to turn.
   - Image: {fileID: 0}
-    Text: Other controls, to be changed in the options menu, are either using buttons
-      on the screen or swiping in the direction you wish to move.
+    Text: 'Other controls, to be changed in the options menu, are either: using buttons
+      on the screen; or tapping anywhere on the screen to move forward and swiping
+      any direction to turn your chosen direction.'
   - Image: {fileID: 0}
     Text: Anyway enough from me - get out of here and rack up those points!

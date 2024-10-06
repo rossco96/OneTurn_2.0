@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: SettingsData_InputType
   m_EditorClassIdentifier: 
   Key: input_type
-  DefaultValue: TapSwipe
+  DefaultValue: SwipeDirectional
